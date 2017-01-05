@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 1%{?dist}
+Release: 3%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -402,6 +402,12 @@ Patch243: 00243-fix-mips64-triplet.patch
 # Not yet fixed upstream: http://bugs.python.org/issue28787
 Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 
+# 00250 #
+# After  glibc-2.24.90, Python 3 failed to start on EL7 kernel
+# rhbz#1410175: https://bugzilla.redhat.com/show_bug.cgi?id=1410175
+# http://bugs.python.org/issue29157
+Patch250: 00250-getentropy.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -639,6 +645,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch206 -p1
 %patch243 -p1
 %patch249 -p1
+%patch250 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1557,6 +1564,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Thu Jan 05 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.0-2
+- Don't blow up on EL7 kernel (random generator) (rhbz#1410175)
+
 * Tue Dec 27 2016 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-1
 - Update to Python 3.6.0 final
 
