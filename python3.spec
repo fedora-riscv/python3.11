@@ -1564,7 +1564,7 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
-* Thu Jan 05 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.0-2
+* Thu Jan 05 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.0-3
 - Don't blow up on EL7 kernel (random generator) (rhbz#1410175)
 
 * Tue Dec 27 2016 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-1
