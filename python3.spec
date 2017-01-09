@@ -411,7 +411,7 @@ Patch250: 00250-getentropy.patch
 # 00253 #
 # Define HAVE_LONG_LONG as 1 instead of blank for backwards compatibility
 # Fixed upstream: https://hg.python.org/cpython/rev/fad67c66885f
-Patch253: fix-HAVE_LONG_LONG-compatibility.patch
+Patch253: 00253-fix-HAVE_LONG_LONG-compatibility.patch
 
 # (New patches go here ^^^)
 #
