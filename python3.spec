@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -408,6 +408,11 @@ Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 # http://bugs.python.org/issue29157
 Patch250: 00250-getentropy.patch
 
+# 00253 #
+# Define HAVE_LONG_LONG as 1 instead of blank for backwards compatibility
+# Fixed upstream: https://hg.python.org/cpython/rev/fad67c66885f
+Patch253: fix-HAVE_LONG_LONG-compatibility.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -646,6 +651,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch243 -p1
 %patch249 -p1
 %patch250 -p1
+%patch253 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1564,6 +1570,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Mon Jan 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-4
+- Define HAVE_LONG_LONG as 1 for backwards compatibility
+
 * Thu Jan 05 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.0-3
 - Don't blow up on EL7 kernel (random generator) (rhbz#1410175)
 
