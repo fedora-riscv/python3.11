@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -493,6 +493,8 @@ Group:          Development/Libraries
 %define __requires_exclude ^(/usr/bin/python3.*|python\\(abi\\) = 3\\..*)$
 
 Requires: expat >= 2.1.0
+# Python 3 built with glibc >= 2.24.90-26 needs to require it (rhbz#1410644).
+Requires: glibc >= 2.24.90-26
 
 %description -n system-python-libs
 This package contains files used to embed System Python into applications.
@@ -1570,6 +1572,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Tue Jan 10 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-5
+- Require glibc >= 2.24.90-26 for system-python-libs (rhbz#1410644)
+
 * Mon Jan 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-4
 - Define HAVE_LONG_LONG as 1 for backwards compatibility
 
