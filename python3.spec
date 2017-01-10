@@ -375,9 +375,7 @@ Patch188: 00188-fix-lib2to3-tests-when-hashlib-doesnt-compile-properly.patch
 # Add the rewheel module, allowing to recreate wheels from already installed
 # ones
 # https://github.com/bkabrda/rewheel
-%if 0%{with_rewheel}
 Patch189: 00189-add-rewheel-module.patch
-%endif
 
 # 00205 #
 # LIBPL variable in makefile takes LIBPL from configure.ac
