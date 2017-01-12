@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1570,6 +1570,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Thu Jan 12 2017 Igor Gnatenko <ignatenko@redhat.com> - 3.6.0-6
+- Rebuild for readline 7.x
+
 * Tue Jan 10 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-5
 - Require glibc >= 2.24.90-26 for system-python-libs (rhbz#1410644)
 
