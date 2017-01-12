@@ -492,7 +492,7 @@ Group:          Development/Libraries
 
 Requires: expat >= 2.1.0
 # Python 3 built with glibc >= 2.24.90-26 needs to require it (rhbz#1410644).
-Requires: glibc >= 2.24.90-26
+Requires: glibc%{?_isa} >= 2.24.90-26
 
 %description -n system-python-libs
 This package contains files used to embed System Python into applications.
