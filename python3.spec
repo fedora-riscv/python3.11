@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -411,6 +411,12 @@ Patch250: 00250-getentropy.patch
 # Fixed upstream: https://hg.python.org/cpython/rev/fad67c66885f
 Patch253: 00253-fix-HAVE_LONG_LONG-compatibility.patch
 
+# 00254 #
+# Fix error check, so that Random.seed actually uses OS randomness
+# rhbz#1412275: https://bugzilla.redhat.com/show_bug.cgi?id=1412275
+# Fixed upstream: https://bugs.python.org/issue29085
+Patch254: 00254-make-Random.seed-actually-use-OS-randomness.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -652,6 +658,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch249 -p1
 %patch250 -p1
 %patch253 -p1
+%patch254 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1570,6 +1577,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Mon Jan 16 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-7
+- Fix error check, so that Random.seed actually uses OS randomness (rhbz#1412275)
+
 * Thu Jan 12 2017 Igor Gnatenko <ignatenko@redhat.com> - 3.6.0-6
 - Rebuild for readline 7.x
 
