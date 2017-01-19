@@ -417,6 +417,12 @@ Patch253: 00253-fix-HAVE_LONG_LONG-compatibility.patch
 # Fixed upstream: https://bugs.python.org/issue29085
 Patch254: 00254-make-Random.seed-actually-use-OS-randomness.patch
 
+# 00258 #
+# Kernel 4.9 introduced some changes to its crypto API
+# making test_aead_aes_gcm fail, so skipping the test for now
+# Reported upstream: http://bugs.python.org/issue29324
+Patch258: 00258-fix-test_aead_aes_gcm.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -659,6 +665,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch250 -p1
 %patch253 -p1
 %patch254 -p1
+%patch258 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1579,6 +1586,7 @@ rm -fr %{buildroot}
 %changelog
 * Mon Jan 16 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-7
 - Fix error check, so that Random.seed actually uses OS randomness (rhbz#1412275)
+- Skip test_aead_aes_gcm during rpmbuild
 
 * Thu Jan 12 2017 Igor Gnatenko <ignatenko@redhat.com> - 3.6.0-6
 - Rebuild for readline 7.x
