@@ -124,15 +124,10 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 8%{?dist}
+Release: 7%{?dist}
 License: Python
 Group: Development/Languages
 
-# Get just the release number out of the Release tag (omit the dist tag)
-# This is used for python3-libs subpackage to be able to Require
-# system-python-libs subpackage without using the dist tag, as it clashes
-# with Modularity use cases.
-%global relnum %(echo %{release} | sed 's/%{?dist}$//')
 
 # =======================
 # Build-time requirements
@@ -477,7 +472,7 @@ considerably, and a lot of deprecated features have finally been removed.
 %package libs
 Summary:        Python 3 runtime libraries
 Group:          Development/Libraries
-Requires:       system-python-libs%{?_isa} = %{version}-%{relnum}
+Requires:       system-python-libs%{?_isa} = %{version}-%{release}
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # this symbol (in pyexpat), so we must explicitly state this dependency to
@@ -1589,10 +1584,6 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
-* Wed Jan 25 2017 Tomas Orsava <torsava@redhat.com> - 3.6.0-8
-- Modify the runtime dependency of python3-libs on system-python-libs to use
-  just the version and release number, but not the dist tag due to Modularity
-
 * Mon Jan 16 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-7
 - Fix error check, so that Random.seed actually uses OS randomness (rhbz#1412275)
 - Skip test_aead_aes_gcm during rpmbuild
