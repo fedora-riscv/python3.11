@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -472,7 +472,12 @@ considerably, and a lot of deprecated features have finally been removed.
 %package libs
 Summary:        Python 3 runtime libraries
 Group:          Development/Libraries
+# For Modularity purpose we need not to include the dist-tag int he dependency
+%if %(d="%{?dist}"; [ "${d#module-base-runtime-}x" != "${d}x" ] && echo 1 || echo 0)
+Requires:       system-python-libs%{?_isa} = %{version}
+%else
 Requires:       system-python-libs%{?_isa} = %{version}-%{release}
+%endif
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # this symbol (in pyexpat), so we must explicitly state this dependency to
@@ -1584,6 +1589,14 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Thu Jan 26 2017 Tomas Orsava <torsava@redhat.com> - 3.6.0-9
+- Modify the runtime dependency of python3-libs on system-python-libs again,
+  because previous attempt didn't work properly with dnf resolving mechanism
+
+* Wed Jan 25 2017 Tomas Orsava <torsava@redhat.com> - 3.6.0-8
+- Modify the runtime dependency of python3-libs on system-python-libs to use
+  just the version and release number, but not the dist tag due to Modularity
+
 * Mon Jan 16 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-7
 - Fix error check, so that Random.seed actually uses OS randomness (rhbz#1412275)
 - Skip test_aead_aes_gcm during rpmbuild
