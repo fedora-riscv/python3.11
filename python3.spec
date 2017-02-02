@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1155,7 +1155,8 @@ rm -fr %{buildroot}
 
 %files
 %defattr(-, root, root)
-%doc LICENSE README
+%license LICENSE
+%doc README
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %{_bindir}/python%{pybasever}
@@ -1166,7 +1167,8 @@ rm -fr %{buildroot}
 
 %files libs
 %defattr(-,root,root,-)
-%doc LICENSE README
+%license LICENSE
+%doc README
 
 %{pylibdir}/lib2to3
 %exclude %{pylibdir}/lib2to3/tests
@@ -1230,12 +1232,14 @@ rm -fr %{buildroot}
 
 %files -n system-python
 %defattr(-,root,root,-)
-%doc LICENSE README
+%license LICENSE
+%doc README
 %{_libexecdir}/system-python
 
 %files -n system-python-libs
 %defattr(-,root,root,-)
-%doc LICENSE README
+%license LICENSE
+%doc README
 %dir %{pylibdir}
 %dir %{dynload_dir}
 
@@ -1589,6 +1593,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Wed Feb 01 2017 Stephen Gallagher <sgallagh@redhat.com> - 3.6.0-10
+- Add missing %%license macro
+
 * Thu Jan 26 2017 Tomas Orsava <torsava@redhat.com> - 3.6.0-9
 - Modify the runtime dependency of python3-libs on system-python-libs again,
   because previous attempt didn't work properly with dnf resolving mechanism
