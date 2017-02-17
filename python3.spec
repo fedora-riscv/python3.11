@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -183,6 +183,10 @@ BuildRequires: zlib-devel
 
 %if 0%{?with_rewheel}
 BuildRequires: python3-setuptools
+BuildRequires: python3-six
+BuildRequires: python3-pyparsing
+BuildRequires: python3-appdirs
+BuildRequires: python3-packaging
 BuildRequires: python3-pip
 %endif
 
@@ -422,6 +426,15 @@ Patch254: 00254-make-Random.seed-actually-use-OS-randomness.patch
 # making test_aead_aes_gcm fail, so skipping the test for now
 # Reported upstream: http://bugs.python.org/issue29324
 Patch258: 00258-fix-test_aead_aes_gcm.patch
+
+# 00260 #
+# setuptools from version 34.0.0 and onwards, unbundled its dependencies
+# and started requiring them so when rewheel mode is enabled we will have
+# to BuildRequire the new dependencies, in order for the virtualenv's to work properly
+# setuptools change: https://setuptools.readthedocs.io/en/latest/history.html#v34-0-0
+# Reported upstream: http://bugs.python.org/issue29523
+# https://github.com/python/cpython/pull/67
+Patch260: 00260-require-setuptools-dependencies.patch
 
 # (New patches go here ^^^)
 #
@@ -671,6 +684,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch253 -p1
 %patch254 -p1
 %patch258 -p1
+%patch260 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1593,6 +1607,10 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Wed Feb 15 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-12
+- BuildRequire the new dependencies of setuptools when rewheel mode is enabled
+in order for the virtualenvs to work properly
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
