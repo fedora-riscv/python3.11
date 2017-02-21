@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -410,6 +410,11 @@ Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 # http://bugs.python.org/issue29157
 Patch250: 00250-getentropy.patch
 
+# 00252
+# Add executable option to install.py command to make it work for
+# scripts specified as an entry_points
+Patch252: 00252-add-executable-option.patch
+
 # 00253 #
 # Define HAVE_LONG_LONG as 1 instead of blank for backwards compatibility
 # Fixed upstream: https://hg.python.org/cpython/rev/fad67c66885f
@@ -681,6 +686,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch243 -p1
 %patch249 -p1
 %patch250 -p1
+%patch252 -p1
 %patch253 -p1
 %patch254 -p1
 %patch258 -p1
@@ -1607,6 +1613,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Fri Feb 17 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.0-13
+- Add --executable option to install.py command
+
 * Wed Feb 15 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-12
 - BuildRequire the new dependencies of setuptools when rewheel mode is enabled
 in order for the virtualenvs to work properly
