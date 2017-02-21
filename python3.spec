@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 13%{?dist}
+Release: 18%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -410,6 +410,11 @@ Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 # http://bugs.python.org/issue29157
 Patch250: 00250-getentropy.patch
 
+# 00251
+# Set values of prefix and exec_prefix to /usr/local if executable is
+# /usr/bin/python* to make pip and distutils install into separate location
+Patch251: 00251-set-python3-prefixes.patch
+
 # 00252
 # Add executable option to install.py command to make it work for
 # scripts specified as an entry_points
@@ -476,6 +481,12 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: python%{pyshortver}
 Provides: python%{pyshortver} = %{version}-%{release}
 
+%if 0%{?_module_build}
+Requires: system-python = %{version}
+%else
+Requires: system-python = %{version}-%{release}
+%endif
+
 %if 0%{with_rewheel}
 Requires: python3-setuptools
 Requires: python3-pip
@@ -491,7 +502,7 @@ considerably, and a lot of deprecated features have finally been removed.
 Summary:        Python 3 runtime libraries
 Group:          Development/Libraries
 # For Modularity purpose we need not to include the dist-tag int he dependency
-%if %(d="%{?dist}"; [ "${d#module-base-runtime-}x" != "${d}x" ] && echo 1 || echo 0)
+%if 0%{?_module_build}
 Requires:       system-python-libs%{?_isa} = %{version}
 %else
 Requires:       system-python-libs%{?_isa} = %{version}-%{release}
@@ -686,6 +697,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch243 -p1
 %patch249 -p1
 %patch250 -p1
+%patch251 -p1
 %patch252 -p1
 %patch253 -p1
 %patch254 -p1
@@ -1613,6 +1625,11 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Tue Feb 21 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.0-18
+- Set values of prefix and exec_prefix to /usr/local for
+  /usr/bin/python* executables
+- Use new %%_module_build macro
+
 * Fri Feb 17 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.0-13
 - Add --executable option to install.py command
 

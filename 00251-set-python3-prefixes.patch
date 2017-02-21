@@ -1,0 +1,36 @@
+diff --git a/Lib/site.py b/Lib/site.py
+index ad1033e..f2fb028 100644
+--- a/Lib/site.py
++++ b/Lib/site.py
+@@ -537,6 +537,23 @@ def execusercustomize():
+                 (err.__class__.__name__, err))
+
+
++def set_prefixes():
++    """Set values of prefix and exec_prefix to /usr/local if executable is
++    /usr/bin/python* to make pip and distutils install into separate location.
++
++    New value of sys.prefix is inserted to PREFIXES list that contains
++    it's previous value. Both paths /usr/lib/pythonX.Y/site-packages and
++    /usr/local/lib/pythonX.Y/site-packages will be included in sys.path.
++    """
++    global PREFIXES
++    global ENABLE_USER_SITE
++
++    if sys.executable.startswith("/usr/bin/python"):
++        sys.prefix = sys.exec_prefix = "/usr/local"
++        if ENABLE_USER_SITE:
++            PREFIXES.insert(0, sys.prefix)
++
++
+ def main():
+     """Add standard site-specific directories to the module search path.
+
+@@ -550,6 +567,7 @@ def main():
+     known_paths = venv(known_paths)
+     if ENABLE_USER_SITE is None:
+         ENABLE_USER_SITE = check_enableusersite()
++    set_prefixes()
+     known_paths = addusersitepackages(known_paths)
+     known_paths = addsitepackages(known_paths)
+     setquit()
