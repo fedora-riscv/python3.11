@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -162,6 +162,8 @@ BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: sqlite-devel
+BuildRequires: desktop-file-utils
+BuildRequires: libappstream-glib
 
 BuildRequires: systemtap-sdt-devel
 BuildRequires: systemtap-devel
@@ -222,6 +224,12 @@ Source8: check-pyc-and-pyo-timestamps.py
 
 # A simple macro that enables packages to require system-python(abi) instead of python(abi)
 Source9: macros.systempython
+
+# Desktop menu entry for idle3
+Source10: idle3.desktop
+
+# AppData file for idle3
+Source11: idle3.appdata.xml
 
 # Fixup distutils/unixccompiler.py to remove standard library path from rpath:
 # Was Patch0 in ivazquez' python3000 specfile:
@@ -870,6 +878,17 @@ install -d -m 0755 ${RPM_BUILD_ROOT}%{pylibdir}/site-packages/__pycache__
 
 mv ${RPM_BUILD_ROOT}%{_bindir}/2to3 ${RPM_BUILD_ROOT}%{_bindir}/python3-2to3
 
+# add idle3 to menu
+install -D -m 0644 Lib/idlelib/Icons/idle_16.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
+install -D -m 0644 Lib/idlelib/Icons/idle_32.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
+install -D -m 0644 Lib/idlelib/Icons/idle_48.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps/idle3.png
+desktop-file-install --dir=${RPM_BUILD_ROOT}%{_datadir}/applications %{SOURCE10}
+
+# Install and validate appdata file
+mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/appdata
+cp -a %{SOURCE11} ${RPM_BUILD_ROOT}%{_datadir}/appdata
+appstream-util validate-relax --nonet ${RPM_BUILD_ROOT}%{_datadir}/appdata/idle3.appdata.xml
+
 # Development tools
 install -m755 -d ${RPM_BUILD_ROOT}%{pylibdir}/Tools
 install Tools/README ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
@@ -1171,7 +1190,17 @@ rm -fr %{buildroot}
 
 %postun -n system-python-libs -p /sbin/ldconfig
 
+%post
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 
+%postun
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+fi
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files
 %defattr(-, root, root)
@@ -1448,6 +1477,9 @@ rm -fr %{buildroot}
 %{_bindir}/idle*
 %{pylibdir}/Tools
 %doc %{pylibdir}/Doc
+%{_datadir}/appdata/idle3.appdata.xml
+%{_datadir}/applications/idle3.desktop
+%{_datadir}/icons/hicolor/*/apps/idle3.*
 
 %files tkinter
 %defattr(-,root,root,755)
@@ -1613,6 +1645,9 @@ rm -fr %{buildroot}
 # ======================================================
 
 %changelog
+* Mon Feb 27 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-20
+- Add desktop entry and appdata.xml file for IDLE 3 (rhbz#1392049)
+
 * Fri Feb 24 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.0-19
 - Revert "Set values of prefix and exec_prefix to /usr/local for
   /usr/bin/python* executables..." to prevent build failures
