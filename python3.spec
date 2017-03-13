@@ -124,7 +124,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.0
-Release: 20%{?dist}
+Release: 21%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -449,6 +449,18 @@ Patch258: 00258-fix-test_aead_aes_gcm.patch
 # https://github.com/python/cpython/pull/67
 Patch260: 00260-require-setuptools-dependencies.patch
 
+# 00261 #
+# Use proper command line parsing in _testembed
+# Fixed upstream: http://bugs.python.org/issue24932
+Patch261: 00261-use-proper-command-line-parsing-in-_testembed.patch
+
+# 00262 #
+# Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
+# https://www.python.org/dev/peps/pep-0538/
+# Fedora Change: https://fedoraproject.org/wiki/Changes/python3_c.utf-8_locale
+# Original proposal: https://bugzilla.redhat.com/show_bug.cgi?id=1404918
+Patch262: 00262-pep538_coerce_legacy_c_locale.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -699,6 +711,8 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch254 -p1
 %patch258 -p1
 %patch260 -p1
+%patch261 -p1
+%patch262 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1645,6 +1659,11 @@ fi
 # ======================================================
 
 %changelog
+* Fri Mar 10 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-21
+- Use proper command line parsing in _testembed
+- Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
+  https://fedoraproject.org/wiki/Changes/python3_c.utf-8_locale
+
 * Mon Feb 27 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-20
 - Add desktop entry and appdata.xml file for IDLE 3 (rhbz#1392049)
 
