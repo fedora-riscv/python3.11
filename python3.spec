@@ -24,6 +24,8 @@
 # Currently these packages are recommended to have been built before a targeted rebuild after a python abi change:
 # python-sphinx, pytest, python-requests, cloud-init, dnf, anaconda, abrt.
 
+# First release cadidate
+%global prerel rc1
 
 %global with_rewheel 1
 
@@ -123,8 +125,8 @@
 # ==================
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
-Version: %{pybasever}.0
-Release: 21%{?dist}
+Version: %{pybasever}.1
+Release: 0.1.%{?prerel}%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -197,7 +199,7 @@ BuildRequires: python3-pip
 # Source code and patches
 # =======================
 
-Source: https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
+Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{?prerel}.tar.xz
 
 # Supply an RPM macro "py_byte_compile" for the python3-devel subpackage
 # to enable specfiles to selectively byte-compile individual files and paths
@@ -412,27 +414,10 @@ Patch243: 00243-fix-mips64-triplet.patch
 # Not yet fixed upstream: http://bugs.python.org/issue28787
 Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 
-# 00250 #
-# After  glibc-2.24.90, Python 3 failed to start on EL7 kernel
-# rhbz#1410175: https://bugzilla.redhat.com/show_bug.cgi?id=1410175
-# http://bugs.python.org/issue29157
-Patch250: 00250-getentropy.patch
-
 # 00252
 # Add executable option to install.py command to make it work for
 # scripts specified as an entry_points
 Patch252: 00252-add-executable-option.patch
-
-# 00253 #
-# Define HAVE_LONG_LONG as 1 instead of blank for backwards compatibility
-# Fixed upstream: https://hg.python.org/cpython/rev/fad67c66885f
-Patch253: 00253-fix-HAVE_LONG_LONG-compatibility.patch
-
-# 00254 #
-# Fix error check, so that Random.seed actually uses OS randomness
-# rhbz#1412275: https://bugzilla.redhat.com/show_bug.cgi?id=1412275
-# Fixed upstream: https://bugs.python.org/issue29085
-Patch254: 00254-make-Random.seed-actually-use-OS-randomness.patch
 
 # 00258 #
 # Kernel 4.9 introduced some changes to its crypto API
@@ -469,6 +454,13 @@ Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 # More information, and a patch number catalog, is at:
 #
 #     https://fedoraproject.org/wiki/SIGs/Python/PythonPatches
+
+# 00264 #
+# test_pass_by_value was added in Python 3.6.1 and on aarch64
+# it is catching an error that was there, but wasn't tested before.
+# Therefore skipping the test on aarch64 until fixed upstream.
+# Reported upstream: http://bugs.python.org/issue29804
+Patch264: 00264-skip-test-failing-on-aarch64.patch
 
 
 # add correct arch for ppc64/ppc64le
@@ -705,14 +697,15 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch206 -p1
 %patch243 -p1
 %patch249 -p1
-%patch250 -p1
 %patch252 -p1
-%patch253 -p1
-%patch254 -p1
 %patch258 -p1
 %patch260 -p1
 %patch261 -p1
 %patch262 -p1
+
+%ifarch aarch64
+%patch264 -p1
+%endif
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1219,7 +1212,7 @@ fi
 %files
 %defattr(-, root, root)
 %license LICENSE
-%doc README
+%doc README.rst
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %{_bindir}/python%{pybasever}
@@ -1231,7 +1224,7 @@ fi
 %files libs
 %defattr(-,root,root,-)
 %license LICENSE
-%doc README
+%doc README.rst
 
 %{pylibdir}/lib2to3
 %exclude %{pylibdir}/lib2to3/tests
@@ -1296,13 +1289,13 @@ fi
 %files -n system-python
 %defattr(-,root,root,-)
 %license LICENSE
-%doc README
+%doc README.rst
 %{_libexecdir}/system-python
 
 %files -n system-python-libs
 %defattr(-,root,root,-)
 %license LICENSE
-%doc README
+%doc README.rst
 %dir %{pylibdir}
 %dir %{dynload_dir}
 
@@ -1375,7 +1368,6 @@ fi
 
 %dir %{pylibdir}/site-packages/
 %dir %{pylibdir}/site-packages/__pycache__/
-%{pylibdir}/site-packages/README
 %{pylibdir}/site-packages/README.txt
 %{pylibdir}/*.py
 %dir %{pylibdir}/__pycache__/
@@ -1659,6 +1651,10 @@ fi
 # ======================================================
 
 %changelog
+* Thu Mar 16 2017 Iryna Shcherbina <ishcherb@redaht.com> - 3.6.1-0.1.rc1
+- Update to Python 3.6.1 release candidate 1
+- Add patch 264 to skip a known test failure on aarch64
+
 * Fri Mar 10 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.0-21
 - Use proper command line parsing in _testembed
 - Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
