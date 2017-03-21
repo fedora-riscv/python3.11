@@ -126,7 +126,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 0.1.%{?prerel}%{?dist}
+Release: 0.2.%{?prerel}%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1651,6 +1651,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Mar 21 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-0.2.rc1
+- Fix syntax error in %%py_byte_compile macro (rhbz#1433569)
+
 * Thu Mar 16 2017 Iryna Shcherbina <ishcherb@redaht.com> - 3.6.1-0.1.rc1
 - Update to Python 3.6.1 release candidate 1
 - Add patch 264 to skip a known test failure on aarch64
