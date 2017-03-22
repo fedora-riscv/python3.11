@@ -24,9 +24,6 @@
 # Currently these packages are recommended to have been built before a targeted rebuild after a python abi change:
 # python-sphinx, pytest, python-requests, cloud-init, dnf, anaconda, abrt.
 
-# First release cadidate
-%global prerel rc1
-
 %global with_rewheel 1
 
 %global pybasever 3.6
@@ -126,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 0.2.%{?prerel}%{?dist}
+Release: 1%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -199,7 +196,7 @@ BuildRequires: python3-pip
 # Source code and patches
 # =======================
 
-Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{?prerel}.tar.xz
+Source: https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 
 # Supply an RPM macro "py_byte_compile" for the python3-devel subpackage
 # to enable specfiles to selectively byte-compile individual files and paths
@@ -1651,6 +1648,9 @@ fi
 # ======================================================
 
 %changelog
+* Wed Mar 22 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.1-1
+- Update to version 3.6.1 final
+
 * Tue Mar 21 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-0.2.rc1
 - Fix syntax error in %%py_byte_compile macro (rhbz#1433569)
 
