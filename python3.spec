@@ -123,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1441,8 +1441,8 @@ fi
 # "Makefile" and the config-32/64.h file are needed by
 # distutils/sysconfig.py:_init_posix(), so we include them in the core
 # package, along with their parent directories (bug 531901):
-%dir %{pylibdir}/config-%{LDVERSION_optimized}/
-%{pylibdir}/config-%{LDVERSION_optimized}/Makefile
+%dir %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/
+%{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/Makefile
 %dir %{_includedir}/python%{LDVERSION_optimized}/
 %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 
@@ -1457,8 +1457,8 @@ fi
 
 %files devel
 %defattr(-,root,root)
-%{pylibdir}/config-%{LDVERSION_optimized}/*
-%exclude %{pylibdir}/config-%{LDVERSION_optimized}/Makefile
+%{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/*
+%exclude %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/Makefile
 %{_includedir}/python%{LDVERSION_optimized}/*.h
 %exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
@@ -1607,7 +1607,7 @@ fi
 %endif
 
 # Analog of the -devel subpackage's files:
-%{pylibdir}/config-%{LDVERSION_debug}
+%{pylibdir}/config-%{LDVERSION_debug}-%{_arch}-linux%{_gnu}
 %{_includedir}/python%{LDVERSION_debug}
 %{_bindir}/python%{LDVERSION_debug}-config
 %{_libdir}/libpython%{LDVERSION_debug}.so
@@ -1648,6 +1648,9 @@ fi
 # ======================================================
 
 %changelog
+* Wed Apr 05 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-2
+- Install the Makefile in its proper location (rhbz#1438219)
+
 * Wed Mar 22 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.1-1
 - Update to version 3.6.1 final
 
