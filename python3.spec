@@ -123,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1099,13 +1099,21 @@ sed \
 
 %endif # with_systemtap
 
-# Rename the script that differs on different arches to arch specific name
+# Rename the -devel script that differs on different arches to arch specific name
 mv %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-{,`uname -m`-}config
 echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_optimized}-`uname -m`-config "$@"' > \
   %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
 echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_optimized}-`uname -m`-config. Look around to see available arches." >&2' >> \
   %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
   chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
+
+# Rename the -debug script that differs on different arches to arch specific name
+mv %{buildroot}%{_bindir}/python%{LDVERSION_debug}-{,`uname -m`-}config
+echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_debug}-`uname -m`-config "$@"' > \
+  %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
+echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_debug}-`uname -m`-config. Look around to see available arches." >&2' >> \
+  %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
+  chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
 
 # System Python: Copy the executable to libexec
 mkdir -p %{buildroot}%{_libexecdir}
@@ -1610,6 +1618,7 @@ fi
 %{pylibdir}/config-%{LDVERSION_debug}-%{_arch}-linux%{_gnu}
 %{_includedir}/python%{LDVERSION_debug}
 %{_bindir}/python%{LDVERSION_debug}-config
+%{_bindir}/python%{LDVERSION_debug}-*-config
 %{_libdir}/libpython%{LDVERSION_debug}.so
 %{_libdir}/libpython%{LDVERSION_debug}.so.1.0
 %{_libdir}/pkgconfig/python-%{LDVERSION_debug}.pc
@@ -1648,6 +1657,10 @@ fi
 # ======================================================
 
 %changelog
+* Thu Apr 13 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-3
+- Rename python3.Xdm-config script from -debug to be arch specific
+Resolves: rhbz#1179073
+
 * Wed Apr 05 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-2
 - Install the Makefile in its proper location (rhbz#1438219)
 
