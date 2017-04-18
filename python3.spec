@@ -123,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1403,7 +1403,7 @@ fi
 %{pylibdir}/distutils/__pycache__/*%{bytecode_suffixes}
 %{pylibdir}/distutils/README
 %{pylibdir}/distutils/command
-
+%exclude %{pylibdir}/distutils/command/wininst-*.exe
 
 %dir %{pylibdir}/email/
 %dir %{pylibdir}/email/__pycache__/
@@ -1468,6 +1468,7 @@ fi
 %defattr(-,root,root)
 %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/*
 %exclude %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/Makefile
+%{pylibdir}/distutils/command/wininst-*.exe
 %{_includedir}/python%{LDVERSION_optimized}/*.h
 %exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
@@ -1658,6 +1659,10 @@ fi
 # ======================================================
 
 %changelog
+* Tue Apr 18 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-4
+- Enable link time optimizations
+- Move windows executables to the devel subpackage (rhbz#1426257)
+
 * Thu Apr 13 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-3
 - Rename python3.Xdm-config script from -debug to be arch specific
 Resolves: rhbz#1179073
