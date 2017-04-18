@@ -760,6 +760,7 @@ BuildPython() {
   --with-system-ffi \
   --enable-loadable-sqlite-extensions \
   --with-dtrace \
+  --with-lto \
 %if 0%{?with_systemtap}
   --with-systemtap \
 %endif
