@@ -8,9 +8,15 @@
 # and other packages, in order to rebase Python 3 one has to build in the
 # following order:
 #
-# 1. gdb without python support (add %%global _without_python 1 on top of gdb's SPEC file)
+# 1. At the same time:
+#     - gdb without python support (add %%global _without_python 1 on top of gdb's SPEC file)
+#     - python-rpm-generators with bootstrapping_python set to 1
+#       (this can be done also during step 2., but should be done before 3.)
 # 2. python3 with with_rewheel set to 0
-# 3. gdb with python support (remove %%global _without_python 1 on top of gdb's SPEC file)
+# 3. At the same time:
+#     - gdb with python support (remove %%global _without_python 1 on top of gdb's SPEC file)
+#     - python-rpm-generators with bootstrapping_python set to 0
+#       (this can be done at any later step without negative effects)
 # 4. rpm
 # 5. python-setuptools with bootstrap set to 1
 # 6. python-pip with build_wheel set to 0
@@ -127,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -572,6 +578,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
+Requires: python3-rpm-generators
 Conflicts: %{name} < %{version}-%{release}
 
 %description devel
@@ -1695,6 +1702,12 @@ fi
 # ======================================================
 
 %changelog
+* Tue May 16 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-7
+- Added a dependency to the devel subpackage on python3-rpm-generators which
+  have been excised out of rpm-build
+- Updated notes on bootstrapping Python on top of this specfile accordingly
+- Involves: rhbz#1410631, rhbz#1444925
+
 * Tue May 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-6
 - Enable profile guided optimizations for x86_64 and i686 architectures
 - Update to a newer implementation of PEP 538
