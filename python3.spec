@@ -123,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1659,6 +1659,9 @@ fi
 # ======================================================
 
 %changelog
+* Fri May 05 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-5
+- Update PEP 538 to the latest upstream implementation
+
 * Tue Apr 18 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-4
 - Enable link time optimizations
 - Move windows executables to the devel subpackage (rhbz#1426257)
