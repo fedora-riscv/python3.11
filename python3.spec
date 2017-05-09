@@ -123,7 +123,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -443,6 +443,19 @@ Patch261: 00261-use-proper-command-line-parsing-in-_testembed.patch
 # Original proposal: https://bugzilla.redhat.com/show_bug.cgi?id=1404918
 Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 
+# 00264 #
+# test_pass_by_value was added in Python 3.6.1 and on aarch64
+# it is catching an error that was there, but wasn't tested before.
+# Therefore skipping the test on aarch64 until fixed upstream.
+# Reported upstream: http://bugs.python.org/issue29804
+Patch264: 00264-skip-test-failing-on-aarch64.patch
+
+# 00269 #
+# Fix python's recompilation with common build commands when using
+# profile guided optimizations.
+# Fixed upstream: http://bugs.python.org/issue29243
+Patch269: 00269-fix-multiple-compilations-issue-with-pgo-builds.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -451,14 +464,6 @@ Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 # More information, and a patch number catalog, is at:
 #
 #     https://fedoraproject.org/wiki/SIGs/Python/PythonPatches
-
-# 00264 #
-# test_pass_by_value was added in Python 3.6.1 and on aarch64
-# it is catching an error that was there, but wasn't tested before.
-# Therefore skipping the test on aarch64 until fixed upstream.
-# Reported upstream: http://bugs.python.org/issue29804
-Patch264: 00264-skip-test-failing-on-aarch64.patch
-
 
 # add correct arch for ppc64/ppc64le
 # it should be ppc64le-linux-gnu/ppc64-linux-gnu instead powerpc64le-linux-gnu/powerpc64-linux-gnu
@@ -725,6 +730,8 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch264 -p1
 %endif
 
+%patch269 -p1
+
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
 #
@@ -824,7 +831,11 @@ BuildPython debug \
 BuildPython optimized \
   python \
   python%{pybasever} \
+%ifarch %{ix86} x86_64
+  "--without-ensurepip --enable-optimizations" \
+%else
   "--without-ensurepip" \
+%end
   true
 
 # ======================================================
@@ -1680,6 +1691,11 @@ fi
 # ======================================================
 
 %changelog
+* Tue May 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-6
+- Enable profile guided optimizations for x86_64 and i686 architectures
+- Update to a newer implementation of PEP 538
+- Update description to reflect that Python 3 is now the default Python
+
 * Fri May 05 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-5
 - Update PEP 538 to the latest upstream implementation
 
