@@ -835,7 +835,7 @@ BuildPython optimized \
   "--without-ensurepip --enable-optimizations" \
 %else
   "--without-ensurepip" \
-%end
+%endif
   true
 
 # ======================================================
