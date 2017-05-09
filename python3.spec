@@ -491,13 +491,24 @@ Requires: python3-pip
 %endif
 
 %description
-Python 3 is a new version of the language that is incompatible with the 2.x
-line of releases. The language is mostly the same, but many details, especially
-how built-in objects like dictionaries and strings work, have changed
-considerably, and a lot of deprecated features have finally been removed.
+Python is an interpreted, interactive, object-oriented programming
+language often compared to Tcl, Perl, Scheme or Java. Python includes
+modules, classes, exceptions, very high level dynamic data types
+and dynamic typing. Python supports interfaces to many system calls and
+libraries, as well as to various windowing systems (X11, Motif, Tk,
+Mac and MFC).
+
+Programmers can write new built-in modules for Python in C or C++.
+Python can be used as an extension language for applications that
+need a programmable interface.
+
+Note that documentation for Python is provided in the python3-docs package.
+
+This package provides the "python3" executable; most of the actual
+implementation is within the "python3-libs" and "system-python-libs" packages.
 
 %package libs
-Summary:        Python 3 runtime libraries
+Summary:        Python runtime libraries
 Group:          Development/Libraries
 # For Modularity purpose we need not to include the dist-tag int he dependency
 %if %(d="%{?dist}"; [ "${d#module-base-runtime-}x" != "${d}x" ] && echo 1 || echo 0)
@@ -515,7 +526,10 @@ Provides: python3-enum34 = 1.0.4-5%{?dist}
 Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
 
 %description libs
-This package contains files used to embed Python 3 into applications.
+This package contains runtime libraries for use by Python:
+- the libpython dynamic library, for use by applications that embed Python as
+a scripting language, and by the main "python3" executable
+- the Python standard library
 
 %package -n system-python
 Summary:        System Python executable
@@ -542,7 +556,7 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 This package contains files used to embed System Python into applications.
 
 %package devel
-Summary: Libraries and header files needed for Python 3 development
+Summary: Libraries and header files needed for Python development
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -552,29 +566,36 @@ Requires: python3-rpm-macros
 Conflicts: %{name} < %{version}-%{release}
 
 %description devel
-This package contains libraries and header files used to build applications
-with and native libraries for Python 3
+The Python programming language's interpreter can be extended with
+dynamically loaded extensions and can be embedded in other programs.
+This package contains the header files and libraries needed to do
+these types of tasks.
+
+Install python3-devel if you want to develop Python extensions. The
+python3 package will also need to be installed.  You'll probably also
+want to install the python3-docs package, which contains Python
+documentation.
 
 %package tools
-Summary: A collection of tools included with Python 3
+Summary: A collection of tools included with Python
 Group: Development/Tools
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tkinter = %{version}-%{release}
 
 %description tools
-This package contains several tools included with Python 3
+This package contains several tools included with Python
 
 %package tkinter
-Summary: A GUI toolkit for Python 3
+Summary: A GUI toolkit for Python
 Group: Development/Languages
 Requires: %{name} = %{version}-%{release}
 
 %description tkinter
-The Tkinter (Tk interface) program is an graphical user interface for
+The Tkinter (Tk interface) program is a graphical user interface for
 the Python scripting language.
 
 %package test
-Summary: The test modules from the main python 3 package
+Summary: The test modules from the main python3 package
 Group: Development/Languages
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tools = %{version}-%{release}
@@ -585,11 +606,11 @@ These are in a separate package to save space, as they are almost never used
 in production.
 
 You might want to install the python3-test package if you're developing
-python 3 code that uses more than just unittest and/or test_support.py.
+python code that uses more than just unittest and/or test_support.py.
 
 %if 0%{?with_debug_build}
 %package debug
-Summary: Debug version of the Python 3 runtime
+Summary: Debug version of the Python runtime
 Group: Applications/System
 
 # The debug build is an all-in-one package version of the regular build, and
@@ -603,20 +624,20 @@ Requires: %{name}-tkinter%{?_isa} = %{version}-%{release}
 Requires: %{name}-tools%{?_isa} = %{version}-%{release}
 
 %description debug
-python3-debug provides a version of the Python 3 runtime with numerous debugging
+python3-debug provides a version of the Python runtime with numerous debugging
 features enabled, aimed at advanced Python users, such as developers of Python
 extension modules.
 
-This version uses more memory and will be slower than the regular Python 3 build,
+This version uses more memory and will be slower than the regular Python build,
 but is useful for tracking down reference-counting issues, and other bugs.
 
 The bytecodes are unchanged, so that .pyc files are compatible between the two
-versions of Python 3, but the debugging features mean that C/C++ extension
+versions of Python, but the debugging features mean that C/C++ extension
 modules are ABI-incompatible with those built for the standard runtime.
 
-It shares installation directories with the standard Python 3 runtime, so that
-.py and .pyc files can be shared.  All compiled extension modules gain a "_d"
-suffix ("foo_d.so" rather than "foo.so") so that each Python 3 implementation
+It shares installation directories with the standard Python runtime, so that
+.py and .pyc files can be shared. All compiled extension modules gain a "_d"
+suffix ("foo_d.so" rather than "foo.so") so that each Python implementation
 can load its own extensions.
 %endif # with_debug_build
 
