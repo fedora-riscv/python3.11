@@ -194,10 +194,6 @@ BuildRequires: zlib-devel
 
 %if 0%{?with_rewheel}
 BuildRequires: python3-setuptools
-BuildRequires: python3-six
-BuildRequires: python3-pyparsing
-BuildRequires: python3-appdirs
-BuildRequires: python3-packaging
 BuildRequires: python3-pip
 %endif
 
@@ -431,15 +427,6 @@ Patch252: 00252-add-executable-option.patch
 # making test_aead_aes_gcm fail, so skipping the test for now
 # Reported upstream: http://bugs.python.org/issue29324
 Patch258: 00258-fix-test_aead_aes_gcm.patch
-
-# 00260 #
-# setuptools from version 34.0.0 and onwards, unbundled its dependencies
-# and started requiring them so when rewheel mode is enabled we will have
-# to BuildRequire the new dependencies, in order for the virtualenv's to work properly
-# setuptools change: https://setuptools.readthedocs.io/en/latest/history.html#v34-0-0
-# Reported upstream: http://bugs.python.org/issue29523
-# https://github.com/python/cpython/pull/67
-Patch260: 00260-require-setuptools-dependencies.patch
 
 # 00261 #
 # Use proper command line parsing in _testembed
@@ -733,7 +720,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch249 -p1
 %patch252 -p1
 %patch258 -p1
-%patch260 -p1
 %patch261 -p1
 %patch262 -p1
 
