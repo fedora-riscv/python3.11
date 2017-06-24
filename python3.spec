@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -453,6 +453,12 @@ Patch264: 00264-skip-test-failing-on-aarch64.patch
 # Fixed upstream: http://bugs.python.org/issue29243
 Patch269: 00269-fix-multiple-compilations-issue-with-pgo-builds.patch
 
+# 00270 #
+# Fix test_alpn_protocols from test_ssl as openssl > 1.1.0f
+# changed the behaviour of the ALPN hook.
+# Fixed upstream: http://bugs.python.org/issue30714
+Patch270: 00270-fix-ssl-alpn-hook-test.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -728,6 +734,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %endif
 
 %patch269 -p1
+%patch270 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1688,6 +1695,10 @@ fi
 # ======================================================
 
 %changelog
+* Fri Jun 23 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-8
+- Fix test_alpn_protocols from test_ssl
+- Do not require rebundled setuptools dependencies
+
 * Tue May 16 2017 Tomas Orsava <torsava@redhat.com> - 3.6.1-7
 - Added a dependency to the devel subpackage on python3-rpm-generators which
   have been excised out of rpm-build
