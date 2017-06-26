@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -416,6 +416,12 @@ Patch243: 00243-fix-mips64-triplet.patch
 # of python is an out of tree build
 # Not yet fixed upstream: http://bugs.python.org/issue28787
 Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
+
+# 00251
+# Set values of prefix and exec_prefix in distutils install command
+# to /usr/local if executable is /usr/bin/python* and RPM build
+# is not detected to make pip and distutils install into separate location
+Patch251: 00251-change-user-install-location.patch
 
 # 00252
 # Add executable option to install.py command to make it work for
@@ -724,6 +730,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch206 -p1
 %patch243 -p1
 %patch249 -p1
+%patch251 -p1
 %patch252 -p1
 %patch258 -p1
 %patch261 -p1
@@ -1695,6 +1702,9 @@ fi
 # ======================================================
 
 %changelog
+* Mon Jun 26 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.1-9
+- Make pip and distutils in user environment install into separate location
+
 * Fri Jun 23 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-8
 - Fix test_alpn_protocols from test_ssl
 - Do not require rebundled setuptools dependencies
