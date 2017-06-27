@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -434,11 +434,6 @@ Patch252: 00252-add-executable-option.patch
 # Reported upstream: http://bugs.python.org/issue29324
 Patch258: 00258-fix-test_aead_aes_gcm.patch
 
-# 00261 #
-# Use proper command line parsing in _testembed
-# Fixed upstream: http://bugs.python.org/issue24932
-Patch261: 00261-use-proper-command-line-parsing-in-_testembed.patch
-
 # 00262 #
 # Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
 # https://www.python.org/dev/peps/pep-0538/
@@ -733,7 +728,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch251 -p1
 %patch252 -p1
 %patch258 -p1
-%patch261 -p1
 %patch262 -p1
 
 %ifarch aarch64
@@ -1702,6 +1696,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Jun 27 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-10
+- Update to the latest upstream implementation of PEP 538
+
 * Mon Jun 26 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.1-9
 - Make pip and distutils in user environment install into separate location
 
