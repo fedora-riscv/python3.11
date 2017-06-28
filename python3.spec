@@ -421,11 +421,13 @@ Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
 # Set values of prefix and exec_prefix in distutils install command
 # to /usr/local if executable is /usr/bin/python* and RPM build
 # is not detected to make pip and distutils install into separate location
+# Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
 Patch251: 00251-change-user-install-location.patch
 
 # 00252
 # Add executable option to install.py command to make it work for
 # scripts specified as an entry_points
+# Reported upstream: https://bugs.python.org/issue29411
 Patch252: 00252-add-executable-option.patch
 
 # 00258 #
