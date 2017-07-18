@@ -132,8 +132,8 @@
 # ==================
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
-Version: %{pybasever}.1
-Release: 10%{?dist}
+Version: %{pybasever}.2
+Release: 1%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -411,12 +411,6 @@ Patch206: 00206-remove-hf-from-arm-triplet.patch
 # Fedora needs the default mips64-linux-gnu
 Patch243: 00243-fix-mips64-triplet.patch
 
-# 00249 #
-# Fix builds using the --with-dtrace flag as the rpmbuild
-# of python is an out of tree build
-# Not yet fixed upstream: http://bugs.python.org/issue28787
-Patch249: 00249-fix-out-of-tree-dtrace-builds.patch
-
 # 00251
 # Set values of prefix and exec_prefix in distutils install command
 # to /usr/local if executable is /usr/bin/python* and RPM build
@@ -429,12 +423,6 @@ Patch251: 00251-change-user-install-location.patch
 # scripts specified as an entry_points
 # Reported upstream: https://bugs.python.org/issue29411
 Patch252: 00252-add-executable-option.patch
-
-# 00258 #
-# Kernel 4.9 introduced some changes to its crypto API
-# making test_aead_aes_gcm fail, so skipping the test for now
-# Reported upstream: http://bugs.python.org/issue29324
-Patch258: 00258-fix-test_aead_aes_gcm.patch
 
 # 00262 #
 # Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
@@ -449,12 +437,6 @@ Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 # Therefore skipping the test on aarch64 until fixed upstream.
 # Reported upstream: http://bugs.python.org/issue29804
 Patch264: 00264-skip-test-failing-on-aarch64.patch
-
-# 00269 #
-# Fix python's recompilation with common build commands when using
-# profile guided optimizations.
-# Fixed upstream: http://bugs.python.org/issue29243
-Patch269: 00269-fix-multiple-compilations-issue-with-pgo-builds.patch
 
 # 00270 #
 # Fix test_alpn_protocols from test_ssl as openssl > 1.1.0f
@@ -726,17 +708,14 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch205 -p1
 %patch206 -p1
 %patch243 -p1
-%patch249 -p1
 %patch251 -p1
 %patch252 -p1
-%patch258 -p1
 %patch262 -p1
 
 %ifarch aarch64
 %patch264 -p1
 %endif
 
-%patch269 -p1
 %patch270 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
@@ -1701,6 +1680,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Jul 18 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.2-1
+- Update to Python 3.6.2
+
 * Tue Jun 27 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.1-10
 - Update to the latest upstream implementation of PEP 538
 
