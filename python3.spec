@@ -1177,7 +1177,7 @@ CheckPython() {
   #   aarch64, see upstream bug http://bugs.python.org/issue21131
   WITHIN_PYTHON_RPM_BUILD= \
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
-    --verbose --findleaks \
+    -wW --slowest --findleaks \
     -x test_distutils \
     %ifarch ppc64le aarch64
     -x test_faulthandler \
