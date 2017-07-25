@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -444,6 +444,12 @@ Patch264: 00264-skip-test-failing-on-aarch64.patch
 # Fixed upstream: http://bugs.python.org/issue30714
 Patch270: 00270-fix-ssl-alpn-hook-test.patch
 
+# 00271 #
+# Make test_asyncio to not depend on the current signal handler
+# as this can make it hang on koji, since it ignores SIGHUP.
+# Reported upstream: http://bugs.python.org/issue31034
+Patch271: 00271-asyncio-get-default-signal-handler.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -717,6 +723,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %endif
 
 %patch270 -p1
+%patch271 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1680,6 +1687,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Jul 25 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.2-2
+- Make test_asyncio to not depend on the current SIGHUP signal handler.
+
 * Tue Jul 18 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.2-1
 - Update to Python 3.6.2
 
