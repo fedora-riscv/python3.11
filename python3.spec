@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -1681,12 +1681,18 @@ fi
 # (if it doesn't, then the rpmbuild ought to fail since the debug-gdb.py
 # payload file would be unpackaged)
 
+# Workaround for rhbz#1476593
+%undefine _debuginfo_subpackages
 
 # ======================================================
 # Finally, the changelog:
 # ======================================================
 
 %changelog
+* Sun Jul 30 2017 Florian Weimer <fweimer@redhat.com> - 3.6.2-4
+- Do not generate debuginfo subpackages (#1476593)
+- Rebuild with binutils fix for ppc64le (#1475636)
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
