@@ -882,7 +882,7 @@ make install DESTDIR=%{buildroot} INSTALL="install -p" EXTRA_CFLAGS="$MoreCFlags
   #
 %if 0%{?with_gdb_hooks}
   DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
-  PathOfGdbPy=$DirHoldingGdbPy/$PyInstSoName.debug-gdb.py
+  PathOfGdbPy=$DirHoldingGdbPy/$PyInstSoName-%{version}-%{release}.%{_arch}.debug-gdb.py
 
   mkdir -p %{buildroot}$DirHoldingGdbPy
   cp Tools/gdb/libpython.py %{buildroot}$PathOfGdbPy
