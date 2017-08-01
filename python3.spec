@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -148,7 +148,6 @@ BuildRequires: autoconf
 BuildRequires: bluez-libs-devel
 BuildRequires: bzip2
 BuildRequires: bzip2-devel
-BuildRequires: db4-devel >= 4.7
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # it (in pyexpat) in order to enable the fix in Python-3.2.3 for CVE-2012-0876:
@@ -1689,6 +1688,12 @@ fi
 # ======================================================
 
 %changelog
+* Tue Aug 01 2017 Tomas Orsava <torsava@redhat.com> - 3.6.2-5
+- Dropped BuildRequires on db4-devel which was useful for Python 2 (module
+  bsddb), however, no longer needod for Python 3
+- Tested building Python 3 with and without the dependency, all tests pass and
+  filelists of resulting RPMs are identical
+
 * Sun Jul 30 2017 Florian Weimer <fweimer@redhat.com> - 3.6.2-4
 - Do not generate debuginfo subpackages (#1476593)
 - Rebuild with binutils fix for ppc64le (#1475636)
