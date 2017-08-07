@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -449,6 +449,13 @@ Patch270: 00270-fix-ssl-alpn-hook-test.patch
 # Reported upstream: http://bugs.python.org/issue31034
 Patch271: 00271-asyncio-get-default-signal-handler.patch
 
+# 00272 #
+# Reject newline characters in ftplib.FTP.putline() arguments to
+# avoid FTP protocol stream injection via malicious URLs.
+# rhbz#1478916
+# Fixed upstream: http://bugs.python.org/issue30119
+Patch272: 00272-fix-ftplib-to-reject-newlines.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -723,6 +730,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 
 %patch270 -p1
 %patch271 -p1
+%patch272 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1688,6 +1696,10 @@ fi
 # ======================================================
 
 %changelog
+* Mon Aug 07 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.2-6
+- Fix the "urllib FTP protocol stream injection" vulnerability
+Resolves: rhbz#1478916
+
 * Tue Aug 01 2017 Tomas Orsava <torsava@redhat.com> - 3.6.2-5
 - Dropped BuildRequires on db4-devel which was useful for Python 2 (module
   bsddb), however, no longer needod for Python 3
