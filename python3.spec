@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -416,12 +416,6 @@ Patch243: 00243-fix-mips64-triplet.patch
 # is not detected to make pip and distutils install into separate location
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
 Patch251: 00251-change-user-install-location.patch
-
-# 00252
-# Add executable option to install.py command to make it work for
-# scripts specified as an entry_points
-# Reported upstream: https://bugs.python.org/issue29411
-Patch252: 00252-add-executable-option.patch
 
 # 00262 #
 # Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
@@ -721,7 +715,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch206 -p1
 %patch243 -p1
 %patch251 -p1
-%patch252 -p1
 %patch262 -p1
 
 %ifarch aarch64
@@ -1696,6 +1689,11 @@ fi
 # ======================================================
 
 %changelog
+* Fri Aug 11 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-7
+- Revert "Add --executable option to install.py command"
+  This enhancement is currently not needed and it can possibly
+  collide with `pip --editable`option
+
 * Mon Aug 07 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.2-6
 - Fix the "urllib FTP protocol stream injection" vulnerability
 Resolves: rhbz#1478916
