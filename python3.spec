@@ -1,8 +1,46 @@
-# ======================================================
-# Conditionals and other variables controlling the build
-# ======================================================
+# ==================
+# Top-level metadata
+# ==================
 
-# NOTES ON BOOTSTRAPING PYTHON 3.6:
+Name: python3
+Summary: Version 3 of the Python programming language aka Python 3000
+
+%global pybasever 3.6
+
+# pybasever without the dot:
+%global pyshortver 36
+
+Version: %{pybasever}.2
+Release: 9%{?dist}
+License: Python
+
+
+# ==================================
+# Conditionals controlling the build
+# ==================================
+
+# Note that the bcond macros are named for the CLI option they create.
+# "%%bcond_without" means "ENABLE by default and create a --without option"
+
+%bcond_without tests
+%bcond_without rewheel
+%bcond_without debug_build
+%bcond_without gdb_hooks
+%bcond_with systemtap
+%bcond_without gdbm
+%bcond_without computed_gotos
+
+# some arches don't have valgrind so we need to disable its support on them
+%ifnarch s390 %{mips} riscv64
+%bcond_without valgrind
+%else
+%bcond_with valgrind
+%endif
+
+
+# ==================================
+# Notes from bootstraping Python 3.6
+# ==================================
 #
 # Due to a dependency cycle between Python, gdb, rpm, pip, setuptools, wheel,
 # and other packages, in order to rebase Python 3 one has to build in the
@@ -12,7 +50,7 @@
 #     - gdb without python support (add %%global _without_python 1 on top of gdb's SPEC file)
 #     - python-rpm-generators with bootstrapping_python set to 1
 #       (this can be done also during step 2., but should be done before 3.)
-# 2. python3 with with_rewheel set to 0
+# 2. python3 with rewheel set to 0
 # 3. At the same time:
 #     - gdb with python support (remove %%global _without_python 1 on top of gdb's SPEC file)
 #     - python-rpm-generators with bootstrapping_python set to 0
@@ -24,7 +62,7 @@
 # 8. python-setuptools with bootstrap set to 0 and also with_check set to 0
 # 9. python-pip with build_wheel set to 1
 # 10. pyparsing
-# 11. python3 with with_rewheel set to 1
+# 11. python3 with rewheel set to 1
 #
 # Then the most important packages have to be built, starting from their
 # various leaf dependencies recursively. After these have been built, a
@@ -34,12 +72,10 @@
 # rebuild after a python abi change:
 #   python-sphinx, pytest, python-requests, cloud-init, dnf, anaconda, abrt
 
-%global with_rewheel 1
 
-%global pybasever 3.6
-
-# pybasever without the dot:
-%global pyshortver 36
+# =====================
+# General global macros
+# =====================
 
 %global pylibdir %{_libdir}/python%{pybasever}
 %global dynload_dir %{pylibdir}/lib-dynload
@@ -69,10 +105,10 @@
 # For example,
 #   foo/bar.py
 # now has bytecode at:
-#   foo/__pycache__/bar.cpython-36.pyc
-#   foo/__pycache__/bar.cpython-36.opt-1.pyc
-#	foo/__pycache__/bar.cpython-36.opt-2.pyc
-%global bytecode_suffixes .cpython-36*.pyc
+#   foo/__pycache__/bar.cpython-%%{pyshortver}.pyc
+#   foo/__pycache__/bar.cpython-%%{pyshortver}.opt-1.pyc
+#	foo/__pycache__/bar.cpython-%%{pyshortver}.opt-2.pyc
+%global bytecode_suffixes .cpython-%{pyshortver}*.pyc
 
 # Python's configure script defines SOVERSION, and this is used in the Makefile
 # to determine INSTSONAME, the name of the libpython DSO:
@@ -84,27 +120,6 @@
 %global py_SOVERSION 1.0
 %global py_INSTSONAME_optimized libpython%{LDVERSION_optimized}.so.%{py_SOVERSION}
 %global py_INSTSONAME_debug     libpython%{LDVERSION_debug}.so.%{py_SOVERSION}
-
-%global with_debug_build 1
-
-%global with_gdb_hooks 1
-
-%global with_systemtap 0
-
-# some arches don't have valgrind so we need to disable its support on them
-%ifnarch s390 %{mips} riscv64
-%global with_valgrind 1
-%else
-%global with_valgrind 0
-%endif
-
-%global with_gdbm 1
-
-# Change from yes to no to turn this off
-%global with_computed_gotos yes
-
-# Turn this to 0 to turn off the "check" phase:
-%global run_selftest_suite 1
 
 # We want to byte-compile the .py files within the packages using the new
 # python3 binary.
@@ -127,17 +142,6 @@
 # pyc/pyo files)
 
 
-# ==================
-# Top-level metadata
-# ==================
-Summary: Version 3 of the Python programming language aka Python 3000
-Name: python3
-Version: %{pybasever}.2
-Release: 8%{?dist}
-License: Python
-Group: Development/Languages
-
-
 # =======================
 # Build-time requirements
 # =======================
@@ -155,7 +159,7 @@ BuildRequires: expat-devel >= 2.1.0
 
 BuildRequires: findutils
 BuildRequires: gcc-c++
-%if %{with_gdbm}
+%if %{with gdbm}
 BuildRequires: gdbm-devel
 %endif
 BuildRequires: glibc-devel
@@ -184,14 +188,14 @@ BuildRequires: tcl-devel
 BuildRequires: tix-devel
 BuildRequires: tk-devel
 
-%if 0%{?with_valgrind}
+%if %{with valgrind}
 BuildRequires: valgrind-devel
 %endif
 
 BuildRequires: xz-devel
 BuildRequires: zlib-devel
 
-%if 0%{?with_rewheel}
+%if %{with rewheel}
 BuildRequires: python3-setuptools
 BuildRequires: python3-pip
 %endif
@@ -484,7 +488,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: python%{pyshortver}
 Provides: python%{pyshortver} = %{version}-%{release}
 
-%if 0%{with_rewheel}
+%if %{with rewheel}
 Requires: python3-setuptools
 Requires: python3-pip
 %endif
@@ -620,7 +624,7 @@ in production.
 You might want to install the python3-test package if you're developing
 python code that uses more than just unittest and/or test_support.py.
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 %package debug
 Summary: Debug version of the Python runtime
 Group: Applications/System
@@ -651,7 +655,7 @@ It shares installation directories with the standard Python runtime, so that
 .py and .pyc files can be shared. All compiled extension modules gain a "_d"
 suffix ("foo_d.so" rather than "foo.so") so that each Python implementation
 can load its own extensions.
-%endif # with_debug_build
+%endif # with debug_build
 
 # ======================================================
 # The prep phase of the build:
@@ -660,11 +664,11 @@ can load its own extensions.
 %prep
 %setup -q -n Python-%{version}%{?prerel}
 
-%if 0%{?with_systemtap}
+%if %{with systemtap}
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE6} .
 cp -a %{SOURCE7} .
-%endif # with_systemtap
+%endif # with systemtap
 
 # Ensure that we're using the system copy of various libraries, rather than
 # copies shipped by upstream in the tarball:
@@ -687,7 +691,7 @@ rm -r Modules/zlib || exit 1
 #    rm Modules/$f
 #done
 
-%if 0%{with_rewheel}
+%if %{with rewheel}
 %global pip_version 9.0.1
 sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
 %endif
@@ -697,7 +701,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 #
 %patch1 -p1
 
-%if 0%{?with_systemtap}
+%if %{with systemtap}
 %patch55 -p1 -b .systemtap
 %endif
 
@@ -719,7 +723,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch186 -p1
 %patch188 -p1
 
-%if 0%{with_rewheel}
+%if %{with rewheel}
 %patch189 -p1
 %endif
 
@@ -784,20 +788,26 @@ BuildPython() {
   # Use the freshly created "configure" script, but in the directory two above:
   %global _configure $topdir/configure
 
+  %if %{with computed_gotos}
+  %global computed_gotos_flag yes
+  %else
+  %global computed_gotos_flag no
+  %endif
+
 %configure \
   --enable-ipv6 \
   --enable-shared \
-  --with-computed-gotos=%{with_computed_gotos} \
+  --with-computed-gotos=%{computed_gotos_flag} \
   --with-dbmliborder=gdbm:ndbm:bdb \
   --with-system-expat \
   --with-system-ffi \
   --enable-loadable-sqlite-extensions \
   --with-dtrace \
   --with-lto \
-%if 0%{?with_systemtap}
+%if %{with systemtap}
   --with-systemtap \
 %endif
-%if 0%{?with_valgrind}
+%if %{with valgrind}
   --with-valgrind \
 %endif
   $ExtraConfigArgs \
@@ -820,7 +830,7 @@ BuildPython() {
 
 # Use "BuildPython" to support building with different configurations:
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 BuildPython debug \
   python-debug \
   python%{pybasever}-debug \
@@ -831,7 +841,7 @@ BuildPython debug \
 %endif
   false \
   -O0
-%endif # with_debug_build
+%endif # with debug_build
 
 BuildPython optimized \
   python \
@@ -892,13 +902,13 @@ make install DESTDIR=%{buildroot} INSTALL="install -p" EXTRA_CFLAGS="$MoreCFlags
   #  /usr/lib/libpython3.1.so.1.0-gdb.py
   # but doing so generated noise when ldconfig was rerun (rhbz:562980)
   #
-%if 0%{?with_gdb_hooks}
+%if %{with gdb_hooks}
   DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
   PathOfGdbPy=$DirHoldingGdbPy/$PyInstSoName-%{version}-%{release}.%{_arch}.debug-gdb.py
 
   mkdir -p %{buildroot}$DirHoldingGdbPy
   cp Tools/gdb/libpython.py %{buildroot}$PathOfGdbPy
-%endif # with_gdb_hooks
+%endif # with gdb_hooks
 
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
@@ -906,11 +916,11 @@ make install DESTDIR=%{buildroot} INSTALL="install -p" EXTRA_CFLAGS="$MoreCFlags
 # Use "InstallPython" to support building with different configurations:
 
 # Install the "debug" build first, so that we can move some files aside
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 InstallPython debug \
   %{py_INSTSONAME_debug} \
   -O0
-%endif # with_debug_build
+%endif # with debug_build
 
 # Now the optimized build:
 InstallPython optimized \
@@ -971,7 +981,7 @@ install -d -m 0755 %{buildroot}/%{_prefix}/lib/python%{pybasever}/site-packages/
 %global SOABI_optimized cpython-%{pyshortver}%{ABIFLAGS_optimized}-%{_arch}-linux%{_gnu}
 %global SOABI_debug     cpython-%{pyshortver}%{ABIFLAGS_debug}-%{_arch}-linux%{_gnu}
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 %global PyIncludeDirs python%{LDVERSION_optimized} python%{LDVERSION_debug}
 
 %else
@@ -1096,7 +1106,7 @@ done
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
 # avoid the user having to know the precise version and ABI flags.  (see
 # e.g. rhbz#676748):
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 ln -s \
   %{_bindir}/python%{LDVERSION_debug} \
   %{buildroot}%{_bindir}/python3-debug
@@ -1105,7 +1115,7 @@ ln -s \
 #
 # Systemtap hooks:
 #
-%if 0%{?with_systemtap}
+%if %{with systemtap}
 # Install a tapset for this libpython into tapsetdir, fixing up the path to the
 # library:
 mkdir -p %{buildroot}%{tapsetdir}
@@ -1122,7 +1132,7 @@ sed \
    %{_sourcedir}/libpython.stp \
    > %{buildroot}%{tapsetdir}/%{libpython_stp_optimized}
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 # In Python 3, python3 and python3-debug don't point to the same binary,
 # so we have to replace "python3" with "python3-debug" to get systemtap
 # working with debug build
@@ -1131,9 +1141,9 @@ sed \
    -e 's|"python3"|"python3-debug"|' \
    %{_sourcedir}/libpython.stp \
    > %{buildroot}%{tapsetdir}/%{libpython_stp_debug}
-%endif # with_debug_build
+%endif # with debug_build
 
-%endif # with_systemtap
+%endif # with systemtap
 
 # Rename the -devel script that differs on different arches to arch specific name
 mv %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-{,`uname -m`-}config
@@ -1143,7 +1153,7 @@ echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_optimized}-`uname
   %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
   chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 # Rename the -debug script that differs on different arches to arch specific name
 mv %{buildroot}%{_bindir}/python%{LDVERSION_debug}-{,`uname -m`-}config
 echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_debug}-`uname -m`-config "$@"' > \
@@ -1151,7 +1161,7 @@ echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_debug}-`uname -m`-config
 echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_debug}-`uname -m`-config. Look around to see available arches." >&2' >> \
   %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
   chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
-%endif # with_debug_build
+%endif # with debug_build
 
 # System Python: Copy the executable to libexec
 mkdir -p %{buildroot}%{_libexecdir}
@@ -1210,15 +1220,15 @@ CheckPython() {
 
 }
 
-%if 0%{run_selftest_suite}
+%if %{with tests}
 
 # Check each of the configurations:
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 CheckPython debug
-%endif # with_debug_build
+%endif # with debug_build
 CheckPython optimized
 
-%endif # run_selftest_suite
+%endif # with tests
 
 
 # ======================================================
@@ -1298,7 +1308,7 @@ fi
 %{pylibdir}/ensurepip/__pycache__/*%{bytecode_suffixes}
 %exclude %{pylibdir}/ensurepip/_bundled
 
-%if 0%{?with_rewheel}
+%if %{with rewheel}
 %dir %{pylibdir}/ensurepip/rewheel/
 %dir %{pylibdir}/ensurepip/rewheel/__pycache__/
 %{pylibdir}/ensurepip/rewheel/*.py
@@ -1367,7 +1377,7 @@ fi
 %{dynload_dir}/_dbm.%{SOABI_optimized}.so
 %{dynload_dir}/_decimal.%{SOABI_optimized}.so
 %{dynload_dir}/_elementtree.%{SOABI_optimized}.so
-%if %{with_gdbm}
+%if %{with gdbm}
 %{dynload_dir}/_gdbm.%{SOABI_optimized}.so
 %endif
 %{dynload_dir}/_hashlib.%{SOABI_optimized}.so
@@ -1495,7 +1505,7 @@ fi
 
 %{_libdir}/%{py_INSTSONAME_optimized}
 %{_libdir}/libpython3.so
-%if 0%{?with_systemtap}
+%if %{with systemtap}
 %dir %(dirname %{tapsetdir})
 %dir %{tapsetdir}
 %{tapsetdir}/%{libpython_stp_optimized}
@@ -1567,7 +1577,7 @@ fi
 # Hence the manifest is the combination of analogous files in the manifests of
 # all of the other subpackages
 
-%if 0%{?with_debug_build}
+%if %{with debug_build}
 %files debug
 %defattr(-,root,root,-)
 
@@ -1602,7 +1612,7 @@ fi
 %{dynload_dir}/_dbm.%{SOABI_debug}.so
 %{dynload_dir}/_decimal.%{SOABI_debug}.so
 %{dynload_dir}/_elementtree.%{SOABI_debug}.so
-%if %{with_gdbm}
+%if %{with gdbm}
 %{dynload_dir}/_gdbm.%{SOABI_debug}.so
 %endif
 %{dynload_dir}/_hashlib.%{SOABI_debug}.so
@@ -1649,7 +1659,7 @@ fi
 # now; they're listed below, under "-devel":
 
 %{_libdir}/%{py_INSTSONAME_debug}
-%if 0%{?with_systemtap}
+%if %{with systemtap}
 %dir %(dirname %{tapsetdir})
 %dir %{tapsetdir}
 %{tapsetdir}/%{libpython_stp_debug}
@@ -1677,7 +1687,7 @@ fi
 %{dynload_dir}/_testcapi.%{SOABI_debug}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_debug}.so
 
-%endif # with_debug_build
+%endif # with debug_build
 
 # We put the debug-gdb.py file inside /usr/lib/debug to avoid noise from
 # ldconfig (rhbz:562980).
@@ -1700,6 +1710,10 @@ fi
 # ======================================================
 
 %changelog
+* Wed Aug 16 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-9
+- Use bconds for configuring the build
+- Reorganize the initial sections
+
 * Wed Aug 16 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-8
 - Have /usr/bin/2to3 (rhbz#1111275)
 - Provide 2to3 and idle3, list them in summary and description (rhbz#1076401)
