@@ -133,7 +133,7 @@
 Summary: Version 3 of the Python programming language aka Python 3000
 Name: python3
 Version: %{pybasever}.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Python
 Group: Development/Languages
 
@@ -577,18 +577,30 @@ want to install the python3-docs package, which contains Python
 documentation.
 
 %package tools
-Summary: A collection of tools included with Python
+Summary: A collection of tools included with Python including 2to3 and idle
 Group: Development/Tools
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tkinter = %{version}-%{release}
 
+Provides: %{name}-2to3 = %{version}-%{release}
+Provides: %{name}-idle = %{version}-%{release}
+Provides: 2to3 = %{version}-%{release}
+Provides: idle3 = %{version}-%{release}
+
 %description tools
-This package contains several tools included with Python
+This package contains several tools included with Python including 2to3
+and idle.
 
 %package tkinter
 Summary: A GUI toolkit for Python
 Group: Development/Languages
 Requires: %{name} = %{version}-%{release}
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+# /usr/bin/2to3 was moved from here
+# TODO Remove in Fedora 29
+Conflicts: python2-tools < 2.7.13-17
+Conflicts: python-tools < 2.7.13-17
 
 %description tkinter
 The Tkinter (Tk interface) program is a graphical user interface for
@@ -905,8 +917,6 @@ InstallPython optimized \
   %{py_INSTSONAME_optimized}
 
 install -d -m 0755 ${RPM_BUILD_ROOT}%{pylibdir}/site-packages/__pycache__
-
-mv ${RPM_BUILD_ROOT}%{_bindir}/2to3 ${RPM_BUILD_ROOT}%{_bindir}/python3-2to3
 
 # add idle3 to menu
 install -D -m 0644 Lib/idlelib/Icons/idle_16.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
@@ -1513,7 +1523,8 @@ fi
 
 %files tools
 %defattr(-,root,root,755)
-%{_bindir}/python3-2to3
+%{_bindir}/2to3
+# TODO: Remove 2to3-3.7 once rebased to 3.7
 %{_bindir}/2to3-%{pybasever}
 %{_bindir}/idle*
 %{pylibdir}/Tools
@@ -1689,6 +1700,10 @@ fi
 # ======================================================
 
 %changelog
+* Wed Aug 16 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-8
+- Have /usr/bin/2to3 (rhbz#1111275)
+- Provide 2to3 and idle3, list them in summary and description (rhbz#1076401)
+
 * Fri Aug 11 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-7
 - Revert "Add --executable option to install.py command"
   This enhancement is currently not needed and it can possibly
