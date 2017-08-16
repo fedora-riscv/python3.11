@@ -11,7 +11,7 @@ Summary: Version 3 of the Python programming language aka Python 3000
 %global pyshortver 36
 
 Version: %{pybasever}.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Python
 
 
@@ -21,6 +21,12 @@ License: Python
 
 # Note that the bcond macros are named for the CLI option they create.
 # "%%bcond_without" means "ENABLE by default and create a --without option"
+
+%ifarch %{ix86} x86_64
+%bcond_without optimizations
+%else
+%bcond_with optimizations
+%endif
 
 %bcond_without tests
 %bcond_without rewheel
@@ -832,11 +838,11 @@ BuildPython debug \
 BuildPython optimized \
   python \
   python%{pybasever} \
-%ifarch %{ix86} x86_64
+%if %{with optimizations}
   "--without-ensurepip --enable-optimizations" \
 %else
-  "--without-ensurepip" \
-%endif
+  "--without-ensurepip --disable-optimizations" \
+%endif  # with optimizations
   true
 
 # ======================================================
@@ -1683,6 +1689,9 @@ fi
 # ======================================================
 
 %changelog
+* Mon Aug 21 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-11
+- Add bcond for --without optimizations
+
 * Mon Aug 21 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-10
 - Remove system-python, see https://fedoraproject.org/wiki/Changes/Platform_Python_Stack
 
