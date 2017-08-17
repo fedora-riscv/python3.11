@@ -22,24 +22,42 @@ License: Python
 # Note that the bcond macros are named for the CLI option they create.
 # "%%bcond_without" means "ENABLE by default and create a --without option"
 
+# Expensive optimizations (mainly, profile-guided optimizations)
 %ifarch %{ix86} x86_64
 %bcond_without optimizations
 %else
+# On some architectures, the optimized build takes tens of hours, possibly
+# longer than Koji's 24-hour timeout. Disable optimizations here.
 %bcond_with optimizations
 %endif
 
+# Run the test suite in %%check
 %bcond_without tests
+
+# Ability to reuse RPM-installed pip using rewheel
 %bcond_without rewheel
+
+# Extra build for debugging the interpreter or C-API extensions
+# (the -debug subpackages)
 %bcond_without debug_build
+
+# Support for the GDB debugger
 %bcond_without gdb_hooks
+
+# Support for systemtap instrumentation
 %bcond_with systemtap
+
+# The dbm.gnu module (key-value database)
 %bcond_without gdbm
+
+# Main interpreter loop optimization
 %bcond_without computed_gotos
 
-# some arches don't have valgrind so we need to disable its support on them
+# Support for the Valgrind debugger/profiler
 %ifnarch s390 %{mips} riscv64
 %bcond_without valgrind
 %else
+# Some arches don't have valgrind, disable support for it there.
 %bcond_with valgrind
 %endif
 
