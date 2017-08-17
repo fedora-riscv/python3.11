@@ -66,17 +66,23 @@ License: Python
 # Notes from bootstraping Python 3.6
 # ==================================
 #
+# New Python major version (3.X) break ABI and bytecode compatibility,
+# so all packages depending on it need to be rebuilt.
+#
 # Due to a dependency cycle between Python, gdb, rpm, pip, setuptools, wheel,
-# and other packages, in order to rebase Python 3 one has to build in the
-# following order:
+# and other packages, this isn't straightforward.
+# Build in the following order:
 #
 # 1. At the same time:
-#     - gdb without python support (add %%global _without_python 1 on top of gdb's SPEC file)
+#     - gdb without python support (add %%global _without_python 1 on top of
+#       gdb's SPEC file)
 #     - python-rpm-generators with bootstrapping_python set to 1
 #       (this can be done also during step 2., but should be done before 3.)
-# 2. python3 with rewheel set to 0
+# 2. python3 without rewheel (use %%bcond_with rewheel instead of
+#     %%bcond_without)
 # 3. At the same time:
-#     - gdb with python support (remove %%global _without_python 1 on top of gdb's SPEC file)
+#     - gdb with python support (remove %%global _without_python 1 on top of
+#       gdb's SPEC file)
 #     - python-rpm-generators with bootstrapping_python set to 0
 #       (this can be done at any later step without negative effects)
 # 4. rpm
@@ -86,15 +92,13 @@ License: Python
 # 8. python-setuptools with bootstrap set to 0 and also with_check set to 0
 # 9. python-pip with build_wheel set to 1
 # 10. pyparsing
-# 11. python3 with rewheel set to 1
+# 11. python3 with rewheel
 #
-# Then the most important packages have to be built, starting from their
-# various leaf dependencies recursively. After these have been built, a
-# targeted rebuild should be requested for the rest.
-#
-# Currently these packages are recommended to have been built before a targeted
-# rebuild after a python abi change:
+# Then the most important packages have to be built, in dependency order.
+# These were:
 #   python-sphinx, pytest, python-requests, cloud-init, dnf, anaconda, abrt
+#
+# After these have been built, a targeted rebuild should be done for the rest.
 
 
 # =====================
