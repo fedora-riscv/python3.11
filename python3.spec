@@ -104,15 +104,8 @@ License: Python
 %global pylibdir %{_libdir}/python%{pybasever}
 %global dynload_dir %{pylibdir}/lib-dynload
 
-# SOABI is defined in the upstream configure.in from Python-3.2a2 onwards,
-# for PEP 3149:
-#   http://www.python.org/dev/peps/pep-3149/
-
-# ("configure.in" became "configure.ac" in Python 3.3 onwards, and in
-# backports)
-
-# ABIFLAGS, LDVERSION and SOABI are in the upstream Makefile
-# With Python 3.3, we lose the "u" suffix due to PEP 393
+# ABIFLAGS, LDVERSION and SOABI are in the upstream configure.ac
+# See PEP 3149 for some background: http://www.python.org/dev/peps/pep-3149/
 %global ABIFLAGS_optimized m
 %global ABIFLAGS_debug     dm
 
@@ -122,13 +115,12 @@ License: Python
 %global SOABI_optimized cpython-%{pyshortver}%{ABIFLAGS_optimized}-%{_arch}-linux%{_gnu}
 %global SOABI_debug     cpython-%{pyshortver}%{ABIFLAGS_debug}-%{_arch}-linux%{_gnu}
 
-# All bytecode files are now in a __pycache__ subdirectory, with a name
-# reflecting the version of the bytecode (to permit sharing of python libraries
-# between different runtimes)
-# See http://www.python.org/dev/peps/pep-3147/
+# All bytecode files are in a __pycache__ subdirectory, with a name
+# reflecting the version of the bytecode.
+# See PEP 3147: http://www.python.org/dev/peps/pep-3147/
 # For example,
 #   foo/bar.py
-# now has bytecode at:
+# has bytecode at:
 #   foo/__pycache__/bar.cpython-%%{pyshortver}.pyc
 #   foo/__pycache__/bar.cpython-%%{pyshortver}.opt-1.pyc
 #	foo/__pycache__/bar.cpython-%%{pyshortver}.opt-2.pyc
