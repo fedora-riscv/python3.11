@@ -521,25 +521,27 @@ Requires: python3-pip
 %endif
 
 %description
-Python is an interpreted, interactive, object-oriented programming
-language often compared to Tcl, Perl, Scheme or Java. Python includes
-modules, classes, exceptions, very high level dynamic data types
-and dynamic typing. Python supports interfaces to many system calls and
-libraries, as well as to various windowing systems (X11, Motif, Tk,
-Mac and MFC).
+Python is an accessible, high-level, dynamically typed, interpreted programming
+language, designed with an emphasis on code readibility.
+It includes an extensive standard library, and has a vast ecosystem of
+third-party libraries.
 
-Programmers can write new built-in modules for Python in C or C++.
-Python can be used as an extension language for applications that
-need a programmable interface.
+This package provides the "python3" executable: the reference interpreter for
+the Python language, version 3.
+The majority of its standard library is provided in the %{name}-libs package,
+which should be installed automatically along with %{name}.
+The remaining parts of the Python standard library are broken out into the
+%{name}-tkinter and %{name}-test packages, which may need to be installed
+separately.
 
-Note that documentation for Python is provided in the python3-docs package.
+Documentation for Python is provided in the %{name}-docs package.
 
-This package provides the "python3" executable; most of the actual
-implementation is within the "python3-libs" package.
+Packages containing additional libraries for Python are generally named with
+the "%{name}-" prefix.
+
 
 %package libs
 Summary:        Python runtime libraries
-Group:          Development/Libraries
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # this symbol (in pyexpat), so we must explicitly state this dependency to
@@ -560,13 +562,13 @@ Obsoletes: system-python-libs < %{version}-%{release}
 
 %description libs
 This package contains runtime libraries for use by Python:
-- the libpython dynamic library, for use by applications that embed Python as
-a scripting language, and by the main "python3" executable
-- the Python standard library
+- the majority of the Python standard library
+- a dynamically linked library for use by applications that embed Python as
+  a scripting language, and by the main "python3" executable
+
 
 %package devel
 Summary: Libraries and header files needed for Python development
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
@@ -576,19 +578,15 @@ Requires: python3-rpm-generators
 Conflicts: %{name} < %{version}-%{release}
 
 %description devel
-The Python programming language's interpreter can be extended with
-dynamically loaded extensions and can be embedded in other programs.
-This package contains the header files and libraries needed to do
-these types of tasks.
+This package contains the header files and configuration needed to compile
+Python extension modules (typically written in C or C++), to embed Python
+into other programs, and to make binary distributions for Python libraries.
 
-Install python3-devel if you want to develop Python extensions. The
-python3 package will also need to be installed.  You'll probably also
-want to install the python3-docs package, which contains Python
-documentation.
+It also contains the necessary macros to build RPM packages with Python modules.
+
 
 %package tools
 Summary: A collection of tools included with Python including 2to3 and idle
-Group: Development/Tools
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tkinter = %{version}-%{release}
 
@@ -598,12 +596,13 @@ Provides: 2to3 = %{version}-%{release}
 Provides: idle3 = %{version}-%{release}
 
 %description tools
-This package contains several tools included with Python including 2to3
-and idle.
+This package contains several tools included with Python, including:
+- 2to3, an automatic source converter from Python 2.X
+- idle, a basic graphical development environment
+
 
 %package tkinter
 Summary: A GUI toolkit for Python
-Group: Development/Languages
 Requires: %{name} = %{version}-%{release}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1111275
@@ -613,27 +612,27 @@ Conflicts: python2-tools < 2.7.13-17
 Conflicts: python-tools < 2.7.13-17
 
 %description tkinter
-The Tkinter (Tk interface) program is a graphical user interface for
-the Python scripting language.
+The Tkinter (Tk interface) library is a graphical user interface toolkit for
+the Python programming language.
+
 
 %package test
-Summary: The test modules from the main python3 package
-Group: Development/Languages
+Summary: The self-test suite for the main python3 package
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tools = %{version}-%{release}
 
-%description test
-The test modules from the main %{name} package.
-These are in a separate package to save space, as they are almost never used
-in production.
 
-You might want to install the python3-test package if you're developing
-python code that uses more than just unittest and/or test_support.py.
+%description test
+The self-test suite for the Python interpreter.
+
+This is only useful to test Python itself. For testing general Python code,
+you should use the unittest module from %{name}-libs, or a library such as
+${name}-pytest or ${name}-nose.
+
 
 %if %{with debug_build}
 %package debug
 Summary: Debug version of the Python runtime
-Group: Applications/System
 
 # The debug build is an all-in-one package version of the regular build, and
 # shares the same .py/.pyc files and directories as the regular build.  Hence
@@ -647,21 +646,23 @@ Requires: %{name}-tools%{?_isa} = %{version}-%{release}
 
 %description debug
 python3-debug provides a version of the Python runtime with numerous debugging
-features enabled, aimed at advanced Python users, such as developers of Python
+features enabled, aimed at advanced Python users such as developers of Python
 extension modules.
 
 This version uses more memory and will be slower than the regular Python build,
-but is useful for tracking down reference-counting issues, and other bugs.
+but is useful for tracking down reference-counting issues and other bugs.
 
-The bytecodes are unchanged, so that .pyc files are compatible between the two
-versions of Python, but the debugging features mean that C/C++ extension
-modules are ABI-incompatible with those built for the standard runtime.
+The bytecode format is unchanged, so that .pyc files are compatible between
+this and the standard version of Python, but the debugging features mean that
+C/C++ extension modules are ABI-incompatible and must be built for each version
+separately.
 
-It shares installation directories with the standard Python runtime, so that
-.py and .pyc files can be shared. All compiled extension modules gain a "_d"
-suffix ("foo_d.so" rather than "foo.so") so that each Python implementation
-can load its own extensions.
+The debug build shares installation directories with the standard Python
+runtime, so that .py and .pyc files can be shared.
+Compiled extension modules use a special ABI flag ("d") in the filename,
+so extensions for both verisons can co-exist in the same directory.
 %endif # with debug_build
+
 
 # ======================================================
 # The prep phase of the build:
@@ -1705,6 +1706,8 @@ fi
 %changelog
 * Mon Aug 21 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-11
 - Add bcond for --without optimizations
+- Reword package descriptions
+- Remove Group declarations
 
 * Mon Aug 21 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-10
 - Remove system-python, see https://fedoraproject.org/wiki/Changes/Platform_Python_Stack
