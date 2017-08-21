@@ -11,7 +11,7 @@ Summary: Version 3 of the Python programming language aka Python 3000
 %global pyshortver 36
 
 Version: %{pybasever}.2
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Python
 
 
@@ -230,7 +230,8 @@ Source7: pyfuntop.stp
 # Written by bkabrda
 Source8: check-pyc-and-pyo-timestamps.py
 
-# A simple macro that enables packages to require system-python(abi) instead of python(abi)
+# Backward compatible no-op macro for system-python
+# Remove in Fedora 29
 Source9: macros.systempython
 
 # Desktop menu entry for idle3
@@ -478,6 +479,12 @@ URL: https://www.python.org/
 # See notes in bug 532118:
 Provides: python(abi) = %{pybasever}
 
+# For backward compatibility only, remove in F29:
+Provides: system-python(abi) = %{pybasever}
+Provides: system-python = %{version}-%{release}
+Provides: system-python%{?_isa} = %{version}-%{release}
+Obsoletes: system-python < %{version}-%{release}
+
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 # In order to support multiple python interpreters, apart from the system python3,
@@ -508,17 +515,11 @@ need a programmable interface.
 Note that documentation for Python is provided in the python3-docs package.
 
 This package provides the "python3" executable; most of the actual
-implementation is within the "python3-libs" and "system-python-libs" packages.
+implementation is within the "python3-libs" package.
 
 %package libs
 Summary:        Python runtime libraries
 Group:          Development/Libraries
-# For Modularity purpose we need not to include the dist-tag int he dependency
-%if %(d="%{?dist}"; [ "${d#module-base-runtime-}x" != "${d}x" ] && echo 1 || echo 0)
-Requires:       system-python-libs%{?_isa} = %{version}
-%else
-Requires:       system-python-libs%{?_isa} = %{version}-%{release}
-%endif
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # this symbol (in pyexpat), so we must explicitly state this dependency to
@@ -528,35 +529,20 @@ Requires: expat >= 2.1.0
 Provides: python3-enum34 = 1.0.4-5%{?dist}
 Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
 
+# Python 3 built with glibc >= 2.24.90-26 needs to require it (rhbz#1410644).
+Requires: glibc%{?_isa} >= 2.24.90-26
+
+# For backward compatibility only, remove in F29:
+Provides: system-python-libs = %{version}-%{release}
+Provides: system-python-libs%{?_isa} = %{version}-%{release}
+Obsoletes: system-python-libs < %{version}-%{release}
+
+
 %description libs
 This package contains runtime libraries for use by Python:
 - the libpython dynamic library, for use by applications that embed Python as
 a scripting language, and by the main "python3" executable
 - the Python standard library
-
-%package -n system-python
-Summary:        System Python executable
-Group:          Development/Libraries
-Requires:       system-python-libs%{?_isa} = %{version}-%{release}
-Provides:       system-python(abi) = %{pybasever}
-
-%description -n system-python
-System Python provides a binary interpreter which uses system-python-libs,
-a subset of standard Python library considered essential to run various tools,
-requiring Python, that consider themselves "system tools".
-
-%package -n system-python-libs
-Summary:        System Python runtime libraries
-Group:          Development/Libraries
-
-%define __requires_exclude ^(/usr/bin/python3.*|python\\(abi\\) = 3\\..*)$
-
-Requires: expat >= 2.1.0
-# Python 3 built with glibc >= 2.24.90-26 needs to require it (rhbz#1410644).
-Requires: glibc%{?_isa} >= 2.24.90-26
-
-%description -n system-python-libs
-This package contains files used to embed System Python into applications.
 
 %package devel
 Summary: Libraries and header files needed for Python development
@@ -1163,9 +1149,10 @@ echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_debug}-`uname -m`
   chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
 %endif # with debug_build
 
-# System Python: Copy the executable to libexec
+# System Python: Link the executable to libexec
+# This is for backwards compatibility only and should be removed in Fedora 29
 mkdir -p %{buildroot}%{_libexecdir}
-cp %{buildroot}%{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
+ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
 
 
 # ======================================================
@@ -1247,10 +1234,6 @@ rm -fr %{buildroot}
 
 %postun libs -p /sbin/ldconfig
 
-%post -n system-python-libs -p /sbin/ldconfig
-
-%postun -n system-python-libs -p /sbin/ldconfig
-
 %post
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 
@@ -1274,11 +1257,16 @@ fi
 %{_bindir}/pyvenv
 %{_bindir}/pyvenv-%{pybasever}
 %{_mandir}/*/*
+# Remove in Fedora 29:
+%{_libexecdir}/system-python
 
 %files libs
 %defattr(-,root,root,-)
 %license LICENSE
 %doc README.rst
+
+%dir %{pylibdir}
+%dir %{dynload_dir}
 
 %{pylibdir}/lib2to3
 %exclude %{pylibdir}/lib2to3/tests
@@ -1337,21 +1325,6 @@ fi
 %{pylibdir}/concurrent/futures/__pycache__/*%{bytecode_suffixes}
 
 %{pylibdir}/pydoc_data
-
-##################################################################################
-
-%files -n system-python
-%defattr(-,root,root,-)
-%license LICENSE
-%doc README.rst
-%{_libexecdir}/system-python
-
-%files -n system-python-libs
-%defattr(-,root,root,-)
-%license LICENSE
-%doc README.rst
-%dir %{pylibdir}
-%dir %{dynload_dir}
 
 %{dynload_dir}/_blake2.%{SOABI_optimized}.so
 %{dynload_dir}/_md5.%{SOABI_optimized}.so
@@ -1710,6 +1683,9 @@ fi
 # ======================================================
 
 %changelog
+* Mon Aug 21 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-10
+- Remove system-python, see https://fedoraproject.org/wiki/Changes/Platform_Python_Stack
+
 * Wed Aug 16 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-9
 - Use bconds for configuring the build
 - Reorganize the initial sections
