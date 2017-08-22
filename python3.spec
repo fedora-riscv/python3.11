@@ -172,6 +172,7 @@ BuildRequires: autoconf
 BuildRequires: bluez-libs-devel
 BuildRequires: bzip2
 BuildRequires: bzip2-devel
+BuildRequires: desktop-file-utils
 
 # expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
 # it (in pyexpat) in order to enable the fix in Python-3.2.3 for CVE-2012-0876:
@@ -184,23 +185,22 @@ BuildRequires: gdbm-devel
 %endif
 BuildRequires: glibc-devel
 BuildRequires: gmp-devel
+BuildRequires: libappstream-glib
 BuildRequires: libffi-devel
 BuildRequires: libGL-devel
 BuildRequires: libX11-devel
 BuildRequires: ncurses-devel
+
 # workaround http://bugs.python.org/issue19804 (test_uuid requires ifconfig)
 BuildRequires: net-tools
+
 BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: sqlite-devel
-BuildRequires: desktop-file-utils
-BuildRequires: libappstream-glib
 
 BuildRequires: systemtap-sdt-devel
 BuildRequires: systemtap-devel
-# (this introduces a dependency on "python", in that systemtap-sdt-devel's
-# /usr/bin/dtrace is a python 2 script)
 %global tapsetdir      /usr/share/systemtap/tapset
 
 BuildRequires: tar
