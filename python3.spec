@@ -491,13 +491,17 @@ Obsoletes: system-python < %{version}-%{release}
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
-# In order to support multiple python interpreters, apart from the system python3,
-# for development purposes, new packages were introduced which can be installed in parallel
-# with the main python3 package (e.g. 1369688), with the naming scheme 'python<version>',
-# however in order to keep the upgrade path clean we need to Obsolete and Provide
-# these packages at the main python3 package.
-Obsoletes: python%{pyshortver}
+# In order to support multiple Python interpreters for development purposes,
+# packages with with the naming scheme pythonXY (e.g. python35) exist for
+# non-default versions of Python 3.
+# For consistency, and to keep the upgrade path clean, we Provide/Obsolete
+# these names here.
 Provides: python%{pyshortver} = %{version}-%{release}
+# Note that using Obsoletes without package version is not standard practice.
+# Here we assert that *any* version of the system's default interpreter is
+# preferable to an "extra" interpreter. For example, python3-3.6.1 will
+# replace python36-3.6.2.
+Obsoletes: python%{pyshortver}
 
 %if %{with rewheel}
 Requires: python3-setuptools
