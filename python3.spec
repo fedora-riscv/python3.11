@@ -978,16 +978,6 @@ install -d -m 0755 %{buildroot}/%{_prefix}/lib/python%{pybasever}/site-packages/
 %global _pyconfig_h %{_pyconfig32_h}
 %endif
 
-# ABIFLAGS, LDVERSION and SOABI are in the upstream Makefile
-%global ABIFLAGS_optimized m
-%global ABIFLAGS_debug     dm
-
-%global LDVERSION_optimized %{pybasever}%{ABIFLAGS_optimized}
-%global LDVERSION_debug     %{pybasever}%{ABIFLAGS_debug}
-
-%global SOABI_optimized cpython-%{pyshortver}%{ABIFLAGS_optimized}-%{_arch}-linux%{_gnu}
-%global SOABI_debug     cpython-%{pyshortver}%{ABIFLAGS_debug}-%{_arch}-linux%{_gnu}
-
 %if %{with debug_build}
 %global PyIncludeDirs python%{LDVERSION_optimized} python%{LDVERSION_debug}
 
