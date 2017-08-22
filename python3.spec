@@ -282,37 +282,9 @@ Patch111: 00111-no-static-lib.patch
 # these unittest hooks in their own "check" phases)
 Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
 
-# 00133 #
-# 00133-skip-test_dl.patch is not relevant for python3: the "dl" module no
-# longer exists
-
 # 00137 #
 # Some tests within distutils fail when run in an rpmbuild:
 Patch137: 00137-skip-distutils-tests-that-fail-in-rpmbuild.patch
-
-# 00146 #
-# Support OpenSSL FIPS mode (e.g. when OPENSSL_FORCE_FIPS_MODE=1 is set)
-# - handle failures from OpenSSL (e.g. on attempts to use MD5 in a
-#   FIPS-enforcing environment)
-# - add a new "usedforsecurity" keyword argument to the various digest
-#   algorithms in hashlib so that you can whitelist a callsite with
-#   "usedforsecurity=False"
-# (sent upstream for python 3 as http://bugs.python.org/issue9216 ; see RHEL6
-# python patch 119)
-# - enforce usage of the _hashlib implementation: don't fall back to the _md5
-#   and _sha* modules (leading to clearer error messages if fips selftests
-#   fail)
-# - don't build the _md5 and _sha* modules; rely on the _hashlib implementation
-#   of hashlib
-# (rhbz#563986)
-# Note: Up to Python 3.4.0.b1, upstream had their own implementation of what
-# they assumed would become sha3. This patch was adapted to give it the
-# usedforsecurity argument, even though it did nothing (OpenSSL didn't have
-# sha3 implementation at that time).In 3.4.0.b2, sha3 implementation was reverted
-# (see http://bugs.python.org/issue16113), but the alterations were left in the
-# patch, since they may be useful again if upstream decides to rerevert sha3
-# implementation and OpenSSL still doesn't support it. For now, they're harmless.
-Patch146: 00146-hashlib-fips.patch
 
 # 00155 #
 # Avoid allocating thunks in ctypes unless absolutely necessary, to avoid
@@ -707,7 +679,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch111 -p1
 %patch132 -p1
 %patch137 -p1
-#patch146 -p1
 %patch155 -p1
 %patch157 -p1
 %patch160 -p1
