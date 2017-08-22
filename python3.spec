@@ -3,7 +3,8 @@
 # ==================
 
 Name: python3
-Summary: Version 3 of the Python programming language aka Python 3000
+Summary: Interpreter of the Python programming language
+URL: https://www.python.org/
 
 %global pybasever 3.6
 
@@ -450,7 +451,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 # Additional metadata, and subpackages
 # ======================================================
 
-URL: https://www.python.org/
 
 # See notes in bug 532118:
 Provides: python(abi) = %{pybasever}
