@@ -447,12 +447,13 @@ Patch5001: python3-powerppc-arch.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
-# ======================================================
-# Additional metadata, and subpackages
-# ======================================================
 
+# ==========================================
+# Descriptions, and metadata for subpackages
+# ==========================================
 
-# See notes in bug 532118:
+# Packages with Python modules in standard locations automatically
+# depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
 
 # For backward compatibility only, remove in F29:
@@ -508,17 +509,20 @@ Summary:        Python runtime libraries
 # prevent "import pyexpat" from failing with a linker error if someone hasn't
 # yet upgraded expat:
 Requires: expat >= 2.1.0
+
+# The "enum" module is included in the standard library.
+# Provide an upgrade path from the external library.
 Provides: python3-enum34 = 1.0.4-5%{?dist}
 Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
 
-# Python 3 built with glibc >= 2.24.90-26 needs to require it (rhbz#1410644).
+# Python 3 built with glibc >= 2.24.90-26 needs to require it
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1410644
 Requires: glibc%{?_isa} >= 2.24.90-26
 
 # For backward compatibility only, remove in F29:
 Provides: system-python-libs = %{version}-%{release}
 Provides: system-python-libs%{?_isa} = %{version}-%{release}
 Obsoletes: system-python-libs < %{version}-%{release}
-
 
 %description libs
 This package contains runtime libraries for use by Python:
