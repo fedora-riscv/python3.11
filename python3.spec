@@ -141,26 +141,10 @@ License: Python
 %global py_INSTSONAME_optimized libpython%{LDVERSION_optimized}.so.%{py_SOVERSION}
 %global py_INSTSONAME_debug     libpython%{LDVERSION_debug}.so.%{py_SOVERSION}
 
-# We want to byte-compile the .py files within the packages using the new
-# python3 binary.
-#
-# Unfortunately, rpmbuild's infrastructure requires us to jump through some
-# hoops to avoid byte-compiling with the system python 2 version:
-#   /usr/lib/rpm/redhat/macros sets up build policy that (amongst other things)
-# defines __os_install_post.  In particular, "brp-python-bytecompile" is
-# invoked without an argument thus using the wrong version of python
-# (/usr/bin/python, rather than the freshly built python), thus leading to
-# numerous syntax errors, and incorrect magic numbers in the .pyc files.  We
-# thus override __os_install_post to avoid invoking this script:
-%global __os_install_post /usr/lib/rpm/brp-compress \
-  %{!?__debug_package:/usr/lib/rpm/brp-strip %{__strip}} \
-  /usr/lib/rpm/brp-strip-static-archive %{__strip} \
-  /usr/lib/rpm/brp-strip-comment-note %{__strip} %{__objdump} \
-  /usr/lib/rpm/brp-python-hardlink
-# to remove the invocation of brp-python-bytecompile, whilst keeping the
-# invocation of brp-python-hardlink (since this should still work for python3
-# pyc/pyo files)
-
+# Disable automatic bytecompilation. The python3 binary is not yet be
+# available in /usr/bin when Python is built. Also, the bytecompilation fails
+# on files that test invalid syntax.
+%undefine py_auto_byte_compile
 
 # =======================
 # Build-time requirements
