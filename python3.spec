@@ -432,6 +432,11 @@ Patch271: 00271-asyncio-get-default-signal-handler.patch
 # Fixed upstream: http://bugs.python.org/issue30119
 Patch272: 00272-fix-ftplib-to-reject-newlines.patch
 
+# 00273 #
+# Skip test_float_with_comma, which fails in Koji with UnicodeDecodeError
+# https://bugzilla.redhat.com/show_bug.cgi?id=1484497
+Patch273: 00273-skip-float-test.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -710,6 +715,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch270 -p1
 %patch271 -p1
 %patch272 -p1
+%patch273 -p1
 
 # Currently (2010-01-15), http://docs.python.org/library is for 2.6, and there
 # are many differences between 2.6 and the Python 3 library.
@@ -1661,6 +1667,7 @@ fi
 - Add bcond for --without optimizations
 - Reword package descriptions
 - Remove Group declarations
+- Skip failing test_float_with_comma
 
 * Mon Aug 21 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-10
 - Remove system-python, see https://fedoraproject.org/wiki/Changes/Platform_Python_Stack
