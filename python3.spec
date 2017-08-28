@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Python
 
 
@@ -247,9 +247,10 @@ Source10: idle3.desktop
 # AppData file for idle3
 Source11: idle3.appdata.xml
 
+# 00001 #
 # Fixup distutils/unixccompiler.py to remove standard library path from rpath:
 # Was Patch0 in ivazquez' python3000 specfile:
-Patch1:         Python-3.1.1-rpath.patch
+Patch1:         00001-rpath.patch
 
 # 00055 #
 # Systemtap support: add statically-defined probe points
@@ -448,9 +449,10 @@ Patch273: 00273-skip-float-test.patch
 #
 #     https://fedoraproject.org/wiki/SIGs/Python/PythonPatches
 
+# 05001 #
 # add correct arch for ppc64/ppc64le
 # it should be ppc64le-linux-gnu/ppc64-linux-gnu instead powerpc64le-linux-gnu/powerpc64-linux-gnu
-Patch5001: python3-powerppc-arch.patch
+Patch5001: 05001-powerppc-arch.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
@@ -1665,6 +1667,9 @@ fi
 # ======================================================
 
 %changelog
+* Mon Aug 28 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-13
+- Rename patch files to be consistent
+
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
   patch to prevent recursion in UnixCCompiler subclasses
