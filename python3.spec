@@ -392,8 +392,6 @@ Patch274: 00274-fix-arch-names.patch
 #
 #     https://fedoraproject.org/wiki/SIGs/Python/PythonPatches
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-root
-
 
 # ==========================================
 # Descriptions, and metadata for subpackages
