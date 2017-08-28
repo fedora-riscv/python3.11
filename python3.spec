@@ -328,21 +328,6 @@ Patch178: 00178-dont-duplicate-flags-in-sysconfig.patch
 # Not appropriate for upstream, Fedora-specific naming
 Patch180: 00180-python-add-support-for-ppc64p7.patch
 
-# 00188 #
-# Downstream only patch that should be removed when we compile all guaranteed
-# hashlib algorithms properly. The problem is this:
-# - during tests, test_hashlib is imported and executed before test_lib2to3
-# - if at least one hash function has failed, trying to import it triggers an
-#   exception that is being caught and exception is logged:
-#   http://hg.python.org/cpython/file/2de806c8b070/Lib/hashlib.py#l217
-# - logging the exception makes logging module run basicConfig
-# - when lib2to3 tests are run again, lib2to3 runs basicConfig again, which
-#   doesn't do anything, because it was run previously
-#   (logging.root.handlers != []), which means that the default setup
-#   (most importantly logging level) is not overriden. That means that a test
-#   relying on this will fail (test_filename_changing_on_output_single_dir)
-Patch188: 00188-fix-lib2to3-tests-when-hashlib-doesnt-compile-properly.patch
-
 # 00189 #
 # Add the rewheel module, allowing to recreate wheels from already installed
 # ones
@@ -667,7 +652,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch170 -p1
 %patch178 -p1
 %patch180 -p1
-%patch188 -p1
 
 %if %{with rewheel}
 %patch189 -p1
@@ -1653,6 +1637,7 @@ fi
 - Merge lib64 patches (104 into 102)
 - Skip test_bdist_rpm using test config rather than a patch (removes patch 137)
 - Remove patches 157 and 186, which had test changes left over after upstreaming
+- Remove patch 188, a temporary workaround for hashlib tests
 
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
