@@ -285,10 +285,6 @@ Patch111: 00111-no-static-lib.patch
 # these unittest hooks in their own "check" phases)
 Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
 
-# 00137 #
-# Some tests within distutils fail when run in an rpmbuild:
-Patch137: 00137-skip-distutils-tests-that-fail-in-rpmbuild.patch
-
 # 00155 #
 # Avoid allocating thunks in ctypes unless absolutely necessary, to avoid
 # generating SELinux denials on "import ctypes" and "import uuid" when
@@ -689,7 +685,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %endif
 %patch111 -p1
 %patch132 -p1
-%patch137 -p1
 %patch155 -p1
 %patch157 -p1
 %patch160 -p1
@@ -1185,6 +1180,7 @@ CheckPython() {
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest --findleaks \
     -x test_distutils \
+    -x test_bdist_rpm \
     %ifarch ppc64le aarch64
     -x test_faulthandler \
     %endif
@@ -1679,6 +1675,7 @@ fi
 - Rename patch files to be consistent
 - Run autotools to generate the configure script before building
 - Merge lib64 patches (104 into 102)
+- Skip test_bdist_rpm using test config rather than a patch (removes patch 137)
 
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
