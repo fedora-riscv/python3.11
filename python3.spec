@@ -311,12 +311,10 @@ Patch163: 00163-disable-parts-of-test_socket-in-rpm-build.patch
 # In debug builds, try to print repr() when a C-level assert fails in the
 # garbage collector (typically indicating a reference-counting error
 # somewhere else e.g in an extension module)
-# Backported to 2.7 from a patch I sent upstream for py3k
-#   http://bugs.python.org/issue9263
-#   (https://bugzilla.redhat.com/show_bug.cgi?id=614680)
-# hiding the proposed new macros/functions within gcmodule.c to avoid exposing
+# The new macros/functions within gcmodule.c are hidden to avoid exposing
 # them within the extension API.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=850013
+# Sent upstream: http://bugs.python.org/issue9263
+# See https://bugzilla.redhat.com/show_bug.cgi?id=614680
 Patch170: 00170-gc-assertions.patch
 
 # 00178 #
