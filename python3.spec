@@ -267,7 +267,8 @@ Patch102: 00102-lib64.patch
 
 # 00111 #
 # Patch the Makefile.pre.in so that the generated Makefile doesn't try to build
-# a libpythonMAJOR.MINOR.a (bug 550692):
+# a libpythonMAJOR.MINOR.a
+# See https://bugzilla.redhat.com/show_bug.cgi?id=556092
 # Downstream only: not appropriate for upstream
 Patch111: 00111-no-static-lib.patch
 
@@ -288,7 +289,8 @@ Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
 # 00155 #
 # Avoid allocating thunks in ctypes unless absolutely necessary, to avoid
 # generating SELinux denials on "import ctypes" and "import uuid" when
-# embedding Python within httpd (rhbz#814391)
+# embedding Python within httpd
+# See https://bugzilla.redhat.com/show_bug.cgi?id=814391
 Patch155: 00155-avoid-ctypes-thunks.patch
 
 # 00157 #
@@ -304,7 +306,7 @@ Patch155: 00155-avoid-ctypes-thunks.patch
 #
 # Update standard library to use this throughout for uid/gid values, so that
 # very large uid/gid values are round-trippable, and -1 remains usable.
-# (rhbz#697470)
+# See https://bugzilla.redhat.com/show_bug.cgi?id=697470
 Patch157: 00157-uid-gid-overflows.patch
 
 # 00160 #
@@ -326,10 +328,11 @@ Patch163: 00163-disable-parts-of-test_socket-in-rpm-build.patch
 # garbage collector (typically indicating a reference-counting error
 # somewhere else e.g in an extension module)
 # Backported to 2.7 from a patch I sent upstream for py3k
-#   http://bugs.python.org/issue9263  (rhbz#614680)
+#   http://bugs.python.org/issue9263
+#   (https://bugzilla.redhat.com/show_bug.cgi?id=614680)
 # hiding the proposed new macros/functions within gcmodule.c to avoid exposing
 # them within the extension API.
-# (rhbz#850013
+# See https://bugzilla.redhat.com/show_bug.cgi?id=850013
 Patch170: 00170-gc-assertions.patch
 
 # 00178 #
@@ -385,7 +388,7 @@ Patch206: 00206-remove-hf-from-arm-triplet.patch
 
 # 00243 #
 # Fix the triplet used on 64-bit MIPS
-# rhbz#1322526: https://bugzilla.redhat.com/show_bug.cgi?id=1322526
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1322526
 # Upstream uses Debian-like style mips64-linux-gnuabi64
 # Fedora needs the default mips64-linux-gnu
 Patch243: 00243-fix-mips64-triplet.patch
@@ -426,13 +429,13 @@ Patch271: 00271-asyncio-get-default-signal-handler.patch
 # 00272 #
 # Reject newline characters in ftplib.FTP.putline() arguments to
 # avoid FTP protocol stream injection via malicious URLs.
-# rhbz#1478916
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1478916
 # Fixed upstream: http://bugs.python.org/issue30119
 Patch272: 00272-fix-ftplib-to-reject-newlines.patch
 
 # 00273 #
 # Skip test_float_with_comma, which fails in Koji with UnicodeDecodeError
-# https://bugzilla.redhat.com/show_bug.cgi?id=1484497
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1484497
 Patch273: 00273-skip-float-test.patch
 
 # (New patches go here ^^^)
@@ -883,7 +886,8 @@ make install DESTDIR=%{buildroot} INSTALL="install -p" EXTRA_CFLAGS="$MoreCFlags
   #
   # Initially I tried:
   #  /usr/lib/libpython3.1.so.1.0-gdb.py
-  # but doing so generated noise when ldconfig was rerun (rhbz:562980)
+  # but doing so generated noise when ldconfig was rerun
+  # (see https://bugzilla.redhat.com/show_bug.cgi?id=562980)
   #
 %if %{with gdb_hooks}
   DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
@@ -1077,8 +1081,8 @@ for Module in %{buildroot}/%{dynload_dir}/*.so ; do
 done
 
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
-# avoid the user having to know the precise version and ABI flags.  (see
-# e.g. rhbz#676748):
+# avoid the user having to know the precise version and ABI flags.
+# See e.g. https://bugzilla.redhat.com/show_bug.cgi?id=676748
 %if %{with debug_build}
 ln -s \
   %{_bindir}/python%{LDVERSION_debug} \
@@ -1154,7 +1158,8 @@ find %{buildroot} -type f -a -name "*.py" -print0 | \
     PYTHONPATH="%{buildroot}%{_libdir}/python%{pybasever} %{buildroot}%{_libdir}/python%{pybasever}/site-packages" \
     xargs -0 %{buildroot}%{_bindir}/python%{pybasever} %{SOURCE8}
 
-# For ppc64 we need a larger stack than default (rhbz#1292462)
+# For ppc64 we need a larger stack than default
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1292462
 %ifarch %{power64}
   ulimit -a
   ulimit -s 16384
@@ -1650,8 +1655,8 @@ fi
 
 %endif # with debug_build
 
-# We put the debug-gdb.py file inside /usr/lib/debug to avoid noise from
-# ldconfig (rhbz:562980).
+# We put the debug-gdb.py file inside /usr/lib/debug to avoid noise from ldconfig
+# See https://bugzilla.redhat.com/show_bug.cgi?id=562980
 #
 # The /usr/lib/rpm/redhat/macros defines %__debug_package to use
 # debugfiles.list, and it appears that everything below /usr/lib/debug and
@@ -1663,7 +1668,7 @@ fi
 # (if it doesn't, then the rpmbuild ought to fail since the debug-gdb.py
 # payload file would be unpackaged)
 
-# Workaround for rhbz#1476593
+# Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1476593
 %undefine _debuginfo_subpackages
 
 # ======================================================
