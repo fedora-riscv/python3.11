@@ -11,6 +11,8 @@ URL: https://www.python.org/
 # pybasever without the dot:
 %global pyshortver 36
 
+#  WARNING  When rebasing to a new Python version,
+#           remember to update the python3-docs package as well
 Version: %{pybasever}.2
 Release: 11%{?dist}
 License: Python
