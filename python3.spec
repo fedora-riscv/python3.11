@@ -293,22 +293,6 @@ Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
 # See https://bugzilla.redhat.com/show_bug.cgi?id=814391
 Patch155: 00155-avoid-ctypes-thunks.patch
 
-# 00157 #
-# Update uid/gid handling throughout the standard library: uid_t and gid_t are
-# unsigned 32-bit values, but existing code often passed them through C long
-# values, which are signed 32-bit values on 32-bit architectures, leading to
-# negative int objects for uid/gid values >= 2^31 on 32-bit architectures.
-#
-# Introduce _PyObject_FromUid/Gid to convert uid_t/gid_t values to python
-# objects, using int objects where the value will fit (long objects otherwise),
-# and _PyArg_ParseUid/Gid to convert int/long to uid_t/gid_t, with -1 allowed
-# as a special case (since this is given special meaning by the chown syscall)
-#
-# Update standard library to use this throughout for uid/gid values, so that
-# very large uid/gid values are round-trippable, and -1 remains usable.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=697470
-Patch157: 00157-uid-gid-overflows.patch
-
 # 00160 #
 # Python 3.3 added os.SEEK_DATA and os.SEEK_HOLE, which may be present in the
 # header files in the build chroot, but may not be supported in the running
@@ -689,7 +673,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch111 -p1
 %patch132 -p1
 %patch155 -p1
-%patch157 -p1
 %patch160 -p1
 %patch163 -p1
 %patch170 -p1
@@ -1681,6 +1664,7 @@ fi
 - Run autotools to generate the configure script before building
 - Merge lib64 patches (104 into 102)
 - Skip test_bdist_rpm using test config rather than a patch (removes patch 137)
+- Remove patch 157, which contained test changes left over after upstreaming
 
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
