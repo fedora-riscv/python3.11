@@ -586,13 +586,9 @@ cp -a %{SOURCE6} .
 cp -a %{SOURCE7} .
 %endif # with systemtap
 
-# Ensure that we're using the system copy of various libraries, rather than
-# copies shipped by upstream in the tarball:
-#   Remove embedded copy of expat:
-rm -r Modules/expat || exit 1
-
-#   Remove embedded copy of zlib:
-rm -r Modules/zlib || exit 1
+# Remove bundled libraries to ensure that we're using the system copy.
+rm -r Modules/expat
+rm -r Modules/zlib
 
 ## Disabling hashlib patch for now as it needs to be reimplemented
 ## for OpenSSL 1.1.0.
