@@ -328,15 +328,6 @@ Patch178: 00178-dont-duplicate-flags-in-sysconfig.patch
 # Not appropriate for upstream, Fedora-specific naming
 Patch180: 00180-python-add-support-for-ppc64p7.patch
 
-# 00186 #
-# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=1023607
-# Previously, this fixed a problem where some *.py files were not being
-# bytecompiled properly during build. This was result of py_compile.compile
-# raising exception when trying to convert test file with bad encoding, and
-# thus not continuing bytecompilation for other files.
-# This was fixed upstream, but the test hasn't been merged yet, so we keep it
-Patch186: 00186-dont-raise-from-py_compile.patch
-
 # 00188 #
 # Downstream only patch that should be removed when we compile all guaranteed
 # hashlib algorithms properly. The problem is this:
@@ -676,7 +667,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch170 -p1
 %patch178 -p1
 %patch180 -p1
-%patch186 -p1
 %patch188 -p1
 
 %if %{with rewheel}
@@ -1662,7 +1652,7 @@ fi
 - Run autotools to generate the configure script before building
 - Merge lib64 patches (104 into 102)
 - Skip test_bdist_rpm using test config rather than a patch (removes patch 137)
-- Remove patch 157, which contained test changes left over after upstreaming
+- Remove patches 157 and 186, which had test changes left over after upstreaming
 
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
