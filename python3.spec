@@ -590,19 +590,6 @@ cp -a %{SOURCE7} .
 rm -r Modules/expat
 rm -r Modules/zlib
 
-## Disabling hashlib patch for now as it needs to be reimplemented
-## for OpenSSL 1.1.0.
-# Don't build upstream Python's implementation of these crypto algorithms;
-# instead rely on _hashlib and OpenSSL.
-#
-# For example, in our builds hashlib.md5 is implemented within _hashlib via
-# OpenSSL (and thus respects FIPS mode), and does not fall back to _md5
-# TODO: there seems to be no OpenSSL support in Python for sha3 so far
-# when it is there, also remove _sha3/ dir
-#for f in md5module.c sha1module.c sha256module.c sha512module.c; do
-#    rm Modules/$f
-#done
-
 %if %{with rewheel}
 %global pip_version 9.0.1
 sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
