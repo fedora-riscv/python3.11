@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Python
 
 
@@ -1665,6 +1665,11 @@ fi
 # ======================================================
 
 %changelog
+* Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
+- Use python3 style of calling super() without arguments in rpath
+  patch to prevent recursion in UnixCCompiler subclasses
+Resolves: rhbz#1458122
+
 * Mon Aug 21 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-11
 - Add bcond for --without optimizations
 - Reword package descriptions
