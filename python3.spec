@@ -731,63 +731,66 @@ BuildPython optimized \
 # ======================================================
 
 %install
+
+# As in %%build, remember the current directory
 topdir=$(pwd)
 
+# We install a collection of hooks for gdb that make it easier to debug
+# executables linked against libpython3* (such as /usr/bin/python3 itself)
+#
+# These hooks are implemented in Python itself (though they are for the version
+# of python that gdb is linked with)
+#
+# gdb-archer looks for them in the same path as the ELF file or its .debug
+# file, with a -gdb.py suffix.
+# We put them next to the debug file, because ldconfig would complain if
+# it found non-library files directly in /usr/lib/
+# (see https://bugzilla.redhat.com/show_bug.cgi?id=562980)
+#
+# We'll put these files in the debuginfo package by installing them to e.g.:
+#  /usr/lib/debug/usr/lib/libpython3.2.so.1.0.debug-gdb.py
+# (note that the debug path is /usr/lib/debug for both 32/64 bit)
+#
+# See https://fedoraproject.org/wiki/Features/EasierPythonDebugging for more
+# information
+
+%if %{with gdb_hooks}
+DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
+mkdir -p %{buildroot}$DirHoldingGdbPy
+%endif # with gdb_hooks
+
+# Use a common function to do an install for all our configurations:
 InstallPython() {
 
   ConfName=$1
   PyInstSoName=$2
   MoreCFlags=$3
 
+  # Switch to the directory with this configuration's built files
   ConfDir=build/$ConfName
-
   echo STARTING: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
   mkdir -p $ConfDir
-
   pushd $ConfDir
 
-make install DESTDIR=%{buildroot} INSTALL="install -p" EXTRA_CFLAGS="$MoreCFlags"
+  make \
+    DESTDIR=%{buildroot} \
+    INSTALL="install -p" \
+    EXTRA_CFLAGS="$MoreCFlags" \
+    install
 
   popd
 
-  # We install a collection of hooks for gdb that make it easier to debug
-  # executables linked against libpython3* (such as /usr/bin/python3 itself)
-  #
-  # These hooks are implemented in Python itself (though they are for the version
-  # of python that gdb is linked with, in this case Python 2.7)
-  #
-  # gdb-archer looks for them in the same path as the ELF file, with a -gdb.py suffix.
-  # We put them in the debuginfo package by installing them to e.g.:
-  #  /usr/lib/debug/usr/lib/libpython3.2.so.1.0.debug-gdb.py
-  #
-  # See https://fedoraproject.org/wiki/Features/EasierPythonDebugging for more
-  # information
-  #
-  # Copy up the gdb hooks into place; the python file will be autoloaded by gdb
-  # when visiting libpython.so, provided that the python file is installed to the
-  # same path as the library (or its .debug file) plus a "-gdb.py" suffix, e.g:
-  #  /usr/lib/debug/usr/lib64/libpython3.2.so.1.0.debug-gdb.py
-  # (note that the debug path is /usr/lib/debug for both 32/64 bit)
-  #
-  # Initially I tried:
-  #  /usr/lib/libpython3.1.so.1.0-gdb.py
-  # but doing so generated noise when ldconfig was rerun
-  # (see https://bugzilla.redhat.com/show_bug.cgi?id=562980)
-  #
 %if %{with gdb_hooks}
-  DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
+  # See comment on $DirHoldingGdbPy above
   PathOfGdbPy=$DirHoldingGdbPy/$PyInstSoName-%{version}-%{release}.%{_arch}.debug-gdb.py
-
-  mkdir -p %{buildroot}$DirHoldingGdbPy
   cp Tools/gdb/libpython.py %{buildroot}$PathOfGdbPy
 %endif # with gdb_hooks
 
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
 
-# Use "InstallPython" to support building with different configurations:
-
-# Install the "debug" build first, so that we can move some files aside
+# Install the "debug" build first; anny common files will be overridden with
+# later builds
 %if %{with debug_build}
 InstallPython debug \
   %{py_INSTSONAME_debug} \
@@ -796,7 +799,8 @@ InstallPython debug \
 
 # Now the optimized build:
 InstallPython optimized \
-  %{py_INSTSONAME_optimized}
+  %{py_INSTSONAME_optimized} \
+  ""
 
 install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
 
@@ -833,7 +837,8 @@ rm -f %{buildroot}%{pylibdir}/email/test/data/audiotest.au %{buildroot}%{pylibdi
 install -d -m 0755 %{buildroot}/%{_prefix}/lib/python%{pybasever}/site-packages/__pycache__
 %endif
 
-# Make python3-devel multilib-ready (bug #192747, #139911)
+# Make python3-devel multilib-ready
+# See https://bugzilla.redhat.com/show_bug.cgi?id=192747
 %global _pyconfig32_h pyconfig-32.h
 %global _pyconfig64_h pyconfig-64.h
 
