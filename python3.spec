@@ -745,8 +745,6 @@ BuildPython optimized \
 
 %install
 topdir=$(pwd)
-rm -fr %{buildroot}
-mkdir -p %{buildroot}%{_prefix} %{buildroot}%{_mandir}
 
 InstallPython() {
 
