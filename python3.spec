@@ -504,6 +504,12 @@ Provides: %{name}-idle = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
 Provides: idle3 = %{version}-%{release}
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+# /usr/bin/2to3 was moved from here
+# TODO Remove in Fedora 29
+Conflicts: python2-tools < 2.7.13-17
+Conflicts: python-tools < 2.7.13-17
+
 %description tools
 This package contains several tools included with Python, including:
 - 2to3, an automatic source converter from Python 2.X
@@ -513,12 +519,6 @@ This package contains several tools included with Python, including:
 %package tkinter
 Summary: A GUI toolkit for Python
 Requires: %{name} = %{version}-%{release}
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-# /usr/bin/2to3 was moved from here
-# TODO Remove in Fedora 29
-Conflicts: python2-tools < 2.7.13-17
-Conflicts: python-tools < 2.7.13-17
 
 %description tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
@@ -1588,7 +1588,8 @@ fi
 - Skip test_bdist_rpm using test config rather than a patch (removes patch 137)
 - Remove patches 157 and 186, which had test changes left over after upstreaming
 - Remove patch 188, a temporary workaround for hashlib tests
-- Merge patches 180, 206, 243, 5001 (architecture naming) into new patch 274.
+- Merge patches 180, 206, 243, 5001 (architecture naming) into new patch 274
+- Move python2-tools conflicts to tools subpackage (it was wrongly in tkinter)
 
 * Mon Aug 28 2017 Michal Cyprian <mcyprian@redhat.com> - 3.6.2-12
 - Use python3 style of calling super() without arguments in rpath
