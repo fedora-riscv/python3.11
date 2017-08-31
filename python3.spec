@@ -644,41 +644,49 @@ rm configure pyconfig.h.in
 autoconf
 autoheader
 
+# Remember the current directory (which has sources and the configure script),
+# so we can refer to it after we "cd" elsewhere.
 topdir=$(pwd)
+
+# Get proper option names from bconds
+%if %{with computed_gotos}
+%global computed_gotos_flag yes
+%else
+%global computed_gotos_flag no
+%endif
+
+%if %{with optimizations}
+%global optimizations_flag "--enable-optimizations"
+%else
+%global optimizations_flag "--disable-optimizations"
+%endif
+
+# Set common compiler/linker flags
 export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -fPIC -fwrapv"
 export CXXFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -fPIC -fwrapv"
-export CPPFLAGS="`pkg-config --cflags-only-I libffi`"
+export CPPFLAGS="$(pkg-config --cflags-only-I libffi)"
 export OPT="$RPM_OPT_FLAGS -D_GNU_SOURCE -fPIC -fwrapv"
 export LINKCC="gcc"
-export CFLAGS="$CFLAGS `pkg-config --cflags openssl`"
-export LDFLAGS="$RPM_LD_FLAGS `pkg-config --libs-only-L openssl`"
+export CFLAGS="$CFLAGS $(pkg-config --cflags openssl)"
+export LDFLAGS="$RPM_LD_FLAGS $(pkg-config --libs-only-L openssl)"
 
-
-# Define a function, for how to perform a "build" of python for a given
-# configuration:
+# We can build several different configurations of Python: regular and debug.
+# Define a common function that does one build:
 BuildPython() {
   ConfName=$1
-  BinaryName=$2
-  SymlinkName=$3
-  ExtraConfigArgs=$4
-  PathFixWithThisBinary=$5
-  MoreCFlags=$6
+  ExtraConfigArgs=$2
+  MoreCFlags=$3
 
+  # Each build is done in its own directory
   ConfDir=build/$ConfName
-
-  echo STARTING: BUILD OF PYTHON FOR CONFIGURATION: $ConfName - %{_bindir}/$BinaryName
+  echo STARTING: BUILD OF PYTHON FOR CONFIGURATION: $ConfName
   mkdir -p $ConfDir
-
   pushd $ConfDir
 
-  # Use the freshly created "configure" script, but in the directory two above:
+  # Normally, %%configure looks for the "configure" script in the current
+  # directory.
+  # Since we changed directories, we need to tell %%configure where to look.
   %global _configure $topdir/configure
-
-  %if %{with computed_gotos}
-  %global computed_gotos_flag yes
-  %else
-  %global computed_gotos_flag no
-  %endif
 
 %configure \
   --enable-ipv6 \
@@ -699,45 +707,24 @@ BuildPython() {
   $ExtraConfigArgs \
   %{nil}
 
-  # Set EXTRA_CFLAGS to our CFLAGS (rather than overriding OPT, as we've done
-  # in the past).
-  # This should fix a problem with --with-valgrind where it adds
-  #   -DDYNAMIC_ANNOTATIONS_ENABLED=1
-  # to OPT which must be passed to all compilation units in the build,
-  # otherwise leading to linker errors, e.g.
-  #    missing symbol AnnotateRWLockDestroy
-  #
-  # Invoke the build:
+  # Invoke the build
   make EXTRA_CFLAGS="$CFLAGS $MoreCFlags" %{?_smp_mflags}
 
   popd
-  echo FINISHED: BUILD OF PYTHON FOR CONFIGURATION: $ConfDir
+  echo FINISHED: BUILD OF PYTHON FOR CONFIGURATION: $ConfName
 }
 
-# Use "BuildPython" to support building with different configurations:
+# Call the above to build each configuration.
 
 %if %{with debug_build}
 BuildPython debug \
-  python-debug \
-  python%{pybasever}-debug \
-%ifarch %{ix86} x86_64 ppc %{power64}
-  "--with-pydebug --without-ensurepip" \
-%else
-  "--with-pydebug --without-ensurepip" \
-%endif
-  false \
-  -O0
+  "--without-ensurepip --with-pydebug" \
+  "-O0"
 %endif # with debug_build
 
 BuildPython optimized \
-  python \
-  python%{pybasever} \
-%if %{with optimizations}
-  "--without-ensurepip --enable-optimizations" \
-%else
-  "--without-ensurepip --disable-optimizations" \
-%endif  # with optimizations
-  true
+  "--without-ensurepip %{optimizations_flag}" \
+  ""
 
 # ======================================================
 # Installing the built code:
