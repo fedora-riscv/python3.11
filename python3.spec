@@ -759,6 +759,22 @@ DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
 mkdir -p %{buildroot}$DirHoldingGdbPy
 %endif # with gdb_hooks
 
+# Multilib support for pyconfig.h
+# 32- and 64-bit versions of pyconfig.h are different. For multilib support
+# (making it possible to install 32- and 64-bit versions simultaneously),
+# we need to install them under different filenames, and to make the common
+# "pyconfig.h" include the right file based on architecture.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=192747
+# Filanames are defined here:
+%global _pyconfig32_h pyconfig-32.h
+%global _pyconfig64_h pyconfig-64.h
+
+%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64} riscv64
+%global _pyconfig_h %{_pyconfig64_h}
+%else
+%global _pyconfig_h %{_pyconfig32_h}
+%endif
+
 # Use a common function to do an install for all our configurations:
 InstallPython() {
 
@@ -794,6 +810,21 @@ InstallPython() {
   echo '[ $? -eq 127 ] && echo "Could not find python'${LDVersion}'-`uname -m`-config. Look around to see available arches." >&2' >> \
     %{buildroot}%{_bindir}/python${LDVersion}-config
     chmod +x %{buildroot}%{_bindir}/python${LDVersion}-config
+
+  # Make python3-devel multilib-ready
+  mv %{buildroot}%{_includedir}/python${LDVersion}/pyconfig.h \
+     %{buildroot}%{_includedir}/python${LDVersion}/%{_pyconfig_h}
+  cat > %{buildroot}%{_includedir}/python${LDVersion}/pyconfig.h << EOF
+#include <bits/wordsize.h>
+
+#if __WORDSIZE == 32
+#include "%{_pyconfig32_h}"
+#elif __WORDSIZE == 64
+#include "%{_pyconfig64_h}"
+#else
+#error "Unknown word size"
+#endif
+EOF
 
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
@@ -853,44 +884,11 @@ cp -ar Tools/demo %{buildroot}%{pylibdir}/Tools/
 # Fix for bug #136654
 rm -f %{buildroot}%{pylibdir}/email/test/data/audiotest.au %{buildroot}%{pylibdir}/test/audiotest.au
 
-# Make python3-devel multilib-ready
-# See https://bugzilla.redhat.com/show_bug.cgi?id=192747
-%global _pyconfig32_h pyconfig-32.h
-%global _pyconfig64_h pyconfig-64.h
-
-%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64} riscv64
-%global _pyconfig_h %{_pyconfig64_h}
-%else
-%global _pyconfig_h %{_pyconfig32_h}
-%endif
-
-%if %{with debug_build}
-%global PyIncludeDirs python%{LDVERSION_optimized} python%{LDVERSION_debug}
-
-%else
-%global PyIncludeDirs python%{LDVERSION_optimized}
-%endif
-
-for PyIncludeDir in %{PyIncludeDirs} ; do
-  mv %{buildroot}%{_includedir}/$PyIncludeDir/pyconfig.h \
-     %{buildroot}%{_includedir}/$PyIncludeDir/%{_pyconfig_h}
-  cat > %{buildroot}%{_includedir}/$PyIncludeDir/pyconfig.h << EOF
-#include <bits/wordsize.h>
-
-#if __WORDSIZE == 32
-#include "%{_pyconfig32_h}"
-#elif __WORDSIZE == 64
-#include "%{_pyconfig64_h}"
-#else
-#error "Unknown word size"
-#endif
-EOF
-done
-
-# Fix for bug 201434: make sure distutils looks at the right pyconfig.h file
+# Make sure distutils looks at the right pyconfig.h file
+# See https://bugzilla.redhat.com/show_bug.cgi?id=201434
 # Similar for sysconfig: sysconfig.get_config_h_filename tries to locate
 # pyconfig.h so it can be parsed, and needs to do this at runtime in site.py
-# when python starts up (bug 653058)
+# when python starts up (see https://bugzilla.redhat.com/show_bug.cgi?id=653058)
 #
 # Split this out so it goes directly to the pyconfig-32.h/pyconfig-64.h
 # variants:
