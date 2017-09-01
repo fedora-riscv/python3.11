@@ -765,6 +765,7 @@ InstallPython() {
   ConfName=$1
   PyInstSoName=$2
   MoreCFlags=$3
+  LDVersion=$4
 
   # Switch to the directory with this configuration's built files
   ConfDir=build/$ConfName
@@ -786,6 +787,14 @@ InstallPython() {
   cp Tools/gdb/libpython.py %{buildroot}$PathOfGdbPy
 %endif # with gdb_hooks
 
+  # Rename the -devel script that differs on different arches to arch specific name
+  mv %{buildroot}%{_bindir}/python${LDVersion}-{,`uname -m`-}config
+  echo -e '#!/bin/sh\nexec `dirname $0`/python'${LDVersion}'-`uname -m`-config "$@"' > \
+    %{buildroot}%{_bindir}/python${LDVersion}-config
+  echo '[ $? -eq 127 ] && echo "Could not find python'${LDVersion}'-`uname -m`-config. Look around to see available arches." >&2' >> \
+    %{buildroot}%{_bindir}/python${LDVersion}-config
+    chmod +x %{buildroot}%{_bindir}/python${LDVersion}-config
+
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
 
@@ -794,13 +803,15 @@ InstallPython() {
 %if %{with debug_build}
 InstallPython debug \
   %{py_INSTSONAME_debug} \
-  -O0
+  -O0 \
+  %{LDVERSION_debug}
 %endif # with debug_build
 
 # Now the optimized build:
 InstallPython optimized \
   %{py_INSTSONAME_optimized} \
-  ""
+  "" \
+  %{LDVERSION_optimized}
 
 # Install directories for additional packages
 install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
@@ -976,25 +987,6 @@ sed \
 %endif # with debug_build
 
 %endif # with systemtap
-
-# Rename the -devel script that differs on different arches to arch specific name
-mv %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-{,`uname -m`-}config
-
-echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_optimized}-`uname -m`-config "$@"' > \
-  %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
-echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_optimized}-`uname -m`-config. Look around to see available arches." >&2' >> \
-  %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
-  chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
-
-%if %{with debug_build}
-# Rename the -debug script that differs on different arches to arch specific name
-mv %{buildroot}%{_bindir}/python%{LDVERSION_debug}-{,`uname -m`-}config
-echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_debug}-`uname -m`-config "$@"' > \
-  %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
-echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_debug}-`uname -m`-config. Look around to see available arches." >&2' >> \
-  %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
-  chmod +x %{buildroot}%{_bindir}/python%{LDVERSION_debug}-config
-%endif # with debug_build
 
 # System Python: Link the executable to libexec
 # This is for backwards compatibility only and should be removed in Fedora 29
