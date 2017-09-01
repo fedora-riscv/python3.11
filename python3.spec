@@ -802,7 +802,16 @@ InstallPython optimized \
   %{py_INSTSONAME_optimized} \
   ""
 
+# Install directories for additional packages
 install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
+%if "%{_lib}" == "lib64"
+# The 64-bit version needs to create "site-packages" in /usr/lib/ (for
+# pure-Python modules) as well as in /usr/lib64/ (for packages with extension
+# modules).
+# Note that rpmlint will complain about hardcoded library path;
+# this is intentional.
+install -d -m 0755 %{buildroot}%{_prefix}/lib/python%{pybasever}/site-packages/__pycache__
+%endif
 
 # add idle3 to menu
 install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
@@ -832,10 +841,6 @@ cp -ar Tools/demo %{buildroot}%{pylibdir}/Tools/
 
 # Fix for bug #136654
 rm -f %{buildroot}%{pylibdir}/email/test/data/audiotest.au %{buildroot}%{pylibdir}/test/audiotest.au
-
-%if "%{_lib}" == "lib64"
-install -d -m 0755 %{buildroot}/%{_prefix}/lib/python%{pybasever}/site-packages/__pycache__
-%endif
 
 # Make python3-devel multilib-ready
 # See https://bugzilla.redhat.com/show_bug.cgi?id=192747
