@@ -935,28 +935,6 @@ mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
 install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d/
 install -m 644 %{SOURCE9} %{buildroot}/%{_rpmconfigdir}/macros.d/
 
-# Ensure that the curses module was linked against libncursesw.so, rather than
-# libncurses.so (bug 539917)
-ldd %{buildroot}/%{dynload_dir}/_curses*.so \
-    | grep curses \
-    | grep libncurses.so && (echo "_curses.so linked against libncurses.so" ; exit 1)
-
-# Ensure that the debug modules are linked against the debug libpython, and
-# likewise for the optimized modules and libpython:
-for Module in %{buildroot}/%{dynload_dir}/*.so ; do
-    case $Module in
-    *.%{SOABI_debug})
-        ldd $Module | grep %{py_INSTSONAME_optimized} &&
-            (echo Debug module $Module linked against optimized %{py_INSTSONAME_optimized} ; exit 1)
-
-        ;;
-    *.%{SOABI_optimized})
-        ldd $Module | grep %{py_INSTSONAME_debug} &&
-            (echo Optimized module $Module linked against debug %{py_INSTSONAME_debug} ; exit 1)
-        ;;
-    esac
-done
-
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
 # avoid the user having to know the precise version and ABI flags.
 # See e.g. https://bugzilla.redhat.com/show_bug.cgi?id=676748
@@ -1001,6 +979,7 @@ sed \
 
 # Rename the -devel script that differs on different arches to arch specific name
 mv %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-{,`uname -m`-}config
+
 echo -e '#!/bin/sh\nexec `dirname $0`/python%{LDVERSION_optimized}-`uname -m`-config "$@"' > \
   %{buildroot}%{_bindir}/python%{LDVERSION_optimized}-config
 echo '[ $? -eq 127 ] && echo "Could not find python%{LDVERSION_optimized}-`uname -m`-config. Look around to see available arches." >&2' >> \
@@ -1024,7 +1003,7 @@ ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
 
 
 # ======================================================
-# Running the upstream test suite
+# Checks for packaging issues
 # ======================================================
 
 %check
@@ -1035,12 +1014,40 @@ find %{buildroot} -type f -a -name "*.py" -print0 | \
     PYTHONPATH="%{buildroot}%{_libdir}/python%{pybasever} %{buildroot}%{_libdir}/python%{pybasever}/site-packages" \
     xargs -0 %{buildroot}%{_bindir}/python%{pybasever} %{SOURCE8}
 
+# Ensure that the curses module was linked against libncursesw.so, rather than
+# libncurses.so
+# See https://bugzilla.redhat.com/show_bug.cgi?id=539917
+ldd %{buildroot}/%{dynload_dir}/_curses*.so \
+    | grep curses \
+    | grep libncurses.so && (echo "_curses.so linked against libncurses.so" ; exit 1)
+
+# Ensure that the debug modules are linked against the debug libpython, and
+# likewise for the optimized modules and libpython:
+for Module in %{buildroot}/%{dynload_dir}/*.so ; do
+    case $Module in
+    *.%{SOABI_debug})
+        ldd $Module | grep %{py_INSTSONAME_optimized} &&
+            (echo Debug module $Module linked against optimized %{py_INSTSONAME_optimized} ; exit 1)
+
+        ;;
+    *.%{SOABI_optimized})
+        ldd $Module | grep %{py_INSTSONAME_debug} &&
+            (echo Optimized module $Module linked against debug %{py_INSTSONAME_debug} ; exit 1)
+        ;;
+    esac
+done
+
+# ======================================================
+# Running the upstream test suite
+# ======================================================
+
 # For ppc64 we need a larger stack than default
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1292462
 %ifarch %{power64}
   ulimit -a
   ulimit -s 16384
 %endif
+
 
 topdir=$(pwd)
 CheckPython() {
