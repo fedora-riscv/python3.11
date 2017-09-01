@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: Python
 
 
@@ -893,10 +893,14 @@ sed -i -e "s/'pyconfig.h'/'%{_pyconfig_h}'/" \
   %{buildroot}%{pylibdir}/sysconfig.py
 
 # Switch all shebangs to refer to the specific Python version.
+# This currently only covers files with .py extension
 LD_LIBRARY_PATH=./build/optimized ./build/optimized/python \
   Tools/scripts/pathfix.py \
   -i "%{_bindir}/python%{pybasever}" \
   %{buildroot}
+# not covered, also redundant and useless:
+rm %{buildroot}%{pylibdir}/Tools/scripts/2to3
+
 
 # Remove shebang lines from .py files that aren't executable, and
 # remove executability from .py files that don't have a shebang line:
@@ -1576,6 +1580,9 @@ fi
 # ======================================================
 
 %changelog
+* Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-15
+- Remove %%{pylibdir}/Tools/scripts/2to3
+
 * Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-14
 - Expat >= 2.1.0 is everywhere, remove explicit requires
 - Conditionalize systemtap-devel BuildRequires
