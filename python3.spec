@@ -175,9 +175,6 @@ BuildRequires: libGL-devel
 BuildRequires: libX11-devel
 BuildRequires: ncurses-devel
 
-# workaround http://bugs.python.org/issue19804 (test_uuid requires ifconfig)
-BuildRequires: net-tools
-
 BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
@@ -202,6 +199,9 @@ BuildRequires: xz-devel
 BuildRequires: zlib-devel
 
 BuildRequires: /usr/bin/dtrace
+
+# workaround http://bugs.python.org/issue19804 (test_uuid requires ifconfig)
+BuildRequires: /usr/sbin/ifconfig
 
 %if %{with rewheel}
 BuildRequires: python3-setuptools
@@ -1579,6 +1579,7 @@ fi
 * Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-14
 - Expat >= 2.1.0 is everywhere, remove explicit requires
 - Conditionalize systemtap-devel BuildRequires
+- For consistency, require /usr/sbin/ifconfig instead of net-tools
 
 * Mon Aug 28 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-13
 - Rename patch files to be consistent
