@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: Python
 
 
@@ -160,10 +160,7 @@ BuildRequires: bluez-libs-devel
 BuildRequires: bzip2
 BuildRequires: bzip2-devel
 BuildRequires: desktop-file-utils
-
-# expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
-# it (in pyexpat) in order to enable the fix in Python-3.2.3 for CVE-2012-0876:
-BuildRequires: expat-devel >= 2.1.0
+BuildRequires: expat-devel
 
 BuildRequires: findutils
 BuildRequires: gcc-c++
@@ -448,12 +445,6 @@ the "%{name}-" prefix.
 
 %package libs
 Summary:        Python runtime libraries
-
-# expat 2.1.0 added the symbol XML_SetHashSalt without bumping SONAME.  We use
-# this symbol (in pyexpat), so we must explicitly state this dependency to
-# prevent "import pyexpat" from failing with a linker error if someone hasn't
-# yet upgraded expat:
-Requires: expat >= 2.1.0
 
 # The "enum" module is included in the standard library.
 # Provide an upgrade path from the external library.
@@ -1581,6 +1572,9 @@ fi
 # ======================================================
 
 %changelog
+* Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-14
+- Expat >= 2.1.0 is everywhere, remove explicit requires
+
 * Mon Aug 28 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-13
 - Rename patch files to be consistent
 - Run autotools to generate the configure script before building
