@@ -183,9 +183,11 @@ BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: sqlite-devel
 
-BuildRequires: systemtap-sdt-devel
+%if %{with systemtap}
 BuildRequires: systemtap-devel
+BuildRequires: systemtap-sdt-devel
 %global tapsetdir      /usr/share/systemtap/tapset
+%endif
 
 BuildRequires: tar
 BuildRequires: tcl-devel
@@ -198,6 +200,8 @@ BuildRequires: valgrind-devel
 
 BuildRequires: xz-devel
 BuildRequires: zlib-devel
+
+BuildRequires: /usr/bin/dtrace
 
 %if %{with rewheel}
 BuildRequires: python3-setuptools
@@ -1574,6 +1578,7 @@ fi
 %changelog
 * Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-14
 - Expat >= 2.1.0 is everywhere, remove explicit requires
+- Conditionalize systemtap-devel BuildRequires
 
 * Mon Aug 28 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-13
 - Rename patch files to be consistent
