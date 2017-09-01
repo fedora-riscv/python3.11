@@ -905,14 +905,8 @@ find %{buildroot} -name \*.py \
   -perm /u+x,g+x,o+x ! -exec grep -m 1 -q '^#!' {} \; \
   -exec chmod a-x {} \; \) \)
 
-# .xpm and .xbm files should not be executable:
-find %{buildroot} \
-  \( -name \*.xbm -o -name \*.xpm -o -name \*.xpm.1 \) \
-  -exec chmod a-x {} \;
-
 # Remove executable flag from files that shouldn't have it:
 chmod a-x \
-  %{buildroot}%{pylibdir}/distutils/tests/Setup.sample \
   %{buildroot}%{pylibdir}/Tools/README
 
 # Get rid of DOS batch files:
@@ -921,24 +915,9 @@ find %{buildroot} -name \*.bat -exec rm {} \;
 # Get rid of backup files:
 find %{buildroot}/ -name "*~" -exec rm -f {} \;
 find . -name "*~" -exec rm -f {} \;
-rm -f %{buildroot}%{pylibdir}/LICENSE.txt
-# Junk, no point in putting in -test sub-pkg
-rm -f %{buildroot}/%{pylibdir}/idlelib/testcode.py*
 
-# Get rid of stray patch file from buildroot:
-rm -f %{buildroot}%{pylibdir}/test/test_imp.py.apply-our-changes-to-expected-shebang # from patch 4
-
-# Fix end-of-line encodings:
-find %{buildroot}/ -name \*.py -exec sed -i 's/\r//' {} \;
-
-# Fix an encoding:
-iconv -f iso8859-1 -t utf-8 %{buildroot}/%{pylibdir}/Demo/rpc/README > README.conv && mv -f README.conv %{buildroot}/%{pylibdir}/Demo/rpc/README
-
-# Note that
-#  %{pylibdir}/Demo/distutils/test2to3/setup.py
-# is in iso-8859-1 encoding, and that this is deliberate; this is test data
-# for the 2to3 tool, and one of the functions of the 2to3 tool is to fixup
-# character encodings within python source code
+# Get rid of a stray copy of the license:
+rm %{buildroot}%{pylibdir}/LICENSE.txt
 
 # Do bytecompilation with the newly installed interpreter.
 # This is similar to the script in macros.pybytecompile
@@ -949,8 +928,7 @@ find %{buildroot} -type f -a -name "*.py" -print0 | \
     xargs -0 %{buildroot}%{_bindir}/python%{pybasever} -O -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("%{buildroot}")[2], optimize=opt) for opt in range(3) for f in sys.argv[1:]]' || :
 
 # Fixup permissions for shared libraries from non-standard 555 to standard 755:
-find %{buildroot} \
-    -perm 555 -exec chmod 755 {} \;
+find %{buildroot} -perm 555 -exec chmod 755 {} \;
 
 # Install macros for rpm:
 mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
