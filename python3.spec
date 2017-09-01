@@ -798,26 +798,26 @@ InstallPython debug \
 InstallPython optimized \
   %{py_INSTSONAME_optimized}
 
-install -d -m 0755 ${RPM_BUILD_ROOT}%{pylibdir}/site-packages/__pycache__
+install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
 
 # add idle3 to menu
-install -D -m 0644 Lib/idlelib/Icons/idle_16.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
-install -D -m 0644 Lib/idlelib/Icons/idle_32.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
-install -D -m 0644 Lib/idlelib/Icons/idle_48.png ${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/48x48/apps/idle3.png
-desktop-file-install --dir=${RPM_BUILD_ROOT}%{_datadir}/applications %{SOURCE10}
+install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
+install -D -m 0644 Lib/idlelib/Icons/idle_32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
+install -D -m 0644 Lib/idlelib/Icons/idle_48.png %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/idle3.png
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE10}
 
 # Install and validate appdata file
-mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/appdata
-cp -a %{SOURCE11} ${RPM_BUILD_ROOT}%{_datadir}/appdata
-appstream-util validate-relax --nonet ${RPM_BUILD_ROOT}%{_datadir}/appdata/idle3.appdata.xml
+mkdir -p %{buildroot}%{_datadir}/appdata
+cp -a %{SOURCE11} %{buildroot}%{_datadir}/appdata
+appstream-util validate-relax --nonet %{buildroot}%{_datadir}/appdata/idle3.appdata.xml
 
 # Development tools
-install -m755 -d ${RPM_BUILD_ROOT}%{pylibdir}/Tools
-install Tools/README ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
-cp -ar Tools/freeze ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
-cp -ar Tools/i18n ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
-cp -ar Tools/pynche ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
-cp -ar Tools/scripts ${RPM_BUILD_ROOT}%{pylibdir}/Tools/
+install -m755 -d %{buildroot}%{pylibdir}/Tools
+install Tools/README %{buildroot}%{pylibdir}/Tools/
+cp -ar Tools/freeze %{buildroot}%{pylibdir}/Tools/
+cp -ar Tools/i18n %{buildroot}%{pylibdir}/Tools/
+cp -ar Tools/pynche %{buildroot}%{pylibdir}/Tools/
+cp -ar Tools/scripts %{buildroot}%{pylibdir}/Tools/
 
 # Documentation tools
 install -m755 -d %{buildroot}%{pylibdir}/Doc
@@ -913,7 +913,7 @@ find %{buildroot}/ -name "*~" -exec rm -f {} \;
 find . -name "*~" -exec rm -f {} \;
 rm -f %{buildroot}%{pylibdir}/LICENSE.txt
 # Junk, no point in putting in -test sub-pkg
-rm -f ${RPM_BUILD_ROOT}/%{pylibdir}/idlelib/testcode.py*
+rm -f %{buildroot}/%{pylibdir}/idlelib/testcode.py*
 
 # Get rid of stray patch file from buildroot:
 rm -f %{buildroot}%{pylibdir}/test/test_imp.py.apply-our-changes-to-expected-shebang # from patch 4
