@@ -149,6 +149,15 @@ License: Python
 # on files that test invalid syntax.
 %undefine py_auto_byte_compile
 
+# For multilib support, files that are different between 32- and 64-bit arches
+# need different filenames. Use "64" or "32" according to the word size.
+%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64} riscv64
+%global wordsize 64
+%else
+%global wordsize 32
+%endif
+
+
 # =======================
 # Build-time requirements
 # =======================
@@ -768,12 +777,7 @@ mkdir -p %{buildroot}$DirHoldingGdbPy
 # Filanames are defined here:
 %global _pyconfig32_h pyconfig-32.h
 %global _pyconfig64_h pyconfig-64.h
-
-%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64} riscv64
-%global _pyconfig_h %{_pyconfig64_h}
-%else
-%global _pyconfig_h %{_pyconfig32_h}
-%endif
+%global _pyconfig_h pyconfig-%{wordsize}.h
 
 # Use a common function to do an install for all our configurations:
 InstallPython() {
@@ -782,6 +786,7 @@ InstallPython() {
   PyInstSoName=$2
   MoreCFlags=$3
   LDVersion=$4
+  Postfix=$5
 
   # Switch to the directory with this configuration's built files
   ConfDir=build/$ConfName
@@ -826,6 +831,16 @@ InstallPython() {
 #endif
 EOF
 
+  # Systemtap hooks
+%if %{with systemtap}
+  mkdir -p %{buildroot}%{tapsetdir}
+  sed \
+     -e "s|LIBRARY_PATH|%{_libdir}/${PyInstSoName}|" \
+     -e 's|"python3"|"python3${Postfix}"|' \
+     %{_sourcedir}/libpython.stp \
+     > %{buildroot}%{tapsetdir}/libpython%{pybasever}${Postfix}-%{wordsize}.stp
+%endif # with systemtap
+
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
 
@@ -835,14 +850,16 @@ EOF
 InstallPython debug \
   %{py_INSTSONAME_debug} \
   -O0 \
-  %{LDVERSION_debug}
+  %{LDVERSION_debug} \
+  -debug
 %endif # with debug_build
 
 # Now the optimized build:
 InstallPython optimized \
   %{py_INSTSONAME_optimized} \
   "" \
-  %{LDVERSION_optimized}
+  %{LDVERSION_optimized} \
+  ""
 
 # Install directories for additional packages
 install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
@@ -952,39 +969,6 @@ ln -s \
   %{_bindir}/python%{LDVERSION_debug} \
   %{buildroot}%{_bindir}/python3-debug
 %endif
-
-#
-# Systemtap hooks:
-#
-%if %{with systemtap}
-# Install a tapset for this libpython into tapsetdir, fixing up the path to the
-# library:
-mkdir -p %{buildroot}%{tapsetdir}
-%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64}
-%global libpython_stp_optimized libpython%{pybasever}-64.stp
-%global libpython_stp_debug     libpython%{pybasever}-debug-64.stp
-%else
-%global libpython_stp_optimized libpython%{pybasever}-32.stp
-%global libpython_stp_debug     libpython%{pybasever}-debug-32.stp
-%endif
-
-sed \
-   -e "s|LIBRARY_PATH|%{_libdir}/%{py_INSTSONAME_optimized}|" \
-   %{_sourcedir}/libpython.stp \
-   > %{buildroot}%{tapsetdir}/%{libpython_stp_optimized}
-
-%if %{with debug_build}
-# In Python 3, python3 and python3-debug don't point to the same binary,
-# so we have to replace "python3" with "python3-debug" to get systemtap
-# working with debug build
-sed \
-   -e "s|LIBRARY_PATH|%{_libdir}/%{py_INSTSONAME_debug}|" \
-   -e 's|"python3"|"python3-debug"|' \
-   %{_sourcedir}/libpython.stp \
-   > %{buildroot}%{tapsetdir}/%{libpython_stp_debug}
-%endif # with debug_build
-
-%endif # with systemtap
 
 # System Python: Link the executable to libexec
 # This is for backwards compatibility only and should be removed in Fedora 29
