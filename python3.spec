@@ -898,9 +898,6 @@ cp -ar Doc/tools %{buildroot}%{pylibdir}/Doc/
 # Demo scripts
 cp -ar Tools/demo %{buildroot}%{pylibdir}/Tools/
 
-# Fix for bug #136654
-rm -f %{buildroot}%{pylibdir}/email/test/data/audiotest.au %{buildroot}%{pylibdir}/test/audiotest.au
-
 # Make sure distutils looks at the right pyconfig.h file
 # See https://bugzilla.redhat.com/show_bug.cgi?id=201434
 # Similar for sysconfig: sysconfig.get_config_h_filename tries to locate
