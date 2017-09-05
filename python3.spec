@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: Python
 
 
@@ -1526,6 +1526,11 @@ fi
 # ======================================================
 
 %changelog
+* Tue Sep 05 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-16
+- Specfile cleanup
+- Make the main description also applicable to the SRPM
+- Add audiotest.au to the test package
+
 * Fri Sep 01 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-15
 - Remove %%{pylibdir}/Tools/scripts/2to3
 
