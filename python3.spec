@@ -151,7 +151,9 @@ License: Python
 
 # For multilib support, files that are different between 32- and 64-bit arches
 # need different filenames. Use "64" or "32" according to the word size.
-%ifarch %{power64} s390x x86_64 ia64 alpha sparc64 aarch64 %{mips64} riscv64
+# Currently, the best way to determine an architecture's word size happens to
+# be checking %%{_lib}.
+%if "%{_lib}" == "lib64"
 %global wordsize 64
 %else
 %global wordsize 32
