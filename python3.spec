@@ -438,14 +438,15 @@ Requires: python3-setuptools
 Requires: python3-pip
 %endif
 
+# The description used both for the SRPM and the main `python3` subpackage:
 %description
 Python is an accessible, high-level, dynamically typed, interpreted programming
 language, designed with an emphasis on code readibility.
 It includes an extensive standard library, and has a vast ecosystem of
 third-party libraries.
 
-This package provides the "python3" executable: the reference interpreter for
-the Python language, version 3.
+The ${name} package provides the "python3" executable: the reference
+interpreter for the Python language, version 3.
 The majority of its standard library is provided in the %{name}-libs package,
 which should be installed automatically along with %{name}.
 The remaining parts of the Python standard library are broken out into the
