@@ -846,7 +846,7 @@ EOF
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
 
-# Install the "debug" build first; anny common files will be overridden with
+# Install the "debug" build first; any common files will be overridden with
 # later builds
 %if %{with debug_build}
 InstallPython debug \
