@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: Python
 
 
@@ -680,7 +680,7 @@ export CPPFLAGS="$(pkg-config --cflags-only-I libffi)"
 export OPT="$RPM_OPT_FLAGS -D_GNU_SOURCE -fPIC -fwrapv"
 export LINKCC="gcc"
 export CFLAGS="$CFLAGS $(pkg-config --cflags openssl)"
-export LDFLAGS="$RPM_LD_FLAGS $(pkg-config --libs-only-L openssl)"
+export LDFLAGS="$RPM_LD_FLAGS -g $(pkg-config --libs-only-L openssl)"
 
 # We can build several different configurations of Python: regular and debug.
 # Define a common function that does one build:
@@ -1526,6 +1526,10 @@ fi
 # ======================================================
 
 %changelog
+* Wed Sep 06 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.2-17
+- Include `-g` in the flags sent to the linker (LDFLAGS)
+Resolves: rhbz#1483222
+
 * Tue Sep 05 2017 Petr Viktorin <pviktori@redhat.com> - 3.6.2-16
 - Specfile cleanup
 - Make the main description also applicable to the SRPM
