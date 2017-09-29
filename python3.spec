@@ -491,6 +491,13 @@ BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
 Requires: python3-rpm-generators
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1217376
+# https://bugzilla.redhat.com/show_bug.cgi?id=1496757
+# https://bugzilla.redhat.com/show_bug.cgi?id=1218294
+# TODO change to a specific subpackage once available (#1218294)
+Requires: redhat-rpm-config
+
 Conflicts: %{name} < %{version}-%{release}
 
 %description devel
@@ -1537,8 +1544,10 @@ fi
 # ======================================================
 
 %changelog
-* Tue Sep 19 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-19
+* Fri Sep 29 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-19
 - Move pathfix.py to bindir, https://github.com/fedora-python/python-rpm-porting/issues/24
+- Make the -devel package require redhat-rpm-config
+Resolves: rhbz#1496757
 
 * Wed Sep 13 2017 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.2-18
 - Fix /usr/bin/env dependency from python3-tools
