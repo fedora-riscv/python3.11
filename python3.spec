@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -384,6 +384,11 @@ Patch274: 00274-fix-arch-names.patch
 # side effect of the test, which makes the koji builds hang.
 # Fixed upstream: https://github.com/python/cpython/commit/11045c9d8a21dd9bd182a3939189db02815f9783
 Patch277: 00277-fix-test-subprocess-hanging-tests.patch
+
+# 00279 #
+# Fix memory corruption due to allocator mix
+# Fixed upstream: https://bugs.python.org/issue31532
+Patch279: 00279-fix-memory-corruption-due-to-allocator-mix.patch
 
 # (New patches go here ^^^)
 #
@@ -1532,6 +1537,10 @@ fi
 # ======================================================
 
 %changelog
+* Mon Oct 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.3-2
+- Fix memory corruption due to allocator mix
+Resolves: rhbz#1498207
+
 * Fri Oct 06 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.3-1
 - Update to Python 3.6.3
 
