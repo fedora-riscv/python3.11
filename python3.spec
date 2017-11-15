@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -428,6 +428,10 @@ Provides: python%{pyshortver} = %{version}-%{release}
 # replace python36-3.6.2.
 Obsoletes: python%{pyshortver}
 
+# Shall be removed in Fedora 31
+%global platpyver 3.6.2-13
+Obsoletes: platform-python < %{platpyver}
+
 %if %{with rewheel}
 Requires: python3-setuptools
 Requires: python3-pip
@@ -471,6 +475,10 @@ Provides: system-python-libs = %{version}-%{release}
 Provides: system-python-libs%{?_isa} = %{version}-%{release}
 Obsoletes: system-python-libs < %{version}-%{release}
 
+# Shall be removed in Fedora 31
+Obsoletes: platform-python-libs < %{platpyver}
+Obsoletes: platform-python-libs-devel < %{platpyver}
+
 %description libs
 This package contains runtime libraries for use by Python:
 - the majority of the Python standard library
@@ -494,6 +502,9 @@ Requires: python3-rpm-generators
 Requires: redhat-rpm-config
 
 Conflicts: %{name} < %{version}-%{release}
+
+# Shall be removed in Fedora 31
+Obsoletes: platform-python-devel < %{platpyver}
 
 %description devel
 This package contains the header files and configuration needed to compile
@@ -519,6 +530,9 @@ Provides: idle3 = %{version}-%{release}
 Conflicts: python2-tools < 2.7.13-17
 Conflicts: python-tools < 2.7.13-17
 
+# Shall be removed in Fedora 31
+Obsoletes: platform-python-tools < %{platpyver}
+
 %description tools
 This package contains several tools included with Python, including:
 - 2to3, an automatic source converter from Python 2.X
@@ -528,6 +542,9 @@ This package contains several tools included with Python, including:
 %package tkinter
 Summary: A GUI toolkit for Python
 Requires: %{name} = %{version}-%{release}
+
+# Shall be removed in Fedora 31
+Obsoletes: platform-python-tkinter < %{platpyver}
 
 %description tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
@@ -539,6 +556,8 @@ Summary: The self-test suite for the main python3 package
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tools = %{version}-%{release}
 
+# Shall be removed in Fedora 31
+Obsoletes: platform-python-test < %{platpyver}
 
 %description test
 The self-test suite for the Python interpreter.
@@ -1538,6 +1557,9 @@ fi
 # ======================================================
 
 %changelog
+* Wed Nov 15 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.3-3
+- Obsolete platform-python and it's subpackages
+
 * Mon Oct 09 2017 Charalampos Stratakis <cstratak@redhat.com> - 3.6.3-2
 - Fix memory corruption due to allocator mix
 Resolves: rhbz#1498207
