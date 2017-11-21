@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 
 
@@ -429,7 +429,10 @@ Provides: python%{pyshortver} = %{version}-%{release}
 Obsoletes: python%{pyshortver}
 
 # Shall be removed in Fedora 31
-%global platpyver 3.6.2-13
+# The release is bumped to 20, so we can do f27 platform-python updates
+# If the release in f27 ever goes >= 20, raise it here
+# If platform-python is ever reintroduced, make it higher version than this:
+%global platpyver 3.6.2-20
 Obsoletes: platform-python < %{platpyver}
 
 %if %{with rewheel}
@@ -1557,6 +1560,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Nov 21 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.3-4
+- Raise the release of platform-python obsoletes for better maintainability
+
 * Wed Nov 15 2017 Miro Hrončok <mhroncok@redhat.com> - 3.6.3-3
 - Obsolete platform-python and it's subpackages
 
