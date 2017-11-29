@@ -68,9 +68,6 @@ License: Python
 # Support for the GDB debugger
 %bcond_without gdb_hooks
 
-# Support for systemtap instrumentation
-%bcond_with systemtap
-
 # The dbm.gnu module (key-value database)
 %bcond_without gdbm
 
@@ -216,12 +213,6 @@ BuildRequires: readline-devel
 BuildRequires: sqlite-devel
 BuildRequires: gdb
 
-%if %{with systemtap}
-BuildRequires: systemtap-devel
-BuildRequires: systemtap-sdt-devel
-%global tapsetdir      /usr/share/systemtap/tapset
-%endif
-
 BuildRequires: tar
 BuildRequires: tcl-devel
 BuildRequires: tix-devel
@@ -256,19 +247,6 @@ Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{prerel}.
 # with different Python runtimes as necessary:
 Source3: macros.pybytecompile%{pybasever}
 
-# Systemtap tapset to make it easier to use the systemtap static probes
-# (actually a template; LIBRARY_PATH will get fixed up during install)
-# Written by dmalcolm; not yet sent upstream
-Source5: libpython.stp
-
-# Example systemtap script using the tapset
-# Written by wcohen, mjw, dmalcolm; not yet sent upstream
-Source6: systemtap-example.stp
-
-# Another example systemtap script that uses the tapset
-# Written by dmalcolm; not yet sent upstream
-Source7: pyfuntop.stp
-
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
 # Written by bkabrda
@@ -288,13 +266,6 @@ Source11: idle3.appdata.xml
 # Fixup distutils/unixccompiler.py to remove standard library path from rpath:
 # Was Patch0 in ivazquez' python3000 specfile:
 Patch1:         00001-rpath.patch
-
-# 00055 #
-# Systemtap support: add statically-defined probe points
-# Patch sent upstream as http://bugs.python.org/issue14776
-# with some subsequent reworking to cope with LANG=C in an rpmbuild
-# (where sys.getfilesystemencoding() == 'ascii')
-Patch55: 00055-systemtap.patch
 
 # 00102 #
 # Change the various install paths to use /usr/lib64/ instead or /usr/lib
@@ -662,12 +633,6 @@ version once Python %{pybasever} is stable.
 %prep
 %setup -q -n Python-%{version}%{?prerel}
 
-%if %{with systemtap}
-# Provide an example of usage of the tapset:
-cp -a %{SOURCE6} .
-cp -a %{SOURCE7} .
-%endif # with systemtap
-
 # Remove bundled libraries to ensure that we're using the system copy.
 rm -r Modules/expat
 
@@ -680,10 +645,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 # Apply patches:
 #
 %patch1 -p1
-
-%if %{with systemtap}
-%patch55 -p1 -b .systemtap
-%endif
 
 %if "%{_lib}" == "lib64"
 %patch102 -p1
@@ -781,9 +742,6 @@ BuildPython() {
   --enable-loadable-sqlite-extensions \
   --with-dtrace \
   --with-lto \
-%if %{with systemtap}
-  --with-systemtap \
-%endif
 %if %{with valgrind}
   --with-valgrind \
 %endif
@@ -904,16 +862,6 @@ InstallPython() {
 #error "Unknown word size"
 #endif
 EOF
-
-  # Systemtap hooks
-%if %{with systemtap}
-  mkdir -p %{buildroot}%{tapsetdir}
-  sed \
-     -e "s|LIBRARY_PATH|%{_libdir}/${PyInstSoName}|" \
-     -e 's|"python3"|"python3${Postfix}"|' \
-     %{_sourcedir}/libpython.stp \
-     > %{buildroot}%{tapsetdir}/libpython%{pybasever}${Postfix}-%{wordsize}.stp
-%endif # with systemtap
 
   echo FINISHED: INSTALL OF PYTHON FOR CONFIGURATION: $ConfName
 }
@@ -1408,12 +1356,6 @@ CheckPython optimized
 %if %{without flatpackage}
 %{_libdir}/libpython3.so
 %endif
-%if %{with systemtap}
-%dir %(dirname %{tapsetdir})
-%dir %{tapsetdir}
-%{tapsetdir}/%{libpython_stp_optimized}
-%doc systemtap-example.stp pyfuntop.stp
-%endif
 
 
 %if %{without flatpackage}
@@ -1594,11 +1536,6 @@ CheckPython optimized
 # now; they're listed below, under "-devel":
 
 %{_libdir}/%{py_INSTSONAME_debug}
-%if %{with systemtap}
-%dir %(dirname %{tapsetdir})
-%dir %{tapsetdir}
-%{tapsetdir}/%{libpython_stp_debug}
-%endif
 
 # Analog of the -devel subpackage's files:
 %{pylibdir}/config-%{LDVERSION_debug}-%{_arch}-linux%{_gnu}
