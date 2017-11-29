@@ -245,7 +245,7 @@ Patch1:         00001-rpath.patch
 
 # 00102 #
 # Change the various install paths to use /usr/lib64/ instead or /usr/lib
-# Only used when "%{_lib}" == "lib64"
+# Only used when "%%{_lib}" == "lib64"
 # Not yet sent upstream.
 Patch102: 00102-lib64.patch
 
@@ -1211,7 +1211,6 @@ fi
 %{dynload_dir}/spwd.%{SOABI_optimized}.so
 %{dynload_dir}/syslog.%{SOABI_optimized}.so
 %{dynload_dir}/termios.%{SOABI_optimized}.so
-#%{dynload_dir}/time.%{SOABI_optimized}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_optimized}.so
 %{dynload_dir}/unicodedata.%{SOABI_optimized}.so
 %{dynload_dir}/xxlimited.%{SOABI_optimized}.so
@@ -1441,7 +1440,6 @@ fi
 %{dynload_dir}/spwd.%{SOABI_debug}.so
 %{dynload_dir}/syslog.%{SOABI_debug}.so
 %{dynload_dir}/termios.%{SOABI_debug}.so
-#%{dynload_dir}/time.%{SOABI_debug}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 %{dynload_dir}/unicodedata.%{SOABI_debug}.so
 %{dynload_dir}/zlib.%{SOABI_debug}.so
@@ -1479,7 +1477,7 @@ fi
 # We put the debug-gdb.py file inside /usr/lib/debug to avoid noise from ldconfig
 # See https://bugzilla.redhat.com/show_bug.cgi?id=562980
 #
-# The /usr/lib/rpm/redhat/macros defines %__debug_package to use
+# The /usr/lib/rpm/redhat/macros defines %%__debug_package to use
 # debugfiles.list, and it appears that everything below /usr/lib/debug and
 # (/usr/src/debug) gets added to this file (via LISTFILES) in
 # /usr/lib/rpm/find-debuginfo.sh
