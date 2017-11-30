@@ -2,14 +2,15 @@
 # Top-level metadata
 # ==================
 
-Name: python3
-Summary: Interpreter of the Python programming language
-URL: https://www.python.org/
-
 %global pybasever 3.7
 
 # pybasever without the dot:
 %global pyshortver 37
+
+Name: python%{pyshortver}
+Summary:  Version %{pybasever} of the Python interpreter
+URL: https://www.python.org/
+
 
 # Second alpha
 %global prerel a2
@@ -28,6 +29,15 @@ License: Python
 # Note that the bcond macros are named for the CLI option they create.
 # "%%bcond_without" means "ENABLE by default and create a --without option"
 
+
+# Flat package, i.e. python36, python37, python38 for tox etc.
+# warning: changes some other defaults
+# in Fedora, never turn this on for the python3 package
+# and always keep it on for python37 etc.
+# WARNING: This does not change the package name and summary above
+%bcond_without flatpackage
+
+
 # Expensive optimizations (mainly, profile-guided optimizations)
 %ifarch %{ix86} x86_64
 %bcond_without optimizations
@@ -41,11 +51,19 @@ License: Python
 %bcond_without tests
 
 # Ability to reuse RPM-installed pip using rewheel
+%if %{with flatpackage}
+%bcond_with rewheel
+%else
 %bcond_without rewheel
+%endif
 
 # Extra build for debugging the interpreter or C-API extensions
 # (the -debug subpackages)
+%if %{with flatpackage}
+%bcond_with debug_build
+%else
 %bcond_without debug_build
+%endif
 
 # Support for the GDB debugger
 %bcond_without gdb_hooks
@@ -389,6 +407,8 @@ Patch274: 00274-fix-arch-names.patch
 # Descriptions, and metadata for subpackages
 # ==========================================
 
+%if %{without flatpackage}
+
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
@@ -402,7 +422,7 @@ Obsoletes: system-python < %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 # In order to support multiple Python interpreters for development purposes,
-# packages with with the naming scheme pythonXY (e.g. python35) exist for
+# packages with with the naming scheme flatpackage (e.g. python35) exist for
 # non-default versions of Python 3.
 # For consistency, and to keep the upgrade path clean, we Provide/Obsolete
 # these names here.
@@ -588,6 +608,27 @@ Compiled extension modules use a special ABI flag ("d") in the filename,
 so extensions for both verisons can co-exist in the same directory.
 %endif # with debug_build
 
+%else  # with flatpackage
+
+Requires: redhat-rpm-config
+
+# We'll not provide this, on purpose
+# No package in Fedora shall ever depend on flatpackage via this
+%global __requires_exclude ^python\\(abi\\) = 3\\..$
+%global __provides_exclude ^python\\(abi\\) = 3\\..$
+
+# We keep those inside on purpose
+Provides: bundled(python3-pip) = 9.0.1
+Provides: bundled(python3-setuptools) = 28.8.0
+
+# The descripton for the flat flatpackage package
+%description
+This package exists to allow developers to test their code against an newer
+version of Python. This is not a full Python stack and if you wish to run
+your applications with Python %{pybasever}, update your Fedora to a newer
+version once Python %{pybasever} is stable.
+
+%endif # with flatpackage
 
 # ======================================================
 # The prep phase of the build:
@@ -879,6 +920,7 @@ install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
 install -d -m 0755 %{buildroot}%{_prefix}/lib/python%{pybasever}/site-packages/__pycache__
 %endif
 
+%if %{without flatpackage}
 # add idle3 to menu
 install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
 install -D -m 0644 Lib/idlelib/Icons/idle_32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
@@ -889,6 +931,7 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE10}
 mkdir -p %{buildroot}%{_datadir}/appdata
 cp -a %{SOURCE11} %{buildroot}%{_datadir}/appdata
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/appdata/idle3.appdata.xml
+%endif
 
 # Development tools
 install -m755 -d %{buildroot}%{pylibdir}/Tools
@@ -973,12 +1016,14 @@ find %{buildroot} -perm 555 -exec chmod 755 {} \;
 # Install macros for rpm:
 mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
 install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d/
+%if %{without flatpackage}
 install -m 644 %{SOURCE9} %{buildroot}/%{_rpmconfigdir}/macros.d/
+%endif
 
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
 # avoid the user having to know the precise version and ABI flags.
 # See e.g. https://bugzilla.redhat.com/show_bug.cgi?id=676748
-%if %{with debug_build}
+%if %{with debug_build} && %{without flatpackage}
 ln -s \
   %{_bindir}/python%{LDVERSION_debug} \
   %{buildroot}%{_bindir}/python3-debug
@@ -986,8 +1031,10 @@ ln -s \
 
 # System Python: Link the executable to libexec
 # This is for backwards compatibility only and should be removed in Fedora 29
+%if %{without flatpackage}
 mkdir -p %{buildroot}%{_libexecdir}
 ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
+%endif
 
 
 # ======================================================
@@ -1024,6 +1071,21 @@ for Module in %{buildroot}/%{dynload_dir}/*.so ; do
         ;;
     esac
 done
+
+%if %{with flatpackage}
+# Remove stuff that would conflict with python3 package
+mv %{buildroot}%{_bindir}/python{3,%{pyshortver}}
+rm %{buildroot}%{_bindir}/pydoc3
+rm %{buildroot}%{_bindir}/pathfix.py
+rm %{buildroot}%{_bindir}/idle3
+rm %{buildroot}%{_bindir}/python3-*
+rm %{buildroot}%{_bindir}/pyvenv
+rm %{buildroot}%{_bindir}/2to3
+rm %{buildroot}%{_libdir}/libpython3.so
+rm %{buildroot}%{_mandir}/man1/python3.1*
+rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
+%endif
+
 
 # ======================================================
 # Running the upstream test suite
@@ -1087,46 +1149,71 @@ CheckPython optimized
 # Scriptlets
 # ======================================================
 
+%if %{without flatpackage}
+
 %post libs -p /sbin/ldconfig
 
 %postun libs -p /sbin/ldconfig
 
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+
+%endif
+
+
 %post
+%if %{with flatpackage}
+/sbin/ldconfig
+%else
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+%endif
 
 %postun
+%if %{with flatpackage}
+/sbin/ldconfig
+%else
 if [ $1 -eq 0 ] ; then
     /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 fi
-
-%posttrans
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+%endif
 
 %files
 %defattr(-, root, root)
 %license LICENSE
 %doc README.rst
+
+%if %{without flatpackage}
 %{_bindir}/pydoc*
 %{_bindir}/python3
-%{_bindir}/python%{pybasever}
-%{_bindir}/python%{pybasever}m
 %{_bindir}/pyvenv
-%{_bindir}/pyvenv-%{pybasever}
-%{_mandir}/*/*
 # Remove in Fedora 29:
 %{_libexecdir}/system-python
+%else
+%{_bindir}/pydoc%{pybasever}
+%{_bindir}/python%{pyshortver}
+%endif
 
+%{_bindir}/python%{pybasever}
+%{_bindir}/python%{pybasever}m
+%{_bindir}/pyvenv-%{pybasever}
+%{_mandir}/*/*
+
+
+%if %{without flatpackage}
 %files libs
 %defattr(-,root,root,-)
 %license LICENSE
 %doc README.rst
+%endif
 
 %dir %{pylibdir}
 %dir %{dynload_dir}
 
 %{pylibdir}/lib2to3
+%if %{without flatpackage}
 %exclude %{pylibdir}/lib2to3/tests
+%endif
 
 %dir %{pylibdir}/unittest/
 %dir %{pylibdir}/unittest/__pycache__/
@@ -1151,7 +1238,13 @@ fi
 %dir %{pylibdir}/ensurepip/__pycache__/
 %{pylibdir}/ensurepip/*.py
 %{pylibdir}/ensurepip/__pycache__/*%{bytecode_suffixes}
+
+%if %{without flatpackage}
 %exclude %{pylibdir}/ensurepip/_bundled
+%else
+%dir %{pylibdir}/ensurepip/_bundled
+%{pylibdir}/ensurepip/_bundled/*.whl
+%endif
 
 %if %{with rewheel}
 %dir %{pylibdir}/ensurepip/rewheel/
@@ -1314,8 +1407,10 @@ fi
 %{pylibdir}/sqlite3/*.py
 %{pylibdir}/sqlite3/__pycache__/*%{bytecode_suffixes}
 
+%if %{without flatpackage}
 %exclude %{pylibdir}/turtle.py
 %exclude %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
+%endif
 
 %{pylibdir}/urllib
 %{pylibdir}/xml
@@ -1335,7 +1430,9 @@ fi
 %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 
 %{_libdir}/%{py_INSTSONAME_optimized}
+%if %{without flatpackage}
 %{_libdir}/libpython3.so
+%endif
 %if %{with systemtap}
 %dir %(dirname %{tapsetdir})
 %dir %{tapsetdir}
@@ -1343,42 +1440,66 @@ fi
 %doc systemtap-example.stp pyfuntop.stp
 %endif
 
+
+%if %{without flatpackage}
 %files devel
 %defattr(-,root,root)
+%endif
+
 %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/*
+%if %{without flatpackage}
 %exclude %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/Makefile
+%exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
+%endif
 %{pylibdir}/distutils/command/wininst-*.exe
 %{_includedir}/python%{LDVERSION_optimized}/*.h
-%exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
+
+%if %{without flatpackage}
 %{_bindir}/python3-config
+%{_libdir}/pkgconfig/python3.pc
+%{_rpmconfigdir}/macros.d/macros.systempython
+%{_bindir}/pathfix.py
+%endif
+
 %{_bindir}/python%{pybasever}-config
 %{_bindir}/python%{LDVERSION_optimized}-config
 %{_bindir}/python%{LDVERSION_optimized}-*-config
-%{_bindir}/pathfix.py
 %{_libdir}/libpython%{LDVERSION_optimized}.so
 %{_libdir}/pkgconfig/python-%{LDVERSION_optimized}.pc
 %{_libdir}/pkgconfig/python-%{pybasever}.pc
-%{_libdir}/pkgconfig/python3.pc
 %{_rpmconfigdir}/macros.d/macros.pybytecompile%{pybasever}
-%{_rpmconfigdir}/macros.d/macros.systempython
 
+
+%if %{without flatpackage}
 %files tools
 %defattr(-,root,root,755)
+
 %{_bindir}/2to3
+%{_bindir}/idle*
+%else
+%{_bindir}/idle%{pybasever}
+%endif
+
 # TODO: Remove 2to3-3.7 once rebased to 3.7
 %{_bindir}/2to3-%{pybasever}
-%{_bindir}/idle*
 %{pylibdir}/Tools
 %doc %{pylibdir}/Doc
+%if %{without flatpackage}
 %{_datadir}/appdata/idle3.appdata.xml
 %{_datadir}/applications/idle3.desktop
 %{_datadir}/icons/hicolor/*/apps/idle3.*
+%endif
 
+%if %{without flatpackage}
 %files tkinter
 %defattr(-,root,root,755)
+%endif
+
 %{pylibdir}/tkinter
+%if %{without flatpackage}
 %exclude %{pylibdir}/tkinter/test
+%endif
 %{dynload_dir}/_tkinter.%{SOABI_optimized}.so
 %{pylibdir}/turtle.py
 %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
@@ -1388,8 +1509,12 @@ fi
 %dir %{pylibdir}/turtledemo/__pycache__/
 %{pylibdir}/turtledemo/__pycache__/*%{bytecode_suffixes}
 
+
+%if %{without flatpackage}
 %files test
 %defattr(-, root, root)
+%endif
+
 %{pylibdir}/ctypes/test
 %{pylibdir}/distutils/tests
 %{pylibdir}/sqlite3/test
@@ -1411,12 +1536,14 @@ fi
 # all of the other subpackages
 
 %if %{with debug_build}
+%if %{without flatpackage}
 %files debug
 %defattr(-,root,root,-)
+%{_bindir}/python3-debug
+%endif
 
 # Analog of the core subpackage's files:
 %{_bindir}/python%{LDVERSION_debug}
-%{_bindir}/python3-debug
 
 # Analog of the -libs subpackage's files:
 # ...with debug builds of the built-in "extension" modules:
