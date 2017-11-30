@@ -1072,6 +1072,10 @@ for Module in %{buildroot}/%{dynload_dir}/*.so ; do
     esac
 done
 
+# There's no point of having this, as decided in
+# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+rm %{buildroot}%{_bindir}/2to3-%{pybasever}
+
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
 mv %{buildroot}%{_bindir}/python{3,%{pyshortver}}
@@ -1481,8 +1485,6 @@ fi
 %{_bindir}/idle%{pybasever}
 %endif
 
-# TODO: Remove 2to3-3.7 once rebased to 3.7
-%{_bindir}/2to3-%{pybasever}
 %{pylibdir}/Tools
 %doc %{pylibdir}/Doc
 %if %{without flatpackage}
