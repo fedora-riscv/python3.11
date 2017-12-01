@@ -1,0 +1,99 @@
+diff --git a/Lib/test/test_asyncio/test_events.py b/Lib/test/test_asyncio/test_events.py
+index 492a84a2313..9746678607c 100644
+--- a/Lib/test/test_asyncio/test_events.py
++++ b/Lib/test/test_asyncio/test_events.py
+@@ -1980,19 +1980,26 @@ def test_subprocess_terminate(self):
+ 
+     @unittest.skipIf(sys.platform == 'win32', "Don't have SIGHUP")
+     def test_subprocess_send_signal(self):
+-        prog = os.path.join(os.path.dirname(__file__), 'echo.py')
+-
+-        connect = self.loop.subprocess_exec(
+-                        functools.partial(MySubprocessProtocol, self.loop),
+-                        sys.executable, prog)
+-        transp, proto = self.loop.run_until_complete(connect)
+-        self.assertIsInstance(proto, MySubprocessProtocol)
+-        self.loop.run_until_complete(proto.connected)
+-
+-        transp.send_signal(signal.SIGHUP)
+-        self.loop.run_until_complete(proto.completed)
+-        self.assertEqual(-signal.SIGHUP, proto.returncode)
+-        transp.close()
++        # bpo-31034: Make sure that we get the default signal handler (killing
++        # the process). The parent process may have decided to ignore SIGHUP,
++        # and signal handlers are inherited.
++        old_handler = signal.signal(signal.SIGHUP, signal.SIG_DFL)
++        try:
++            prog = os.path.join(os.path.dirname(__file__), 'echo.py')
++
++            connect = self.loop.subprocess_exec(
++                            functools.partial(MySubprocessProtocol, self.loop),
++                            sys.executable, prog)
++            transp, proto = self.loop.run_until_complete(connect)
++            self.assertIsInstance(proto, MySubprocessProtocol)
++            self.loop.run_until_complete(proto.connected)
++
++            transp.send_signal(signal.SIGHUP)
++            self.loop.run_until_complete(proto.completed)
++            self.assertEqual(-signal.SIGHUP, proto.returncode)
++            transp.close()
++        finally:
++            signal.signal(signal.SIGHUP, old_handler)
+ 
+     def test_subprocess_stderr(self):
+         prog = os.path.join(os.path.dirname(__file__), 'echo2.py')
+diff --git a/Lib/test/test_asyncio/test_subprocess.py b/Lib/test/test_asyncio/test_subprocess.py
+index 2e14a8a9735..e8822c36698 100644
+--- a/Lib/test/test_asyncio/test_subprocess.py
++++ b/Lib/test/test_asyncio/test_subprocess.py
+@@ -166,25 +166,32 @@ def test_terminate(self):
+ 
+     @unittest.skipIf(sys.platform == 'win32', "Don't have SIGHUP")
+     def test_send_signal(self):
+-        code = 'import time; print("sleeping", flush=True); time.sleep(3600)'
+-        args = [sys.executable, '-c', code]
+-        create = asyncio.create_subprocess_exec(*args,
+-                                                stdout=subprocess.PIPE,
+-                                                loop=self.loop)
+-        proc = self.loop.run_until_complete(create)
+-
+-        @asyncio.coroutine
+-        def send_signal(proc):
+-            # basic synchronization to wait until the program is sleeping
+-            line = yield from proc.stdout.readline()
+-            self.assertEqual(line, b'sleeping\n')
++        # bpo-31034: Make sure that we get the default signal handler (killing
++        # the process). The parent process may have decided to ignore SIGHUP,
++        # and signal handlers are inherited.
++        old_handler = signal.signal(signal.SIGHUP, signal.SIG_DFL)
++        try:
++            code = 'import time; print("sleeping", flush=True); time.sleep(3600)'
++            args = [sys.executable, '-c', code]
++            create = asyncio.create_subprocess_exec(*args,
++                                                    stdout=subprocess.PIPE,
++                                                    loop=self.loop)
++            proc = self.loop.run_until_complete(create)
+ 
+-            proc.send_signal(signal.SIGHUP)
+-            returncode = (yield from proc.wait())
+-            return returncode
+-
+-        returncode = self.loop.run_until_complete(send_signal(proc))
+-        self.assertEqual(-signal.SIGHUP, returncode)
++            @asyncio.coroutine
++            def send_signal(proc):
++                # basic synchronization to wait until the program is sleeping
++                line = yield from proc.stdout.readline()
++                self.assertEqual(line, b'sleeping\n')
++
++                proc.send_signal(signal.SIGHUP)
++                returncode = (yield from proc.wait())
++                return returncode
++
++            returncode = self.loop.run_until_complete(send_signal(proc))
++            self.assertEqual(-signal.SIGHUP, returncode)
++        finally:
++            signal.signal(signal.SIGHUP, old_handler)
+ 
+     def prepare_broken_pipe_test(self):
+         # buffer large enough to feed the whole pipe buffer

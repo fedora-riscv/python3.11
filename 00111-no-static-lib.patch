@@ -1,0 +1,53 @@
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index a5a9d5e..51e8132 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -530,7 +530,7 @@ clinic: $(BUILDPYTHON) $(srcdir)/Modules/_blake2/blake2s_impl.c
+ 	$(RUNSHARED) $(PYTHON_FOR_BUILD) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
+ 
+ # Build the interpreter
+-$(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
++$(BUILDPYTHON):	Programs/python.o $(LDLIBRARY) $(PY3LIBRARY)
+ 	$(LINKCC) $(PY_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+ platform: $(BUILDPYTHON) pybuilddir.txt
+@@ -574,12 +574,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+ 		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
+ 		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
+ 
+-
+-# Build static library
+-$(LIBRARY): $(LIBRARY_OBJS)
+-	-rm -f $@
+-	$(AR) $(ARFLAGS) $@ $(LIBRARY_OBJS)
+-
+ libpython$(LDVERSION).so: $(LIBRARY_OBJS)
+ 	if test $(INSTSONAME) != $(LDLIBRARY); then \
+ 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM) $(LDLAST); \
+@@ -667,7 +661,7 @@ Modules/Setup: $(srcdir)/Modules/Setup.dist
+ 		echo "-----------------------------------------------"; \
+ 	fi
+ 
+-Programs/_testembed: Programs/_testembed.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
++Programs/_testembed: Programs/_testembed.o $(LDLIBRARY) $(PY3LIBRARY)
+ 	$(LINKCC) $(PY_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+ ############################################################################
+@@ -1408,17 +1402,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+ 		else	true; \
+ 		fi; \
+ 	done
+-	@if test -d $(LIBRARY); then :; else \
+-		if test "$(PYTHONFRAMEWORKDIR)" = no-framework; then \
+-			if test "$(SHLIB_SUFFIX)" = .dll; then \
+-				$(INSTALL_DATA) $(LDLIBRARY) $(DESTDIR)$(LIBPL) ; \
+-			else \
+-				$(INSTALL_DATA) $(LIBRARY) $(DESTDIR)$(LIBPL)/$(LIBRARY) ; \
+-			fi; \
+-		else \
+-			echo Skip install of $(LIBRARY) - use make frameworkinstall; \
+-		fi; \
+-	fi
+ 	$(INSTALL_DATA) Modules/config.c $(DESTDIR)$(LIBPL)/config.c
+ 	$(INSTALL_DATA) Programs/python.o $(DESTDIR)$(LIBPL)/python.o
+ 	$(INSTALL_DATA) $(srcdir)/Modules/config.c.in $(DESTDIR)$(LIBPL)/config.c.in

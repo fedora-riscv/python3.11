@@ -1,0 +1,58 @@
+From 8c2d4cf092c5f0335e7982392a33927579c4d512 Mon Sep 17 00:00:00 2001
+From: Dong-hee Na <donghee.na92@gmail.com>
+Date: Wed, 26 Jul 2017 21:11:25 +0900
+Subject: [PATCH] [3.6] bpo-30119: fix ftplib.FTP.putline() to throw an error
+ for a illegal command (#1214) (#2886)
+
+---
+ Lib/ftplib.py                                                     | 2 ++
+ Lib/test/test_ftplib.py                                           | 6 +++++-
+ Misc/NEWS.d/next/Library/2017-07-26-15-15-00.bpo-30119.DZ6C_S.rst | 2 ++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2017-07-26-15-15-00.bpo-30119.DZ6C_S.rst
+
+diff --git a/Lib/ftplib.py b/Lib/ftplib.py
+index 8f36f537e8a..a02e595cb02 100644
+--- a/Lib/ftplib.py
++++ b/Lib/ftplib.py
+@@ -186,6 +186,8 @@ def sanitize(self, s):
+ 
+     # Internal: send one line to the server, appending CRLF
+     def putline(self, line):
++        if '\r' in line or '\n' in line:
++            raise ValueError('an illegal newline character should not be contained')
+         line = line + CRLF
+         if self.debugging > 1:
+             print('*put*', self.sanitize(line))
+diff --git a/Lib/test/test_ftplib.py b/Lib/test/test_ftplib.py
+index 12fabc5e8be..a561e9efa03 100644
+--- a/Lib/test/test_ftplib.py
++++ b/Lib/test/test_ftplib.py
+@@ -484,6 +484,9 @@ def test_sanitize(self):
+         self.assertEqual(self.client.sanitize('PASS 12345'), repr('PASS *****'))
+ 
+     def test_exceptions(self):
++        self.assertRaises(ValueError, self.client.sendcmd, 'echo 40\r\n0')
++        self.assertRaises(ValueError, self.client.sendcmd, 'echo 40\n0')
++        self.assertRaises(ValueError, self.client.sendcmd, 'echo 40\r0')
+         self.assertRaises(ftplib.error_temp, self.client.sendcmd, 'echo 400')
+         self.assertRaises(ftplib.error_temp, self.client.sendcmd, 'echo 499')
+         self.assertRaises(ftplib.error_perm, self.client.sendcmd, 'echo 500')
+@@ -492,7 +495,8 @@ def test_exceptions(self):
+ 
+     def test_all_errors(self):
+         exceptions = (ftplib.error_reply, ftplib.error_temp, ftplib.error_perm,
+-                      ftplib.error_proto, ftplib.Error, OSError, EOFError)
++                      ftplib.error_proto, ftplib.Error, OSError,
++                      EOFError)
+         for x in exceptions:
+             try:
+                 raise x('exception not included in all_errors set')
+diff --git a/Misc/NEWS.d/next/Library/2017-07-26-15-15-00.bpo-30119.DZ6C_S.rst b/Misc/NEWS.d/next/Library/2017-07-26-15-15-00.bpo-30119.DZ6C_S.rst
+new file mode 100644
+index 00000000000..a37d3703842
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2017-07-26-15-15-00.bpo-30119.DZ6C_S.rst
+@@ -0,0 +1,2 @@
++ftplib.FTP.putline() now throws ValueError on commands that contains CR or
++LF. Patch by Dong-hee Na.
