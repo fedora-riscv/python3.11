@@ -1050,14 +1050,6 @@ done
 # Running the upstream test suite
 # ======================================================
 
-# For ppc64 we need a larger stack than default
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1292462
-%ifarch %{power64}
-  ulimit -a
-  ulimit -s 16384
-%endif
-
-
 topdir=$(pwd)
 CheckPython() {
   ConfName=$1
