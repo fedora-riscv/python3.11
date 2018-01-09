@@ -105,13 +105,13 @@ index 9ee4d31..53c8606 100644
          'scripts': '{userbase}/bin',
          'data': '{userbase}',
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index 99e7b4f..c4c98a6 100644
+index 266adf0..e8513b6 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -275,8 +275,8 @@ class HelperFunctionsTests(unittest.TestCase):
              self.assertEqual(dirs[1], wanted)
          elif os.sep == '/':
-             # OS X non-framwework builds, Linux, FreeBSD, etc
+             # OS X non-framework builds, Linux, FreeBSD, etc
 -            self.assertEqual(len(dirs), 1)
 -            wanted = os.path.join('xoxo', 'lib',
 +            self.assertEqual(len(dirs), 2)
@@ -120,7 +120,7 @@ index 99e7b4f..c4c98a6 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index e8df8f7..a5a9d5e 100644
+index 59ba9d4..5780ed8 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -133,7 +133,7 @@ LIBDIR=		@libdir@
@@ -133,41 +133,41 @@ index e8df8f7..a5a9d5e 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index dd3387a..1258fcd 100644
+index 85e737b..2a1fc79 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -494,7 +494,7 @@ calculate_path(void)
-     _pythonpath = Py_DecodeLocale(PYTHONPATH, NULL);
-     _prefix = Py_DecodeLocale(PREFIX, NULL);
-     _exec_prefix = Py_DecodeLocale(EXEC_PREFIX, NULL);
--    lib_python = Py_DecodeLocale("lib/python" VERSION, NULL);
-+    lib_python = Py_DecodeLocale("lib64/python" VERSION, NULL);
- 
-     if (!_pythonpath || !_prefix || !_exec_prefix || !lib_python) {
-         Py_FatalError(
-@@ -683,7 +683,7 @@ calculate_path(void)
-     }
-     else
-         wcsncpy(zip_path, _prefix, MAXPATHLEN);
--    joinpath(zip_path, L"lib/python00.zip");
-+    joinpath(zip_path, L"lib64/python00.zip");
-     bufsz = wcslen(zip_path);   /* Replace "00" with version */
-     zip_path[bufsz - 6] = VERSION[0];
-     zip_path[bufsz - 5] = VERSION[2];
-@@ -695,7 +695,7 @@ calculate_path(void)
-             fprintf(stderr,
+@@ -500,7 +500,7 @@ calculate_exec_prefix(const _PyCoreConfig *core_config,
                  "Could not find platform dependent libraries <exec_prefix>\n");
-         wcsncpy(exec_prefix, _exec_prefix, MAXPATHLEN);
+         }
+         wcsncpy(exec_prefix, calculate->exec_prefix, MAXPATHLEN);
 -        joinpath(exec_prefix, L"lib/lib-dynload");
 +        joinpath(exec_prefix, L"lib64/lib-dynload");
      }
      /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
+ }
+@@ -742,7 +742,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix)
+     else {
+         wcsncpy(calculate->zip_path, calculate->prefix, MAXPATHLEN);
+     }
+-    joinpath(calculate->zip_path, L"lib/python00.zip");
++    joinpath(calculate->zip_path, L"lib64/python00.zip");
  
+     /* Replace "00" with version */
+     size_t bufsz = wcslen(calculate->zip_path);
+@@ -867,7 +867,7 @@ calculate_init(PyCalculatePath *calculate,
+     if (!calculate->prefix) {
+         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
+     }
+-    calculate->lib_python = Py_DecodeLocale("lib/python" VERSION, &len);
++    calculate->lib_python = Py_DecodeLocale("lib64/python" VERSION, &len);
+     if (!calculate->lib_python) {
+         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
+     }
 diff --git a/setup.py b/setup.py
-index 11c4ec6..c3e5512 100644
+index f1933f7..450cd8a 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -513,7 +513,7 @@ class PyBuildExt(build_ext):
+@@ -531,7 +531,7 @@ class PyBuildExt(build_ext):
          # directories (i.e. '.' and 'Include') must be first.  See issue
          # 10520.
          if not cross_compiling:
@@ -176,7 +176,7 @@ index 11c4ec6..c3e5512 100644
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
          if cross_compiling:
-@@ -809,11 +809,11 @@ class PyBuildExt(build_ext):
+@@ -830,11 +830,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(lib_dirs +
@@ -190,7 +190,7 @@ index 11c4ec6..c3e5512 100644
                                     extra_link_args=readline_extra_link_args,
                                     libraries=readline_libs) )
          else:
-@@ -850,8 +850,8 @@ class PyBuildExt(build_ext):
+@@ -871,8 +871,8 @@ class PyBuildExt(build_ext):
              if krb5_h:
                  ssl_incs += krb5_h
          ssl_libs = find_library_file(self.compiler, 'ssl',lib_dirs,
