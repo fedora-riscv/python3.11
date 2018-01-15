@@ -1,6 +1,7 @@
-diff -Nur Python-3.4.1/Lib/ensurepip/__init__.py Python-3.4.1-rewheel/Lib/ensurepip/__init__.py
---- Python-3.4.1/Lib/ensurepip/__init__.py	2014-08-21 10:49:30.792695824 +0200
-+++ Python-3.4.1-rewheel/Lib/ensurepip/__init__.py	2014-08-21 10:10:41.958341726 +0200
+diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
+index d69e09f..5cb12df 100644
+--- a/Lib/ensurepip/__init__.py
++++ b/Lib/ensurepip/__init__.py
 @@ -1,8 +1,10 @@
  import os
  import os.path
@@ -12,16 +13,16 @@ diff -Nur Python-3.4.1/Lib/ensurepip/__init__.py Python-3.4.1-rewheel/Lib/ensure
  
  
  __all__ = ["version", "bootstrap"]
-@@ -38,6 +40,8 @@
+@@ -25,6 +27,8 @@ def _run_pip(args, additional_paths=None):
  
      # Install the bundled software
      import pip
 +    if args[0] in ["install", "list", "wheel"]:
 +        args.append('--pre')
-     pip.main(args)
+     return pip.main(args)
  
  
-@@ -87,20 +91,39 @@
+@@ -88,20 +92,39 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          # omit pip and easy_install
          os.environ["ENSUREPIP_OPTIONS"] = "install"
  
@@ -72,8 +73,8 @@ diff -Nur Python-3.4.1/Lib/ensurepip/__init__.py Python-3.4.1-rewheel/Lib/ensure
          # Construct the arguments to be passed to the pip command
          args = ["install", "--no-index", "--find-links", tmpdir]
 diff -Nur Python-3.4.1/Lib/ensurepip/rewheel/__init__.py Python-3.4.1-rewheel/Lib/ensurepip/rewheel/__init__.py
---- Python-3.4.1/Lib/ensurepip/rewheel/__init__.py	1970-01-01 01:00:00.000000000 +0100
-+++ Python-3.4.1-rewheel/Lib/ensurepip/rewheel/__init__.py	2014-08-21 10:11:22.560320121 +0200
+--- Python-3.4.1/Lib/ensurepip/rewheel/__init__.py  1970-01-01 01:00:00.000000000 +0100
++++ Python-3.4.1-rewheel/Lib/ensurepip/rewheel/__init__.py  2014-08-21 10:11:22.560320121 +0200
 @@ -0,0 +1,143 @@
 +import argparse
 +import codecs
@@ -219,8 +220,8 @@ diff -Nur Python-3.4.1/Lib/ensurepip/rewheel/__init__.py Python-3.4.1-rewheel/Li
 +            pass # bad RECORD or empty line
 +    return to_write, to_omit
 diff -Nur Python-3.4.1/Makefile.pre.in Python-3.4.1-rewheel/Makefile.pre.in
---- Python-3.4.1/Makefile.pre.in	2014-08-21 10:49:31.512695040 +0200
-+++ Python-3.4.1-rewheel/Makefile.pre.in	2014-08-21 10:10:41.961341722 +0200
+--- Python-3.4.1/Makefile.pre.in    2014-08-21 10:49:31.512695040 +0200
++++ Python-3.4.1-rewheel/Makefile.pre.in    2014-08-21 10:10:41.961341722 +0200
 @@ -1145,7 +1145,7 @@
  		test/test_asyncio \
  		collections concurrent concurrent/futures encodings \
