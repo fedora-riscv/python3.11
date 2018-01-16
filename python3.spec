@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -173,7 +173,7 @@ BuildRequires: expat-devel
 BuildRequires: findutils
 BuildRequires: gcc-c++
 %if %{with gdbm}
-BuildRequires: gdbm-devel
+BuildRequires: gdbm-devel >= 1:1.13
 %endif
 BuildRequires: glibc-devel
 BuildRequires: gmp-devel
@@ -1484,6 +1484,9 @@ fi
 # ======================================================
 
 %changelog
+* Tue Jan 16 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-2
+- Rebuild for reverted gdbm 1.13 on Fedora 27
+
 * Mon Jan 15 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-1
 - Update to version 3.6.4
 
