@@ -194,7 +194,7 @@ BuildRequires: expat-devel
 BuildRequires: findutils
 BuildRequires: gcc-c++
 %if %{with gdbm}
-BuildRequires: gdbm-devel
+BuildRequires: gdbm-devel >= 1:1.13
 %endif
 BuildRequires: glibc-devel
 BuildRequires: gmp-devel
