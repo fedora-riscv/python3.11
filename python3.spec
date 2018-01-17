@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -441,6 +441,11 @@ Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
 # Python 3 built with glibc >= 2.24.90-26 needs to require it
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1410644
 Requires: glibc%{?_isa} >= 2.24.90-26
+
+%if %{with gdbm}
+# When built with this (as guarded by the BuildRequires above), require it
+Requires: gdbm-devel%{?_isa} >= 1:1.13
+%endif
 
 # For backward compatibility only, remove in F29:
 Provides: system-python-libs = %{version}-%{release}
@@ -1484,6 +1489,9 @@ fi
 # ======================================================
 
 %changelog
+* Wed Jan 17 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-3
+- Require large enough gdbm (fixup for previous bump)
+
 * Tue Jan 16 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-2
 - Rebuild for reverted gdbm 1.13 on Fedora 27
 
