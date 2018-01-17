@@ -459,6 +459,11 @@ Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1410644
 Requires: glibc%{?_isa} >= 2.24.90-26
 
+%if %{with gdbm}
+# When built with this (as guarded by the BuildRequires above), require it
+Requires: gdbm-devel%{?_isa} >= 1:1.13
+%endif
+
 # For backward compatibility only, remove in F29:
 Provides: system-python-libs = %{version}-%{release}
 Provides: system-python-libs%{?_isa} = %{version}-%{release}
