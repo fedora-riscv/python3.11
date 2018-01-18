@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.10.%{?prerel}%{?dist}
+Release: 0.11.%{?prerel}%{?dist}
 License: Python
 
 
@@ -964,9 +964,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 find %{buildroot} -perm 555 -exec chmod 755 {} \;
 
 # Install macros for rpm:
+%if %{without flatpackage}
 mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
 install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d/
-%if %{without flatpackage}
 install -m 644 %{SOURCE9} %{buildroot}/%{_rpmconfigdir}/macros.d/
 %endif
 
@@ -1365,6 +1365,7 @@ CheckPython optimized
 %{_bindir}/python3-config
 %{_libdir}/pkgconfig/python3.pc
 %{_rpmconfigdir}/macros.d/macros.systempython
+%{_rpmconfigdir}/macros.d/macros.pybytecompile%{pybasever}
 %{_bindir}/pathfix.py
 %endif
 
@@ -1374,7 +1375,6 @@ CheckPython optimized
 %{_libdir}/libpython%{LDVERSION_optimized}.so
 %{_libdir}/pkgconfig/python-%{LDVERSION_optimized}.pc
 %{_libdir}/pkgconfig/python-%{pybasever}.pc
-%{_rpmconfigdir}/macros.d/macros.pybytecompile%{pybasever}
 
 
 %if %{without flatpackage}
@@ -1572,6 +1572,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.11.b1
+- Fix the py_byte_compile macro to work on Python 2
+- Remove the pybytecompile macro file from the flat package
+Resolves: rhbz#1484993
+
 * Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.10.b1
 - Filter out automatic /usr/bin/python3.X requirement,
   recommend the main package from libs instead
