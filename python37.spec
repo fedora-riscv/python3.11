@@ -1047,6 +1047,24 @@ mkdir -p %{buildroot}%{_libexecdir}
 ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
 %endif
 
+# There's no point of having this, as decided in
+# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+rm %{buildroot}%{_bindir}/2to3-%{pybasever}
+
+%if %{with flatpackage}
+# Remove stuff that would conflict with python3 package
+rm %{buildroot}%{_bindir}/python3
+rm %{buildroot}%{_bindir}/pydoc3
+rm %{buildroot}%{_bindir}/pathfix.py
+rm %{buildroot}%{_bindir}/idle3
+rm %{buildroot}%{_bindir}/python3-*
+rm %{buildroot}%{_bindir}/pyvenv
+rm %{buildroot}%{_bindir}/2to3
+rm %{buildroot}%{_libdir}/libpython3.so
+rm %{buildroot}%{_mandir}/man1/python3.1*
+rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
+%endif
+
 
 # ======================================================
 # Checks for packaging issues
@@ -1082,24 +1100,6 @@ for Module in %{buildroot}/%{dynload_dir}/*.so ; do
         ;;
     esac
 done
-
-# There's no point of having this, as decided in
-# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-rm %{buildroot}%{_bindir}/2to3-%{pybasever}
-
-%if %{with flatpackage}
-# Remove stuff that would conflict with python3 package
-rm %{buildroot}%{_bindir}/python3
-rm %{buildroot}%{_bindir}/pydoc3
-rm %{buildroot}%{_bindir}/pathfix.py
-rm %{buildroot}%{_bindir}/idle3
-rm %{buildroot}%{_bindir}/python3-*
-rm %{buildroot}%{_bindir}/pyvenv
-rm %{buildroot}%{_bindir}/2to3
-rm %{buildroot}%{_libdir}/libpython3.so
-rm %{buildroot}%{_mandir}/man1/python3.1*
-rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
-%endif
 
 
 # ======================================================
@@ -1686,6 +1686,7 @@ fi
 %changelog
 * Thu Jan 18 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.3.a4
 - Remove /usr/bin/python37 (#1526129)
+- Move install stuff from %%check to %%install, where it belongs (oops)
 
 * Tue Jan 09 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.2.a4
 - Update to 3.7.0 alpha 4
