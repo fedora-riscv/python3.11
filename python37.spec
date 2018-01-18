@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.2.%{?prerel}%{?dist}
+Release: 0.3.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1089,7 +1089,7 @@ rm %{buildroot}%{_bindir}/2to3-%{pybasever}
 
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
-mv %{buildroot}%{_bindir}/python{3,%{pyshortver}}
+rm %{buildroot}%{_bindir}/python3
 rm %{buildroot}%{_bindir}/pydoc3
 rm %{buildroot}%{_bindir}/pathfix.py
 rm %{buildroot}%{_bindir}/idle3
@@ -1206,7 +1206,6 @@ fi
 %{_libexecdir}/system-python
 %else
 %{_bindir}/pydoc%{pybasever}
-%{_bindir}/python%{pyshortver}
 %endif
 
 %{_bindir}/python%{pybasever}
@@ -1685,6 +1684,9 @@ fi
 # ======================================================
 
 %changelog
+* Thu Jan 18 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.3.a4
+- Remove /usr/bin/python37 (#1526129)
+
 * Tue Jan 09 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.2.a4
 - Update to 3.7.0 alpha 4
 - Fix the compilation of the nis module
