@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 17%{?dist}
+Release: 18%{?dist}
 License: Python
 
 
@@ -1513,6 +1513,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Mar 15 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-18
+- Fix the py_byte_compile macro to work on Python 2
+- Remove the pybytecompile macro file from the flat package
+Resolves: rhbz#1484993
+
 * Tue Mar 13 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-17
 - Do not send IP addresses in SNI TLS extension
 

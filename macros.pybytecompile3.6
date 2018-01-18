@@ -3,8 +3,23 @@
 # Python's compile_all module only works on directories, and requires a max
 # recursion depth
 
+# Note that the py_byte_compile macro should work for python2 as well
+# Which unfortunately makes the definition more complicated than it should be
+# The condition should be reversed once /usr/bin/python is python3!
+
 %py_byte_compile()\
-python_binary="%1"\
-bytecode_compilation_path="%2"\
-find $bytecode_compilation_path -type f -a -name "*.py" -print0 | xargs -0 $python_binary -O -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("$RPM_BUILD_ROOT")[2], optimize=opt) for opt in range(2) for f in sys.argv[1:]]' || :\
+py2_byte_compile () {\
+    python_binary="%1"\
+    bytecode_compilation_path="%2"\
+    find $bytecode_compilation_path -type f -a -name "*.py" -print0 | xargs -0 $python_binary -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("$RPM_BUILD_ROOT")[2]) for f in sys.argv[1:]]' || :\
+    find $bytecode_compilation_path -type f -a -name "*.py" -print0 | xargs -0 $python_binary -O -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("$RPM_BUILD_ROOT")[2]) for f in sys.argv[1:]]' || :\
+}\
+\
+py3_byte_compile () {\
+    python_binary="%1"\
+    bytecode_compilation_path="%2"\
+    find $bytecode_compilation_path -type f -a -name "*.py" -print0 | xargs -0 $python_binary -O -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("$RPM_BUILD_ROOT")[2], optimize=opt) for opt in range(2) for f in sys.argv[1:]]' || :\
+}\
+\
+[[ "%1" == *python3* ]] || py2_byte_compile "%1" "%2" && py3_byte_compile "%1" "%2" \
 %{nil}
