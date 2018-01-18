@@ -461,7 +461,7 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 
 %if %{with gdbm}
 # When built with this (as guarded by the BuildRequires above), require it
-Requires: gdbm-devel%{?_isa} >= 1:1.13
+Requires: gdbm%{?_isa} >= 1:1.13
 %endif
 
 # For backward compatibility only, remove in F29:
