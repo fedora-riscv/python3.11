@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.4.%{?prerel}%{?dist}
+Release: 0.5.%{?prerel}%{?dist}
 License: Python
 
 
@@ -519,7 +519,20 @@ Requires: python3-rpm-generators
 # TODO change to a specific subpackage once available (#1218294)
 Requires: redhat-rpm-config
 
+Provides: %{name}-2to3 = %{version}-%{release}
+Provides: 2to3 = %{version}-%{release}
+
 Conflicts: %{name} < %{version}-%{release}
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+# /usr/bin/2to3 was moved from python2-tools to python3-tools
+# TODO Remove in Fedora 29
+Conflicts: python2-tools < 2.7.13-17
+Conflicts: python-tools < 2.7.13-17
+# https://bugzilla.redhat.com/show_bug.cgi?id=1312030
+# /usr/bin/2to3 was moved from python3-tools to python3-devel
+# TODO Remove in Fedora 30
+Conflicts: python3-tools < 3.7
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-devel < %{platpyver}
@@ -529,32 +542,35 @@ This package contains the header files and configuration needed to compile
 Python extension modules (typically written in C or C++), to embed Python
 into other programs, and to make binary distributions for Python libraries.
 
-It also contains the necessary macros to build RPM packages with Python modules.
+It also contains the necessary macros to build RPM packages with Python modules
+and 2to3 tool, an automatic source converter from Python 2.X.
 
 
-%package tools
-Summary: A collection of tools included with Python including 2to3 and idle
+%package idle
+Summary: A basic graphical development environment for Python
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tkinter = %{version}-%{release}
 
-Provides: %{name}-2to3 = %{version}-%{release}
-Provides: %{name}-idle = %{version}-%{release}
-Provides: 2to3 = %{version}-%{release}
 Provides: idle3 = %{version}-%{release}
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-# /usr/bin/2to3 was moved from here
-# TODO Remove in Fedora 29
-Conflicts: python2-tools < 2.7.13-17
-Conflicts: python-tools < 2.7.13-17
+Provides: %{name}-tools = %{version}-%{release}
+Provides: %{name}-tools%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-tools < %{version}-%{release}
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-tools < %{platpyver}
 
-%description tools
-This package contains several tools included with Python, including:
-- 2to3, an automatic source converter from Python 2.X
-- idle, a basic graphical development environment
+%description idle
+IDLE is Python’s Integrated Development and Learning Environment.
+
+IDLE has the following features: Python shell window (interactive
+interpreter) with colorizing of code input, output, and error messages;
+multi-window text editor with multiple undo, Python colorizing,
+smart indent, call tips, auto completion, and other features;
+search within any window, replace within editor windows, and
+search through multiple files (grep); debugger with persistent
+breakpoints, stepping, and viewing of global and local namespaces;
+configuration, browsers, and other dialogs.
 
 
 %package tkinter
@@ -572,7 +588,6 @@ the Python programming language.
 %package test
 Summary: The self-test suite for the main python3 package
 Requires: %{name} = %{version}-%{release}
-Requires: %{name}-tools = %{version}-%{release}
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-test < %{platpyver}
@@ -597,7 +612,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: %{name}-test%{?_isa} = %{version}-%{release}
 Requires: %{name}-tkinter%{?_isa} = %{version}-%{release}
-Requires: %{name}-tools%{?_isa} = %{version}-%{release}
+Requires: %{name}-idle%{?_isa} = %{version}-%{release}
 
 %description debug
 python3-debug provides a version of the Python runtime with numerous debugging
@@ -944,21 +959,6 @@ cp -a %{SOURCE11} %{buildroot}%{_datadir}/appdata
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/appdata/idle3.appdata.xml
 %endif
 
-# Development tools
-install -m755 -d %{buildroot}%{pylibdir}/Tools
-install Tools/README %{buildroot}%{pylibdir}/Tools/
-cp -ar Tools/freeze %{buildroot}%{pylibdir}/Tools/
-cp -ar Tools/i18n %{buildroot}%{pylibdir}/Tools/
-cp -ar Tools/pynche %{buildroot}%{pylibdir}/Tools/
-cp -ar Tools/scripts %{buildroot}%{pylibdir}/Tools/
-
-# Documentation tools
-install -m755 -d %{buildroot}%{pylibdir}/Doc
-cp -ar Doc/tools %{buildroot}%{pylibdir}/Doc/
-
-# Demo scripts
-cp -ar Tools/demo %{buildroot}%{pylibdir}/Tools/
-
 # Make sure distutils looks at the right pyconfig.h file
 # See https://bugzilla.redhat.com/show_bug.cgi?id=201434
 # Similar for sysconfig: sysconfig.get_config_h_filename tries to locate
@@ -971,22 +971,21 @@ sed -i -e "s/'pyconfig.h'/'%{_pyconfig_h}'/" \
   %{buildroot}%{pylibdir}/distutils/sysconfig.py \
   %{buildroot}%{pylibdir}/sysconfig.py
 
+# Install pathfix.py to bindir
+# See https://github.com/fedora-python/python-rpm-porting/issues/24
+cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/
+
 # Switch all shebangs to refer to the specific Python version.
 # This currently only covers files matching ^[a-zA-Z0-9_]+\.py$,
 # so handle files named using other naming scheme separately.
 LD_LIBRARY_PATH=./build/optimized ./build/optimized/python \
   Tools/scripts/pathfix.py \
   -i "%{_bindir}/python%{pybasever}" \
-  %{buildroot} %{buildroot}%{pylibdir}/Tools/scripts/*-*.py \
-  %{buildroot}%{pylibdir}/Tools/pynche/{pynche,pynche.pyw}
-# not covered, also redundant and useless:
-rm %{buildroot}%{pylibdir}/Tools/scripts/{2to3,idle3,pydoc3,pyvenv}
+  %{buildroot}
 
-
-# Move pathfix.py to bindir
-# See https://github.com/fedora-python/python-rpm-porting/issues/24
-mv %{buildroot}%{pylibdir}/Tools/scripts/pathfix.py %{buildroot}%{_bindir}/
-
+# Remove tests for python3-tools which was removed in
+# https://bugzilla.redhat.com/show_bug.cgi?id=1312030
+rm -rf %{buildroot}%{pylibdir}/test/test_tools
 
 # Remove shebang lines from .py files that aren't executable, and
 # remove executability from .py files that don't have a shebang line:
@@ -995,10 +994,6 @@ find %{buildroot} -name \*.py \
   -print -exec sed -i '1d' {} \; \) -o \( \
   -perm /u+x,g+x,o+x ! -exec grep -m 1 -q '^#!' {} \; \
   -exec chmod a-x {} \; \) \)
-
-# Remove executable flag from files that shouldn't have it:
-chmod a-x \
-  %{buildroot}%{pylibdir}/Tools/README
 
 # Get rid of DOS batch files:
 find %{buildroot} -name \*.bat -exec rm {} \;
@@ -1047,9 +1042,10 @@ mkdir -p %{buildroot}%{_libexecdir}
 ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
 %endif
 
-# There's no point of having this, as decided in
-# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-rm %{buildroot}%{_bindir}/2to3-%{pybasever}
+# There's 2to3-X.X executable and 2to3 soft link to it.
+# No reason to have both, so keep only 2to3 as an executable.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
 
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
@@ -1267,8 +1263,6 @@ fi
 %{pylibdir}/ensurepip/rewheel/__pycache__/*%{bytecode_suffixes}
 %endif
 
-%{pylibdir}/idlelib
-
 %dir %{pylibdir}/test/
 %dir %{pylibdir}/test/__pycache__/
 %dir %{pylibdir}/test/support/
@@ -1458,6 +1452,7 @@ fi
 %if %{without flatpackage}
 %files devel
 %defattr(-,root,root)
+%{_bindir}/2to3
 %endif
 
 %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/*
@@ -1486,17 +1481,16 @@ fi
 
 
 %if %{without flatpackage}
-%files tools
+%files idle
 %defattr(-,root,root,755)
 
-%{_bindir}/2to3
 %{_bindir}/idle*
 %else
 %{_bindir}/idle%{pybasever}
 %endif
 
-%{pylibdir}/Tools
-%doc %{pylibdir}/Doc
+%{pylibdir}/idlelib
+
 %if %{without flatpackage}
 %{_datadir}/appdata/idle3.appdata.xml
 %{_datadir}/applications/idle3.desktop
@@ -1684,6 +1678,12 @@ fi
 # ======================================================
 
 %changelog
+* Fri Jan 26 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.7.0-0.5.a4
+- Remove the python3-tools package (#rhbz 1312030)
+- Move /usr/bin/2to3 to python3-devel
+- Move /usr/bin/idle and idlelib to python3-idle
+- Provide python3-tools from python3-idle
+
 * Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 3.7.0-0.4.a4
 - Rebuilt for switch to libxcrypt
 
