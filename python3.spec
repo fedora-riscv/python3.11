@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 
 
@@ -444,7 +444,7 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 
 %if %{with gdbm}
 # When built with this (as guarded by the BuildRequires above), require it
-Requires: gdbm-devel%{?_isa} >= 1:1.13
+Requires: gdbm%{?_isa} >= 1:1.13
 %endif
 
 # For backward compatibility only, remove in F29:
@@ -1489,6 +1489,9 @@ fi
 # ======================================================
 
 %changelog
+* Thu Jan 18 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.6.4-4
+- R: gdbm-devel → R: gdbm for python3-libs
+
 * Wed Jan 17 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-3
 - Require large enough gdbm (fixup for previous bump)
 
