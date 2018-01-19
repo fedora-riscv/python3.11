@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 
 
@@ -342,9 +342,9 @@ Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 Patch264: 00264-skip-test-failing-on-aarch64.patch
 
 # 00273 #
-# Skip test_float_with_comma, which fails in Koji with UnicodeDecodeError
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1484497
-Patch273: 00273-skip-float-test.patch
+# Fix localeconv() encoding for LC_NUMERIC
+# Fixed upstream: https://bugs.python.org/issue31900
+Patch273: 00273-fix-localeconv-encoding-for-LC_NUMERIC.patch
 
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
@@ -1489,6 +1489,9 @@ fi
 # ======================================================
 
 %changelog
+* Fri Jan 19 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-5
+- Fix localeconv() encoding for LC_NUMERIC
+
 * Thu Jan 18 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.6.4-4
 - R: gdbm-devel → R: gdbm for python3-libs
 
