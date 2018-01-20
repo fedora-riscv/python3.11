@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.3.%{?prerel}%{?dist}
+Release: 0.4.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1684,6 +1684,9 @@ fi
 # ======================================================
 
 %changelog
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 3.7.0-0.4.a4
+- Rebuilt for switch to libxcrypt
+
 * Thu Jan 18 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.3.a4
 - Remove /usr/bin/python37 (#1526129)
 - Move install stuff from %%check to %%install, where it belongs (oops)
