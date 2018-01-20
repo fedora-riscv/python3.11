@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 
 
@@ -1489,6 +1489,9 @@ fi
 # ======================================================
 
 %changelog
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 3.6.4-6
+- Rebuilt for switch to libxcrypt
+
 * Fri Jan 19 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-5
 - Fix localeconv() encoding for LC_NUMERIC
 
