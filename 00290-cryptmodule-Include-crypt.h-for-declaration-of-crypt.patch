@@ -1,0 +1,47 @@
+From 6811089dbf34a2cef9799e1cb6d63b863b58739f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Sun, 21 Jan 2018 18:55:31 +0100
+Subject: [PATCH] cryptmodule: Include <crypt.h> for declaration of crypt() if
+ needed
+
+Not every target system may provide a crypt() function in its stdlibc
+and may use an external or replacement library, like libxcrypt, for
+providing such functions.
+---
+ Modules/_cryptmodule.c | 4 ++++
+ configure.ac           | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/Modules/_cryptmodule.c b/Modules/_cryptmodule.c
+index 58d179e6a3..bb26d83f55 100644
+--- a/Modules/_cryptmodule.c
++++ b/Modules/_cryptmodule.c
+@@ -5,6 +5,10 @@
+ 
+ #include <sys/types.h>
+ 
++#if defined(HAVE_XCRYPT)
++#include <crypt.h>
++#endif
++
+ /* Module crypt */
+ 
+ /*[clinic input]
+diff --git a/configure.ac b/configure.ac
+index 39e2e8e769..129c198c15 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2816,6 +2816,10 @@ LIBS="$withval $LIBS"
+ 
+ PKG_PROG_PKG_CONFIG
+ 
++# Check for libxcrypt is present.
++PKG_CHECK_MODULES([libxcrypt], libxcrypt,
++            AC_DEFINE([HAVE_XCRYPT], 1, [Define to 1 if libxcrypt is found.]), [])
++
+ # Check for use of the system expat library
+ AC_MSG_CHECKING(for --with-system-expat)
+ AC_ARG_WITH(system_expat,
+-- 
+2.16.0
+
