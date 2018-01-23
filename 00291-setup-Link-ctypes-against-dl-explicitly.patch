@@ -1,0 +1,25 @@
+From aae2ef0bace0e38f4ee5aaa4642aa32450a84216 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Tue, 23 Jan 2018 14:43:43 +0100
+Subject: [PATCH] setup: Link ctypes against dl explicitly
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index c23628a2a9..9e40bb53e6 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1935,7 +1935,7 @@ class PyBuildExt(build_ext):
+         self.use_system_libffi = False
+         include_dirs = []
+         extra_compile_args = []
+-        extra_link_args = []
++        extra_link_args = ['-ldl']
+         sources = ['_ctypes/_ctypes.c',
+                    '_ctypes/callbacks.c',
+                    '_ctypes/callproc.c',
+-- 
+2.16.1
+
