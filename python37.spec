@@ -378,7 +378,7 @@ Patch289: 00289-fix-nis-compilation.patch
 # Not every target system may provide a crypt() function in its stdlibc
 # and may use an external or replacement library, like libxcrypt, for
 # providing such functions.
-# Reported upstream: https://bugs.python.org/issue32635
+# Fixed upstream: https://bugs.python.org/issue32635
 Patch290: 00290-cryptmodule-Include-crypt.h-for-declaration-of-crypt.patch
 
 # 00291 #
