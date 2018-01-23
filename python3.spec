@@ -146,6 +146,11 @@ License: Python
 # on files that test invalid syntax.
 %undefine py_auto_byte_compile
 
+# Disable strict symbol checks in the link editor.
+# See: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af192613e1beec34824a94dc5f6feeeea1568?branch=master
+# https://bugzilla.redhat.com/show_bug.cgi?id=1537489
+%undefine _strict_symbol_defs_build
+
 # For multilib support, files that are different between 32- and 64-bit arches
 # need different filenames. Use "64" or "32" according to the word size.
 # Currently, the best way to determine an architecture's word size happens to
@@ -363,6 +368,7 @@ Patch289: 00289-fix-nis-compilation.patch
 # Not every target system may provide a crypt() function in its stdlibc
 # and may use an external or replacement library, like libxcrypt, for
 # providing such functions.
+# Reported upstream: https://bugs.python.org/issue32635
 Patch290: 00290-cryptmodule-Include-crypt.h-for-declaration-of-crypt.patch
 
 # (New patches go here ^^^)
@@ -1498,6 +1504,7 @@ fi
 %changelog
 * Mon Jan 22 2018 Björn Esser <besser82@fedoraproject.org> - 3.6.4-7
 - Add patch for libxcrypt
+- Disable strict symbol checks in the link editor
 
 * Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 3.6.4-6
 - Rebuilt for switch to libxcrypt
