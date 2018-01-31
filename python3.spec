@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Python
 
 
@@ -1041,14 +1041,15 @@ CheckPython() {
     -wW --slowest --findleaks \
     -x test_distutils \
     -x test_bdist_rpm \
+    -x test_gdb \
     %ifarch ppc64le aarch64
     -x test_faulthandler \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
-    %ifarch %{power64} s390 s390x armv7hl aarch64 %{mips}
-    -x test_gdb
+    %ifarch ppc64le
+    -x test_buffer \
     %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
@@ -1511,6 +1512,12 @@ fi
 # ======================================================
 
 %changelog
+* Wed Jan 31 2018 Tomas Orsava <torsava@redhat.com> - 3.6.4-10
+- Disable test_gdb for all arches and test_buffer for ppc64le in anticipation
+  of the F28 mass rebuild
+- Re-enable these tests after the mass rebuild when they can be properly
+  addressed
+
 * Tue Jan 23 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-9
 - Restore the PyExc_RecursionErrorInst public symbol
 
