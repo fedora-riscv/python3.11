@@ -1067,14 +1067,15 @@ CheckPython() {
     -wW --slowest --findleaks \
     -x test_distutils \
     -x test_bdist_rpm \
+    -x test_gdb \
     %ifarch ppc64le aarch64
     -x test_faulthandler \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
-    %ifarch %{power64} s390 s390x armv7hl aarch64 %{mips}
-    -x test_gdb
+    %ifarch ppc64le
+    -x test_buffer \
     %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
