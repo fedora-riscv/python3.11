@@ -738,6 +738,7 @@ BuildPython() {
   --enable-loadable-sqlite-extensions \
   --with-dtrace \
   --with-lto \
+  --with-ssl-default-suites=openssl \
 %if %{with valgrind}
   --with-valgrind \
 %endif
@@ -1577,6 +1578,7 @@ CheckPython optimized
 %changelog
 * Mon Feb 12 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.7.0-0.7.b1
 - Update to 3.7.0b1
+- Define TLS cipher suite on build time
 
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.0-0.6.a4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
