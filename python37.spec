@@ -13,12 +13,12 @@ URL: https://www.python.org/
 
 
 # Second alpha
-%global prerel a4
+%global prerel b1
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.6.%{?prerel}%{?dist}
+Release: 0.7.%{?prerel}%{?dist}
 License: Python
 
 
@@ -356,30 +356,9 @@ Patch251: 00251-change-user-install-location.patch
 # Reported upstream: http://bugs.python.org/issue29804
 Patch264: 00264-skip-test-failing-on-aarch64.patch
 
-# 00273 #
-# Skip test_float_with_comma, which fails in Koji with UnicodeDecodeError
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1484497
-Patch273: 00273-skip-float-test.patch
-
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
-
-# 00289 #
-# Fix the compilation of the nis module, as glibc removed the
-# interfaces related to Sun RPC and they are now provided
-# by libtirpc and libnsl2.
-# See: https://fedoraproject.org/wiki/Changes/SunRPCRemoval
-# and https://fedoraproject.org/wiki/Changes/NISIPv6
-# Fixed upstream: https://bugs.python.org/issue32521
-Patch289: 00289-fix-nis-compilation.patch
-
-# 00290 #
-# Not every target system may provide a crypt() function in its stdlibc
-# and may use an external or replacement library, like libxcrypt, for
-# providing such functions.
-# Fixed upstream: https://bugs.python.org/issue32635
-Patch290: 00290-cryptmodule-Include-crypt.h-for-declaration-of-crypt.patch
 
 # 00291 #
 # Build fails with undefined references to dlopen / dlsym otherwise.
@@ -686,10 +665,7 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch264 -p1
 %endif
 
-%patch273 -p1
 %patch274 -p1
-%patch289 -p1
-%patch290 -p1
 %patch291 -p1
 
 
@@ -1227,6 +1203,7 @@ CheckPython optimized
 %{dynload_dir}/_codecs_jp.%{SOABI_optimized}.so
 %{dynload_dir}/_codecs_kr.%{SOABI_optimized}.so
 %{dynload_dir}/_codecs_tw.%{SOABI_optimized}.so
+%{dynload_dir}/_contextvars.%{SOABI_optimized}.so
 %{dynload_dir}/_crypt.%{SOABI_optimized}.so
 %{dynload_dir}/_csv.%{SOABI_optimized}.so
 %{dynload_dir}/_ctypes.%{SOABI_optimized}.so
@@ -1248,11 +1225,13 @@ CheckPython optimized
 %{dynload_dir}/_opcode.%{SOABI_optimized}.so
 %{dynload_dir}/_pickle.%{SOABI_optimized}.so
 %{dynload_dir}/_posixsubprocess.%{SOABI_optimized}.so
+%{dynload_dir}/_queue.%{SOABI_optimized}.so
 %{dynload_dir}/_random.%{SOABI_optimized}.so
 %{dynload_dir}/_socket.%{SOABI_optimized}.so
 %{dynload_dir}/_sqlite3.%{SOABI_optimized}.so
 %{dynload_dir}/_ssl.%{SOABI_optimized}.so
 %{dynload_dir}/_struct.%{SOABI_optimized}.so
+%{dynload_dir}/_xxsubinterpreters.%{SOABI_optimized}.so
 %{dynload_dir}/array.%{SOABI_optimized}.so
 %{dynload_dir}/audioop.%{SOABI_optimized}.so
 %{dynload_dir}/binascii.%{SOABI_optimized}.so
@@ -1490,6 +1469,7 @@ CheckPython optimized
 %{dynload_dir}/_codecs_jp.%{SOABI_debug}.so
 %{dynload_dir}/_codecs_kr.%{SOABI_debug}.so
 %{dynload_dir}/_codecs_tw.%{SOABI_debug}.so
+%{dynload_dir}/_contextvars.%{SOABI_debug}.so
 %{dynload_dir}/_crypt.%{SOABI_debug}.so
 %{dynload_dir}/_csv.%{SOABI_debug}.so
 %{dynload_dir}/_ctypes.%{SOABI_debug}.so
@@ -1511,11 +1491,13 @@ CheckPython optimized
 %{dynload_dir}/_opcode.%{SOABI_debug}.so
 %{dynload_dir}/_pickle.%{SOABI_debug}.so
 %{dynload_dir}/_posixsubprocess.%{SOABI_debug}.so
+%{dynload_dir}/_queue.%{SOABI_debug}.so
 %{dynload_dir}/_random.%{SOABI_debug}.so
 %{dynload_dir}/_socket.%{SOABI_debug}.so
 %{dynload_dir}/_sqlite3.%{SOABI_debug}.so
 %{dynload_dir}/_ssl.%{SOABI_debug}.so
 %{dynload_dir}/_struct.%{SOABI_debug}.so
+%{dynload_dir}/_xxsubinterpreters.%{SOABI_debug}.so
 %{dynload_dir}/array.%{SOABI_debug}.so
 %{dynload_dir}/audioop.%{SOABI_debug}.so
 %{dynload_dir}/binascii.%{SOABI_debug}.so
@@ -1592,6 +1574,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Feb 12 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.7.0-0.7.b1
+- Update to 3.7.0b1
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.0-0.6.a4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 

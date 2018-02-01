@@ -60,8 +60,8 @@ index 904fc7d..5676007 100644
  import unittest
  from test.support import (verbose, refcount_test, run_unittest,
                            strip_python_stderr, cpython_only, start_threads,
--                          temp_dir, requires_type_collecting)
-+                          temp_dir, import_module, requires_type_collecting)
+-                          temp_dir, requires_type_collecting,reap_threads)
++                          temp_dir,reap_threads, import_module, requires_type_collecting)
  from test.support.script_helper import assert_python_ok, make_script
  
  import sys

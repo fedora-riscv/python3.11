@@ -70,8 +70,8 @@ index 7dc1b04..85016b4 100644
              sitepackages.append(prefix)
 +            sitepackages.append(os.path.join(prefix, "lib64", "site-packages"))
              sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
-         # for framework builds *only* we add the standard Apple locations.
-         if sys.platform == "darwin" and sys._framework:
+     return sitepackages
+ 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
 index 9ee4d31..53c8606 100644
 --- a/Lib/sysconfig.py
@@ -109,9 +109,9 @@ index 266adf0..e8513b6 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -275,8 +275,8 @@ class HelperFunctionsTests(unittest.TestCase):
-             self.assertEqual(dirs[1], wanted)
-         elif os.sep == '/':
-             # OS X non-framework builds, Linux, FreeBSD, etc
+         dirs = site.getsitepackages()
+         if os.sep == '/':
+             # OS X, Linux, FreeBSD, etc
 -            self.assertEqual(len(dirs), 1)
 -            wanted = os.path.join('xoxo', 'lib',
 +            self.assertEqual(len(dirs), 2)
@@ -190,14 +190,3 @@ index f1933f7..450cd8a 100644
                                     extra_link_args=readline_extra_link_args,
                                     libraries=readline_libs) )
          else:
-@@ -871,8 +871,8 @@ class PyBuildExt(build_ext):
-             if krb5_h:
-                 ssl_incs += krb5_h
-         ssl_libs = find_library_file(self.compiler, 'ssl',lib_dirs,
--                                     ['/usr/local/ssl/lib',
--                                      '/usr/contrib/ssl/lib/'
-+                                     ['/usr/local/ssl/lib64',
-+                                      '/usr/contrib/ssl/lib64/'
-                                      ] )
- 
-         if (ssl_incs is not None and
