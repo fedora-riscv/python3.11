@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Python
 
 
@@ -1502,6 +1502,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Feb 02 2018 Michal Cyprian <mcyprian@redhat.com> - 3.6.4-12
+- Remove sys.executable check from change-user-install-location patch
+Resolves: rhbz#1532287
+
 * Thu Feb 01 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.4-11
 - Define TLS cipher suite on build time.
 
