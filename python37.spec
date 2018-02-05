@@ -1156,39 +1156,6 @@ CheckPython optimized
 %endif # with tests
 
 
-# ======================================================
-# Scriptlets
-# ======================================================
-
-%if %{without flatpackage}
-
-%post libs -p /sbin/ldconfig
-
-%postun libs -p /sbin/ldconfig
-
-%posttrans
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-
-%endif
-
-
-%post
-%if %{with flatpackage}
-/sbin/ldconfig
-%else
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-%endif
-
-%postun
-%if %{with flatpackage}
-/sbin/ldconfig
-%else
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-%endif
-
 %files
 %defattr(-, root, root)
 %license LICENSE
