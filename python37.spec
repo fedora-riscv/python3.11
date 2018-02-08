@@ -425,7 +425,7 @@ language, designed with an emphasis on code readibility.
 It includes an extensive standard library, and has a vast ecosystem of
 third-party libraries.
 
-The ${name} package provides the "python3" executable: the reference
+The %{name} package provides the "python3" executable: the reference
 interpreter for the Python language, version 3.
 The majority of its standard library is provided in the %{name}-libs package,
 which should be installed automatically along with %{name}.
