@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Python
 
 
@@ -1502,6 +1502,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.6.4-13
+- Escape macros in %%changelog
+
 * Fri Feb 02 2018 Michal Cyprian <mcyprian@redhat.com> - 3.6.4-12
 - Remove sys.executable check from change-user-install-location patch
 Resolves: rhbz#1532287
@@ -1775,7 +1778,7 @@ porting ssl and hashlib modules to OpenSSL 1.1.0
 - Obsolete and Provide python35 package
 
 * Mon Sep 12 2016 Charalampos Stratakis <cstratak@redhat.com> - 3.5.2-3
-- Update %py_byte_compile macro
+- Update %%py_byte_compile macro
 - Remove unused configure flags (rhbz#1374357)
 
 * Fri Sep 09 2016 Tomas Orsava <torsava@redhat.com> - 3.5.2-2
