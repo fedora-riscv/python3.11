@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.5.%{?prerel}%{?dist}
+Release: 0.6.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1645,6 +1645,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.0-0.6.a4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Fri Jan 26 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.7.0-0.5.a4
 - Remove the python3-tools package (#rhbz 1312030)
 - Move /usr/bin/2to3 to python3-devel
