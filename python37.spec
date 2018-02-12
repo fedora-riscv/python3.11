@@ -148,7 +148,7 @@ License: Python
 # has bytecode at:
 #   foo/__pycache__/bar.cpython-%%{pyshortver}.pyc
 #   foo/__pycache__/bar.cpython-%%{pyshortver}.opt-1.pyc
-#	foo/__pycache__/bar.cpython-%%{pyshortver}.opt-2.pyc
+#   foo/__pycache__/bar.cpython-%%{pyshortver}.opt-2.pyc
 %global bytecode_suffixes .cpython-%{pyshortver}*.pyc
 
 # Python's configure script defines SOVERSION, and this is used in the Makefile
@@ -421,7 +421,7 @@ Requires: python3-pip
 # The description used both for the SRPM and the main `python3` subpackage:
 %description
 Python is an accessible, high-level, dynamically typed, interpreted programming
-language, designed with an emphasis on code readibility.
+language, designed with an emphasis on code readability.
 It includes an extensive standard library, and has a vast ecosystem of
 third-party libraries.
 
@@ -573,7 +573,7 @@ you should use the unittest module from %{name}-libs, or a library such as
 Summary: Debug version of the Python runtime
 
 # The debug build is an all-in-one package version of the regular build, and
-# shares the same .py/.pyc files and directories as the regular build.  Hence
+# shares the same .py/.pyc files and directories as the regular build. Hence
 # we depend on all of the subpackages of the regular build:
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -598,7 +598,7 @@ separately.
 The debug build shares installation directories with the standard Python
 runtime, so that .py and .pyc files can be shared.
 Compiled extension modules use a special ABI flag ("d") in the filename,
-so extensions for both verisons can co-exist in the same directory.
+so extensions for both versions can co-exist in the same directory.
 %endif # with debug_build
 
 %else  # with flatpackage
