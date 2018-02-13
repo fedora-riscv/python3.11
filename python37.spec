@@ -815,7 +815,6 @@ InstallPython() {
   PyInstSoName=$2
   MoreCFlags=$3
   LDVersion=$4
-  Postfix=$5
 
   # Switch to the directory with this configuration's built files
   ConfDir=build/$ConfName
@@ -869,16 +868,14 @@ EOF
 InstallPython debug \
   %{py_INSTSONAME_debug} \
   -O0 \
-  %{LDVERSION_debug} \
-  -debug
+  %{LDVERSION_debug}
 %endif # with debug_build
 
 # Now the optimized build:
 InstallPython optimized \
   %{py_INSTSONAME_optimized} \
   "" \
-  %{LDVERSION_optimized} \
-  ""
+  %{LDVERSION_optimized}
 
 # Install directories for additional packages
 install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
