@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.7.%{?prerel}%{?dist}
+Release: 0.8.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1094,6 +1094,15 @@ CheckPython optimized
 %endif # with tests
 
 
+# Remove this when F27 EOL
+%if %{with flatpackage}
+%ldconfig_scriptlets
+%else
+%ldconfig_scriptlets libs
+%ldconfig_scriptlets debug
+%endif
+
+
 %files
 %defattr(-, root, root)
 %license LICENSE
@@ -1576,6 +1585,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 14 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.8.b1
+- Readd ldconfig scriplets via macro
+
 * Mon Feb 12 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.7.0-0.7.b1
 - Update to 3.7.0b1
 - Define TLS cipher suite on build time
