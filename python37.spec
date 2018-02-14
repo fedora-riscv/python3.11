@@ -349,13 +349,6 @@ Patch205: 00205-make-libpl-respect-lib64.patch
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
 Patch251: 00251-change-user-install-location.patch
 
-# 00264 #
-# test_pass_by_value was added in Python 3.6.1 and on aarch64
-# it is catching an error that was there, but wasn't tested before.
-# Therefore skipping the test on aarch64 until fixed upstream.
-# Reported upstream: http://bugs.python.org/issue29804
-Patch264: 00264-skip-test-failing-on-aarch64.patch
-
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
@@ -674,11 +667,6 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 
 %patch205 -p1
 %patch251 -p1
-
-%ifarch aarch64
-%patch264 -p1
-%endif
-
 %patch274 -p1
 %patch291 -p1
 
