@@ -568,7 +568,7 @@ The self-test suite for the Python interpreter.
 
 This is only useful to test Python itself. For testing general Python code,
 you should use the unittest module from %{name}-libs, or a library such as
-${name}-pytest or ${name}-nose.
+%{name}-pytest or %{name}-nose.
 
 
 %if %{with debug_build}
