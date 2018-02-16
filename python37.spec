@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.8.%{?prerel}%{?dist}
+Release: 0.9.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1582,6 +1582,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Feb 15 2018 Michal Cyprian <mcyprian@redhat.com> - 3.7.0-0.9.b1
+- Remove sys.executable check from change-user-install-location patch
+Resolves: rhbz#1532287
+
 * Wed Feb 14 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.8.b1
 - Readd ldconfig scriplets via macro
 
