@@ -1065,9 +1065,11 @@ CheckPython() {
     -wW --slowest --findleaks \
     -x test_distutils \
     -x test_bdist_rpm \
-    -x test_gdb \
     %ifarch %{mips64}
     -x test_ctypes \
+    %endif
+    %ifarch %{power64} s390 s390x armv7hl %{mips}
+    -x test_gdb \
     %endif
     %ifarch ppc64le
     -x test_buffer \
