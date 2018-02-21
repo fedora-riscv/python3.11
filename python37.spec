@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.9.%{?prerel}%{?dist}
+Release: 0.10.%{?prerel}%{?dist}
 License: Python
 
 
@@ -418,6 +418,14 @@ Requires: python3-setuptools
 Requires: python3-pip
 %endif
 
+# This prevents ALL subpackages built from this spec to require
+# /usr/bin/python3*. Granularity per subpackage is impossible.
+# It's intended for the libs package not to drag in the interpreter, see
+# https://bugzilla.redhat.com/show_bug.cgi?id=1547131
+# All others require %%{name} anyway.
+%global __requires_exclude ^/usr/bin/python3
+
+
 # The description used both for the SRPM and the main `python3` subpackage:
 %description
 Python is an accessible, high-level, dynamically typed, interpreted programming
@@ -455,6 +463,12 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 # When built with this (as guarded by the BuildRequires above), require it
 Requires: gdbm%{?_isa} >= 1:1.13
 %endif
+
+# There are files in the standard library that have python shebang.
+# We've filtered the automatic requirement out so libs are installable without
+# the main package. This however makes it pulled in by default.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
+Recommends: %{name}%{?_isa} = %{version}-%{release}
 
 # For backward compatibility only, remove in F29:
 Provides: system-python-libs = %{version}-%{release}
@@ -1573,6 +1587,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.10.b1
+- Filter out automatic /usr/bin/python3.X requirement,
+  recommend the main package from libs instead
+Resolves: rhbz#1547131
+
 * Thu Feb 15 2018 Michal Cyprian <mcyprian@redhat.com> - 3.7.0-0.9.b1
 - Remove sys.executable check from change-user-install-location patch
 Resolves: rhbz#1532287
