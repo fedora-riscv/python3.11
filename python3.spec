@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: Python
 
 
@@ -436,6 +436,14 @@ Requires: python3-setuptools
 Requires: python3-pip
 %endif
 
+# This prevents ALL subpackages built from this spec to require
+# /usr/bin/python3*. Granularity per subpackage is impossible.
+# It's intended for the libs package not to drag in the interpreter, see
+# https://bugzilla.redhat.com/show_bug.cgi?id=1547131
+# All others require %%{name} anyway.
+%global __requires_exclude ^/usr/bin/python3
+
+
 # The description used both for the SRPM and the main `python3` subpackage:
 %description
 Python is an accessible, high-level, dynamically typed, interpreted programming
@@ -473,6 +481,12 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 # When built with this (as guarded by the BuildRequires above), require it
 Requires: gdbm%{?_isa} >= 1:1.13
 %endif
+
+# There are files in the standard library that have python shebang.
+# We've filtered the automatic requirement out so libs are installable without
+# the main package. This however makes it pulled in by default.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
+Recommends: %{name}%{?_isa} = %{version}-%{release}
 
 # For backward compatibility only, remove in F29:
 Provides: system-python-libs = %{version}-%{release}
@@ -1491,6 +1505,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-15
+- Filter out automatic /usr/bin/python3.X requirement,
+  recommend the main package from libs instead
+Resolves: rhbz#1547131
+
 * Thu Feb 15 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.4-14
 - Remove the python3-tools package (#rhbz 1312030)
 - Move /usr/bin/2to3 to python3-devel
