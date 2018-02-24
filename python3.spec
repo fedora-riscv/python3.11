@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: Python
 
 
@@ -1505,6 +1505,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Feb 24 2018 Florian Weimer <fweimer@redhat.com> - 3.6.4-16
+- Rebuild with new LDFLAGS from redhat-rpm-config
+
 * Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-15
 - Filter out automatic /usr/bin/python3.X requirement,
   recommend the main package from libs instead
