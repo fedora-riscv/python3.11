@@ -370,6 +370,7 @@ Patch290: 00290-cryptmodule-Include-crypt.h-for-declaration-of-crypt.patch
 # Build fails with undefined references to dlopen / dlsym otherwise.
 # See: https://bugzilla.redhat.com/show_bug.cgi?id=1537489
 # and: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af19
+# Fixed upstream: https://bugs.python.org/issue32647
 Patch291: 00291-setup-Link-ctypes-against-dl-explicitly.patch
 
 # 00292 #
