@@ -1,9 +1,9 @@
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index a5a9d5e..51e8132 100644
+index 0eddd13..7ed4f3c 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -530,7 +530,7 @@ clinic: $(BUILDPYTHON) $(srcdir)/Modules/_blake2/blake2s_impl.c
- 	$(RUNSHARED) $(PYTHON_FOR_BUILD) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
+@@ -565,7 +565,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+ 	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
 -$(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
@@ -11,7 +11,7 @@ index a5a9d5e..51e8132 100644
  	$(LINKCC) $(PY_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -574,12 +574,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -609,12 +609,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -24,7 +24,7 @@ index a5a9d5e..51e8132 100644
  libpython$(LDVERSION).so: $(LIBRARY_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
  		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM) $(LDLAST); \
-@@ -667,7 +661,7 @@ Modules/Setup: $(srcdir)/Modules/Setup.dist
+@@ -702,7 +696,7 @@ Modules/Setup: $(srcdir)/Modules/Setup.dist
  		echo "-----------------------------------------------"; \
  	fi
  
@@ -33,7 +33,7 @@ index a5a9d5e..51e8132 100644
  	$(LINKCC) $(PY_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
  
  ############################################################################
-@@ -1408,17 +1402,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1460,17 +1454,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

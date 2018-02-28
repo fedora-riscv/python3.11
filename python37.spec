@@ -13,12 +13,12 @@ URL: https://www.python.org/
 
 
 # Second alpha
-%global prerel b1
+%global prerel b2
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.11.%{?prerel}%{?dist}
+Release: 0.12.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1572,6 +1572,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 28 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.12.b2
+- Update to 3.7.0b2
+
 * Wed Feb 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.11.b1
 - Fix the py_byte_compile macro to work on Python 2
 - Remove the pybytecompile macro file from the flat package
