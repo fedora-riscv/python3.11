@@ -1,0 +1,46 @@
+# KNOWN BUGS:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1489816
+addFilter(r'crypto-policy-non-compliance-openssl')
+
+
+# TESTS:
+addFilter(r'(zero-length|pem-certificate|uncompressed-zip) /usr/lib(64)?/python3.\d/test')
+
+
+# OTHER DELIBERATES:
+# chroot function
+addFilter(r'missing-call-to-chdir-with-chroot')
+
+# intentionally unversioned
+addFilter(r'unversioned-explicit-obsoletes python')
+
+# intentionally hardcoded
+addFilter(r'hardcoded-library-path in %{_prefix}/lib/(debug/%{_libdir}|python%{pybasever})')
+
+# intentional for our pythonXY package
+addFilter(r'python3\d\.[^:]+: (E|W): devel-file-in-non-devel-package')
+
+
+# SORRY, NOT SORRY:
+# manual pages
+addFilter(r'no-manual-page-for-binary (idle|pydoc|pyvenv-)3\.\d$')
+addFilter(r'no-manual-page-for-binary python3.*-config$')
+addFilter(r'no-manual-page-for-binary python3.\dm$')
+
+
+# RPMLINT IMPERFECTIONS
+# https://github.com/rpm-software-management/rpmlint/issues/123
+addFilter(r'python-bytecode-wrong-magic-value .* expected 33\d\d \(3\.7\), found 3393')
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1550562
+# https://github.com/rpm-software-management/rpmlint/issues/128
+addFilter(r'python-bytecode-inconsistent-mtime .* 1970')
+
+# debugsource
+addFilter(r'^python3\d?-debugsource\.[^:]+: (E|W): no-documentation')
+
+# debuginfo
+addFilter(r'^python3\d?-debuginfo\.[^:]+: (E|W): useless-provides debuginfo\(build-id\)')
+
+# this is OK for F28+
+addFilter(r'library-without-ldconfig-post')
