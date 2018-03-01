@@ -1,0 +1,65 @@
+# KNOWN BUGS:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1489816
+addFilter(r'crypto-policy-non-compliance-openssl')
+
+
+# TESTS:
+addFilter(r'(zero-length|pem-certificate|uncompressed-zip) /usr/lib(64)?/python3.\d/test')
+
+
+# OTHER DELIBERATES:
+# chroot function
+addFilter(r'missing-call-to-chdir-with-chroot')
+
+# intentionally unversioned and selfobsoleted
+addFilter(r'unversioned-explicit-obsoletes python')
+addFilter(r'self-obsoletion python3\d obsoletes python3\d')
+
+# intentionally hardcoded
+addFilter(r'hardcoded-library-path in %{_prefix}/lib/(debug/%{_libdir}|python%{pybasever})')
+
+# we have non binary stuff, python files
+addFilter(r'only-non-binary-in-usr-lib')
+
+# some devel files that are deliberately needed
+addFilter(r'devel-file-in-non-devel-package /usr/include/python3\.\dm/pyconfig-(32|64)\.h')
+addFilter(r'devel-file-in-non-devel-package /usr/lib64/python3\.\d/distutils/tests/xxmodule\.c')
+
+
+# SORRY, NOT SORRY:
+# manual pages
+addFilter(r'no-manual-page-for-binary (idle|pydoc|pyvenv|2to3|python3-debug|pathfix\.py)')
+addFilter(r'no-manual-page-for-binary python3.*-config$')
+addFilter(r'no-manual-page-for-binary python3.\dd?m$')
+
+# missing documentation from subpackages
+addFilter(r'^python3\d?-(debug|tkinter|test|idle)\.[^:]+: (E|W): no-documentation')
+
+# platform python is obsoleted, but not provided
+addFilter(r'obsolete-not-provided platform-python')
+
+
+# RPMLINT IMPERFECTIONS:
+# ifarch applied patches are OK
+# https://fedoraproject.org/wiki/Packaging:Guidelines#Architecture_Support
+addFilter(r'%ifarch-applied-patch')
+
+# debugsource
+addFilter(r'^python3\d?-debugsource\.[^:]+: (E|W): no-documentation')
+
+# debuginfo
+addFilter(r'^python3\d?-debuginfo\.[^:]+: (E|W): useless-provides debuginfo\(build-id\)')
+
+# this is OK for F28+
+addFilter(r'library-without-ldconfig-post')
+
+# debug package contains devel and non-devel files
+addFilter(r'python3\d?-debug.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-package')
+
+# this goes to other subpackage, hence not actually dangling, the read error is bogus
+addFilter(r'dangling-relative-symlink /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc python-3\.\d\.pc')
+addFilter(r'read-error /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc \[Errno 2\]')
+
+
+# SPELLING ERRORS
+addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
