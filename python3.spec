@@ -884,9 +884,9 @@ InstallPython() {
 #include <bits/wordsize.h>
 
 #if __WORDSIZE == 32
-#include "%{_pyconfig32_h}"
+#include "%%{_pyconfig32_h}"
 #elif __WORDSIZE == 64
-#include "%{_pyconfig64_h}"
+#include "%%{_pyconfig64_h}"
 #else
 #error "Unknown word size"
 #endif
