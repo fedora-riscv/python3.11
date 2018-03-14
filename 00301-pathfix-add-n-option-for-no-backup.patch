@@ -1,0 +1,104 @@
+From 5affd5c29eb1493cb31ef3cfdde15538ac134689 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 13 Mar 2018 10:56:43 +0100
+Subject: [PATCH] bpo-32885: Tools/scripts/pathfix.py: Add -n option for no
+ backup~ (#5772)
+
+Creating backup files with ~ suffix can be undesirable in some environment,
+such as when building RPM packages. Instead of requiring the user to remove
+those files manually, option -n was added, that simply disables this feature.
+
+-n was selected because 2to3 has the same option with this behavior.
+---
+ Misc/ACKS                                          |  1 +
+ .../2018-02-20-12-16-47.bpo-32885.dL5x7C.rst       |  2 ++
+ Tools/scripts/pathfix.py                           | 28 +++++++++++++++-------
+ 3 files changed, 23 insertions(+), 8 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Tools-Demos/2018-02-20-12-16-47.bpo-32885.dL5x7C.rst
+
+diff --git a/Misc/ACKS b/Misc/ACKS
+index d8179c8b03ab..d752d8a35434 100644
+--- a/Misc/ACKS
++++ b/Misc/ACKS
+@@ -687,6 +687,7 @@ Ken Howard
+ Brad Howes
+ Mike Hoy
+ Ben Hoyt
++Miro Hrončok
+ Chiu-Hsiang Hsu
+ Chih-Hao Huang
+ Christian Hudon
+diff --git a/Misc/NEWS.d/next/Tools-Demos/2018-02-20-12-16-47.bpo-32885.dL5x7C.rst b/Misc/NEWS.d/next/Tools-Demos/2018-02-20-12-16-47.bpo-32885.dL5x7C.rst
+new file mode 100644
+index 000000000000..e003e1d84fd0
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tools-Demos/2018-02-20-12-16-47.bpo-32885.dL5x7C.rst
+@@ -0,0 +1,2 @@
++Add an ``-n`` flag for ``Tools/scripts/pathfix.py`` to disbale automatic
++backup creation (files with ``~`` suffix).
+diff --git a/Tools/scripts/pathfix.py b/Tools/scripts/pathfix.py
+index 562bbc737812..c5bf984306a3 100755
+--- a/Tools/scripts/pathfix.py
++++ b/Tools/scripts/pathfix.py
+@@ -7,8 +7,9 @@
+ # Directories are searched recursively for files whose name looks
+ # like a python module.
+ # Symbolic links are always ignored (except as explicit directory
+-# arguments).  Of course, the original file is kept as a back-up
+-# (with a "~" attached to its name).
++# arguments).
++# The original file is kept as a back-up (with a "~" attached to its name),
++# -n flag can be used to disable this.
+ #
+ # Undoubtedly you can do this using find and sed or perl, but this is
+ # a nice example of Python code that recurses down a directory tree
+@@ -31,14 +32,17 @@
+ 
+ new_interpreter = None
+ preserve_timestamps = False
++create_backup = True
++
+ 
+ def main():
+     global new_interpreter
+     global preserve_timestamps
+-    usage = ('usage: %s -i /interpreter -p file-or-directory ...\n' %
++    global create_backup
++    usage = ('usage: %s -i /interpreter -p -n file-or-directory ...\n' %
+              sys.argv[0])
+     try:
+-        opts, args = getopt.getopt(sys.argv[1:], 'i:p')
++        opts, args = getopt.getopt(sys.argv[1:], 'i:pn')
+     except getopt.error as msg:
+         err(str(msg) + '\n')
+         err(usage)
+@@ -48,6 +52,8 @@ def main():
+             new_interpreter = a.encode()
+         if o == '-p':
+             preserve_timestamps = True
++        if o == '-n':
++            create_backup = False
+     if not new_interpreter or not new_interpreter.startswith(b'/') or \
+            not args:
+         err('-i option or file-or-directory missing\n')
+@@ -134,10 +140,16 @@ def fix(filename):
+     except OSError as msg:
+         err('%s: warning: chmod failed (%r)\n' % (tempname, msg))
+     # Then make a backup of the original file as filename~
+-    try:
+-        os.rename(filename, filename + '~')
+-    except OSError as msg:
+-        err('%s: warning: backup failed (%r)\n' % (filename, msg))
++    if create_backup:
++        try:
++            os.rename(filename, filename + '~')
++        except OSError as msg:
++            err('%s: warning: backup failed (%r)\n' % (filename, msg))
++    else:
++        try:
++            os.remove(filename)
++        except OSError as msg:
++            err('%s: warning: removing failed (%r)\n' % (filename, msg))
+     # Now move the temp file to the original file
+     try:
+         os.rename(tempname, filename)
