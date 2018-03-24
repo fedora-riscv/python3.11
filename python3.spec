@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.4
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: Python
 
 
@@ -884,9 +884,9 @@ InstallPython() {
 #include <bits/wordsize.h>
 
 #if __WORDSIZE == 32
-#include "%%{_pyconfig32_h}"
+#include "%{_pyconfig32_h}"
 #elif __WORDSIZE == 64
-#include "%%{_pyconfig64_h}"
+#include "%{_pyconfig64_h}"
 #else
 #error "Unknown word size"
 #endif
@@ -1520,6 +1520,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Mar 24 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-20
+- Fix broken macro invocation and broken building of C Python extensions
+Resolves: rhbz#1560103
+
 * Fri Mar 16 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-19
 - Add -n option for pathfix.py
 Resolves: rhbz#1546990
