@@ -60,6 +60,8 @@ addFilter(r'python3\d?-debug.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-pac
 addFilter(r'dangling-relative-symlink /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc python-3\.\d\.pc')
 addFilter(r'read-error /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc \[Errno 2\]')
 
+# we need this macro to evaluate, even if the line starts with #
+addFilter(r'macro-in-comment %\{_pyconfig(32|64)_h\}')
 
 # SPELLING ERRORS
 addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
