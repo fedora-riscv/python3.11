@@ -953,8 +953,9 @@ cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/
 # so handle files named using other naming scheme separately.
 LD_LIBRARY_PATH=./build/optimized ./build/optimized/python \
   Tools/scripts/pathfix.py \
-  -i "%{_bindir}/python%{pybasever}" \
-  %{buildroot}
+  -i "%{_bindir}/python%{pybasever}" -pn \
+  %{buildroot} \
+  %{?with_gdb_hooks:%{buildroot}$DirHoldingGdbPy/*.py}
 
 # Remove tests for python3-tools which was removed in
 # https://bugzilla.redhat.com/show_bug.cgi?id=1312030
