@@ -618,8 +618,8 @@ Requires: redhat-rpm-config
 %global __provides_exclude ^python\\(abi\\) = 3\\..$
 
 # We keep those inside on purpose
-Provides: bundled(python3-pip) = 9.0.1
-Provides: bundled(python3-setuptools) = 28.8.0
+Provides: bundled(python3-pip) = 9.0.3
+Provides: bundled(python3-setuptools) = 39.0.1
 
 # The descripton for the flat flatpackage package
 %description
