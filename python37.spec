@@ -12,13 +12,13 @@ Summary:  Version %{pybasever} of the Python interpreter
 URL: https://www.python.org/
 
 
-# Second alpha
-%global prerel b2
+# Third beta
+%global prerel b3
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.13.%{?prerel}%{?dist}
+Release: 0.14.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1573,6 +1573,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Mar 29 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.14.b3
+- Update to 3.7.0b3
+
 * Sat Mar 24 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.13.b2
 - Fix broken macro invocation and broken building of C Python extensions
 Resolves: rhbz#1560103
