@@ -542,18 +542,6 @@ diff --git a/Lib/test/test_cmd_line.py b/Lib/test/test_cmd_line.py
 index ae2bcd4..0a302ff 100644
 --- a/Lib/test/test_cmd_line.py
 +++ b/Lib/test/test_cmd_line.py
-@@ -9,8 +9,9 @@ import sys
- import subprocess
- import tempfile
- from test.support import script_helper, is_android
--from test.support.script_helper import (spawn_python, kill_python, assert_python_ok,
--    assert_python_failure)
-+from test.support.script_helper import (
-+    spawn_python, kill_python, assert_python_ok, assert_python_failure
-+)
- 
- 
- # XXX (ncoghlan): Move to script_helper and make consistent with run_python
 @@ -151,6 +152,7 @@ class CmdLineTest(unittest.TestCase):
          env = os.environ.copy()
          # Use C locale to get ascii for the locale encoding

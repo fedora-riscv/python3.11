@@ -13,8 +13,8 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-Version: %{pybasever}.4
-Release: 20%{?dist}
+Version: %{pybasever}.5
+Release: 1%{?dist}
 License: Python
 
 
@@ -334,44 +334,9 @@ Patch251: 00251-change-user-install-location.patch
 # Original proposal: https://bugzilla.redhat.com/show_bug.cgi?id=1404918
 Patch262: 00262-pep538_coerce_legacy_c_locale.patch
 
-# 00264 #
-# test_pass_by_value was added in Python 3.6.1 and on aarch64
-# it is catching an error that was there, but wasn't tested before.
-# Therefore skipping the test on aarch64 until fixed upstream.
-# Reported upstream: http://bugs.python.org/issue29804
-Patch264: 00264-skip-test-failing-on-aarch64.patch
-
-# 00273 #
-# Fix localeconv() encoding for LC_NUMERIC
-# Fixed upstream: https://bugs.python.org/issue31900
-Patch273: 00273-fix-localeconv-encoding-for-LC_NUMERIC.patch
-
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
-
-# 00289 #
-# Fix the compilation of the nis module, as glibc removed the
-# interfaces related to Sun RPC and they are now provided
-# by libtirpc and libnsl2.
-# See: https://fedoraproject.org/wiki/Changes/SunRPCRemoval
-# and https://fedoraproject.org/wiki/Changes/NISIPv6
-# Fixed upstream: https://bugs.python.org/issue32521
-Patch289: 00289-fix-nis-compilation.patch
-
-# 00290 #
-# Not every target system may provide a crypt() function in its stdlibc
-# and may use an external or replacement library, like libxcrypt, for
-# providing such functions.
-# Fixed upstream: https://bugs.python.org/issue32635
-Patch290: 00290-cryptmodule-Include-crypt.h-for-declaration-of-crypt.patch
-
-# 00291 #
-# Build fails with undefined references to dlopen / dlsym otherwise.
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=1537489
-# and: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af19
-# Fixed upstream: https://bugs.python.org/issue32647
-Patch291: 00291-setup-Link-ctypes-against-dl-explicitly.patch
 
 # 00292 #
 # Restore the public PyExc_RecursionErrorInst symbol that was removed
@@ -386,12 +351,6 @@ Patch292: 00292-restore-PyExc_RecursionErrorInst-symbol.patch
 # https://bugs.python.org/issue31429
 # See also: https://bugzilla.redhat.com/show_bug.cgi?id=1489816
 Patch294: 00294-define-TLS-cipher-suite-on-build-time.patch
-
-# 00298 #
-# The SSL module no longer sends IP addresses in SNI TLS extension on
-# platforms with OpenSSL 1.0.2+ or inet_pton.
-# Fixed upstream: https://bugs.python.org/issue32185
-Patch298: 00298-do-not-send-IP-in-SNI-TLS-extension.patch
 
 # 00301 #
 # Tools/scripts/pathfix.py: Add -n option for no backup~
@@ -659,7 +618,7 @@ rm -r Modules/expat
 rm -r Modules/zlib
 
 %if %{with rewheel}
-%global pip_version 9.0.1
+%global pip_version 9.0.3
 sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
 %endif
 
@@ -686,19 +645,9 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch205 -p1
 %patch251 -p1
 %patch262 -p1
-
-%ifarch aarch64
-%patch264 -p1
-%endif
-
-%patch273 -p1
 %patch274 -p1
-%patch289 -p1
-%patch290 -p1
-%patch291 -p1
 %patch292 -p1
 %patch294 -p1
-%patch298 -p1
 %patch301 -p1
 
 
@@ -1521,6 +1470,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Mar 29 2018 Charalampos Stratakis <cstratak@redhat.com> - 3.6.5-1
+- Update to 3.6.5
+
 * Sat Mar 24 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.4-20
 - Fix broken macro invocation and broken building of C Python extensions
 Resolves: rhbz#1560103
