@@ -242,11 +242,6 @@ BuildRequires: python3-pip
 
 Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{prerel}.tar.xz
 
-# Supply an RPM macro "py_byte_compile" for the python3-devel subpackage
-# to enable specfiles to selectively byte-compile individual files and paths
-# with different Python runtimes as necessary:
-Source3: macros.pybytecompile%{pybasever}
-
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
 # Written by bkabrda
@@ -967,7 +962,6 @@ find %{buildroot} -perm 555 -exec chmod 755 {} \;
 # Install macros for rpm:
 %if %{without flatpackage}
 mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
-install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d/
 install -m 644 %{SOURCE9} %{buildroot}/%{_rpmconfigdir}/macros.d/
 %endif
 
@@ -1366,7 +1360,6 @@ CheckPython optimized
 %{_bindir}/python3-config
 %{_libdir}/pkgconfig/python3.pc
 %{_rpmconfigdir}/macros.d/macros.systempython
-%{_rpmconfigdir}/macros.d/macros.pybytecompile%{pybasever}
 %{_bindir}/pathfix.py
 %endif
 
