@@ -379,7 +379,7 @@ Obsoletes: system-python < %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 # In order to support multiple Python interpreters for development purposes,
-# packages with with the naming scheme flatpackage (e.g. python35) exist for
+# packages with the naming scheme flatpackage (e.g. python35) exist for
 # non-default versions of Python 3.
 # For consistency, and to keep the upgrade path clean, we Provide/Obsolete
 # these names here.
@@ -612,9 +612,11 @@ Requires: redhat-rpm-config
 Provides: bundled(python3-pip) = 9.0.3
 Provides: bundled(python3-setuptools) = 39.0.1
 
-# The descripton for the flat flatpackage package
+# The description for the flat package
 %description
-This package exists to allow developers to test their code against an newer
+Python %{pybasever} package for developers.
+
+This package exists to allow developers to test their code against a newer
 version of Python. This is not a full Python stack and if you wish to run
 your applications with Python %{pybasever}, update your Fedora to a newer
 version once Python %{pybasever} is stable.
