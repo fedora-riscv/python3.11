@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1093,6 +1093,9 @@ CheckPython() {
     %ifarch ppc64le
     -x test_buffer \
     %endif
+    -x test_multiprocessing_fork \
+    -x test_multiprocessing_forkserver \
+    -x test_multiprocessing_spawn \
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
@@ -1579,6 +1582,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Apr 19 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.5-3
+- Skip test_multiprocessing_fork(server) and _spawn for now
+
 * Wed Apr 18 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.5-2
 - Add flatpackage conditionals
 
