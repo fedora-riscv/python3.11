@@ -484,7 +484,12 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
+
+%if %{with rewheel}
+# without rewheel is used to bootstrap setuptools+pip
+# python3-rpm-generators needs python3-setuptools, so we cannot have it yet
 Requires: python3-rpm-generators
+%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 # https://bugzilla.redhat.com/show_bug.cgi?id=1496757
