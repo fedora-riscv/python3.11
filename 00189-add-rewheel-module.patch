@@ -1,5 +1,5 @@
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index d69e09f..5cb12df 100644
+index 7ff938b..8c3d062 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
 @@ -1,8 +1,10 @@
@@ -13,16 +13,25 @@ index d69e09f..5cb12df 100644
  
  
  __all__ = ["version", "bootstrap"]
-@@ -25,6 +27,8 @@ def _run_pip(args, additional_paths=None):
+@@ -24,8 +26,15 @@ def _run_pip(args, additional_paths=None):
+         sys.path = additional_paths + sys.path
  
      # Install the bundled software
-     import pip
+-    import pip._internal
+-    return pip._internal.main(args)
++    try:
++        # pip 10
++        from pip._internal import main
++    except ImportError:
++        # pip 9
++        from pip import main
 +    if args[0] in ["install", "list", "wheel"]:
 +        args.append('--pre')
-     return pip.main(args)
++    return main(args)
  
  
-@@ -88,20 +92,39 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+ def version():
+@@ -88,20 +97,39 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          # omit pip and easy_install
          os.environ["ENSUREPIP_OPTIONS"] = "install"
  
@@ -222,10 +231,10 @@ index 0000000..753c764
 +            pass # bad RECORD or empty line
 +    return to_write, to_omit
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 51e8132..42b3d29 100644
+index d07b312..1c6720e 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1241,7 +1241,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
+@@ -1301,7 +1301,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
  		test/test_asyncio \
  		collections concurrent concurrent/futures encodings \
  		email email/mime test/test_email test/test_email/data \
