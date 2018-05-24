@@ -92,15 +92,12 @@ License: Python
 # 1. At the same time:
 #     - gdb without python support (add %%global _without_python 1 on top of
 #       gdb's SPEC file)
-#     - python-rpm-generators with bootstrapping_python set to 1
+#     - python-rpm-generators
 #       (this can be done also during step 2., but should be done before 3.)
 # 2. python3 without rewheel (use %%bcond_with rewheel instead of
 #     %%bcond_without)
-# 3. At the same time:
-#     - gdb with python support (remove %%global _without_python 1 on top of
-#       gdb's SPEC file)
-#     - python-rpm-generators with bootstrapping_python set to 0
-#       (this can be done at any later step without negative effects)
+# 3. gdb with python support (remove %%global _without_python 1 on top of
+#    gdb's SPEC file)
 # 4. rpm
 # 5. python-setuptools with bootstrap set to 1
 # 6. python-pip with build_wheel set to 0
