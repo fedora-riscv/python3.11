@@ -1,5 +1,5 @@
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index d69e09f..5cb12df 100644
+index 7ff938b..8c3d062 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
 @@ -1,8 +1,10 @@
@@ -13,16 +13,25 @@ index d69e09f..5cb12df 100644
  
  
  __all__ = ["version", "bootstrap"]
-@@ -25,6 +27,8 @@ def _run_pip(args, additional_paths=None):
+@@ -24,8 +26,15 @@ def _run_pip(args, additional_paths=None):
+         sys.path = additional_paths + sys.path
  
      # Install the bundled software
-     import pip
+-    import pip._internal
+-    return pip._internal.main(args)
++    try:
++        # pip 10
++        from pip._internal import main
++    except ImportError:
++        # pip 9
++        from pip import main
 +    if args[0] in ["install", "list", "wheel"]:
 +        args.append('--pre')
-     return pip.main(args)
++    return main(args)
  
  
-@@ -88,20 +92,39 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+ def version():
+@@ -88,20 +97,39 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          # omit pip and easy_install
          os.environ["ENSUREPIP_OPTIONS"] = "install"
  
@@ -72,9 +81,11 @@ index d69e09f..5cb12df 100644
  
          # Construct the arguments to be passed to the pip command
          args = ["install", "--no-index", "--find-links", tmpdir]
-diff -Nur Python-3.4.1/Lib/ensurepip/rewheel/__init__.py Python-3.4.1-rewheel/Lib/ensurepip/rewheel/__init__.py
---- Python-3.4.1/Lib/ensurepip/rewheel/__init__.py  1970-01-01 01:00:00.000000000 +0100
-+++ Python-3.4.1-rewheel/Lib/ensurepip/rewheel/__init__.py  2014-08-21 10:11:22.560320121 +0200
+diff --git a/Lib/ensurepip/rewheel/__init__.py b/Lib/ensurepip/rewheel/__init__.py
+new file mode 100644
+index 0000000..753c764
+--- /dev/null
++++ b/Lib/ensurepip/rewheel/__init__.py
 @@ -0,0 +1,143 @@
 +import argparse
 +import codecs
@@ -219,10 +230,11 @@ diff -Nur Python-3.4.1/Lib/ensurepip/rewheel/__init__.py Python-3.4.1-rewheel/Li
 +        else:
 +            pass # bad RECORD or empty line
 +    return to_write, to_omit
-diff -Nur Python-3.4.1/Makefile.pre.in Python-3.4.1-rewheel/Makefile.pre.in
---- Python-3.4.1/Makefile.pre.in    2014-08-21 10:49:31.512695040 +0200
-+++ Python-3.4.1-rewheel/Makefile.pre.in    2014-08-21 10:10:41.961341722 +0200
-@@ -1145,7 +1145,7 @@
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index d07b312..1c6720e 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -1301,7 +1301,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
  		test/test_asyncio \
  		collections concurrent concurrent/futures encodings \
  		email email/mime test/test_email test/test_email/data \

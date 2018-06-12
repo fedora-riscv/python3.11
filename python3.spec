@@ -2,19 +2,23 @@
 # Top-level metadata
 # ==================
 
-%global pybasever 3.6
+%global pybasever 3.7
 
 # pybasever without the dot:
-%global pyshortver 36
+%global pyshortver 37
 
 Name: python3
 Summary: Interpreter of the Python programming language
 URL: https://www.python.org/
 
+
+# First rc
+%global prerel rc1
+
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-Version: %{pybasever}.5
-Release: 4%{?dist}
+Version: %{pybasever}.0
+Release: 0.20.%{?prerel}%{?dist}
 License: Python
 
 
@@ -25,10 +29,11 @@ License: Python
 # Note that the bcond macros are named for the CLI option they create.
 # "%%bcond_without" means "ENABLE by default and create a --without option"
 
+
 # Flat package, i.e. python36, python37, python38 for tox etc.
 # warning: changes some other defaults
 # in Fedora, never turn this on for the python3 package
-# and always keep it on for python36 etc.
+# and always keep it on for python37 etc.
 # WARNING: This does not change the package name and summary above
 %bcond_with flatpackage
 
@@ -195,6 +200,7 @@ BuildRequires: libffi-devel
 BuildRequires: libnsl2-devel
 BuildRequires: libtirpc-devel
 BuildRequires: libGL-devel
+BuildRequires: libuuid-devel
 BuildRequires: libX11-devel
 BuildRequires: ncurses-devel
 
@@ -231,21 +237,12 @@ BuildRequires: python3-pip
 # Source code and patches
 # =======================
 
-Source: https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
-
-# Supply an RPM macro "py_byte_compile" for the python3-devel subpackage
-# to enable specfiles to selectively byte-compile individual files and paths
-# with different Python runtimes as necessary:
-Source3: macros.pybytecompile%{pybasever}
+Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{prerel}.tar.xz
 
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
 # Written by bkabrda
 Source8: check-pyc-and-pyo-timestamps.py
-
-# Backward compatible no-op macro for system-python
-# Remove in Fedora 29
-Source9: macros.systempython
 
 # Desktop menu entry for idle3
 Source10: idle3.desktop
@@ -340,42 +337,15 @@ Patch205: 00205-make-libpl-respect-lib64.patch
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
 Patch251: 00251-change-user-install-location.patch
 
-# 00262 #
-# Backport of PEP 538: Coercing the legacy C locale to a UTF-8 based locale
-# https://www.python.org/dev/peps/pep-0538/
-# Fedora Change: https://fedoraproject.org/wiki/Changes/python3_c.utf-8_locale
-# Original proposal: https://bugzilla.redhat.com/show_bug.cgi?id=1404918
-Patch262: 00262-pep538_coerce_legacy_c_locale.patch
-
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
 
-# 00292 #
-# Restore the public PyExc_RecursionErrorInst symbol that was removed
-# from the 3.6.4 release upstream.
-# Reported upstream: https://bugs.python.org/issue30697
-Patch292: 00292-restore-PyExc_RecursionErrorInst-symbol.patch
-
-# 00294 #
-# Define TLS cipher suite on build time depending
-# on the OpenSSL default cipher suite selection.
-# Fixed upstream on CPython's 3.7 branch:
-# https://bugs.python.org/issue31429
-# See also: https://bugzilla.redhat.com/show_bug.cgi?id=1489816
-Patch294: 00294-define-TLS-cipher-suite-on-build-time.patch
-
-# 00301 #
-# Tools/scripts/pathfix.py: Add -n option for no backup~
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=1546990
-# Fixed upstream: https://bugs.python.org/issue32885
-Patch301: 00301-pathfix-add-n-option-for-no-backup.patch
-
-# 00302 #
-# Fix multiprocessing regression on newer glibcs
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=1569933
-# and: https://bugs.python.org/issue33329
-Patch302: 00302-fix-multiprocessing-regression-on-newer-glibcs.patch
+# 00291 #
+# Build fails with undefined references to dlopen / dlsym otherwise.
+# See: https://bugzilla.redhat.com/show_bug.cgi?id=1537489
+# and: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af19
+Patch291: 00291-setup-Link-ctypes-against-dl-explicitly.patch
 
 # (New patches go here ^^^)
 #
@@ -504,7 +474,12 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
+
+%if %{with rewheel}
+# without rewheel is used to bootstrap setuptools+pip
+# python3-rpm-generators needs python3-setuptools, so we cannot have it yet
 Requires: python3-rpm-generators
+%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 # https://bugzilla.redhat.com/show_bug.cgi?id=1496757
@@ -525,7 +500,7 @@ Conflicts: python-tools < 2.7.13-17
 # https://bugzilla.redhat.com/show_bug.cgi?id=1312030
 # /usr/bin/2to3 was moved from python3-tools to python3-devel
 # TODO Remove in Fedora 30
-Conflicts: python3-tools < 3.6.4-14
+Conflicts: python3-tools < 3.7
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-devel < %{platpyver}
@@ -636,18 +611,17 @@ Requires: redhat-rpm-config
 %global __provides_exclude ^python\\(abi\\) = 3\\..$
 
 # We keep those inside on purpose
-Provides: bundled(python3-pip) = 9.0.3
+Provides: bundled(python3-pip) = 10.0.1
 Provides: bundled(python3-setuptools) = 39.0.1
 
 # The description for the flat package
 %description
 Python %{pybasever} package for developers.
 
-This package exists to allow developers to test their code against an older
+This package exists to allow developers to test their code against a newer
 version of Python. This is not a full Python stack and if you wish to run
-your applications with Python %{pybasever}, see other distributions
-that support it, such as CentOS or RHEL with Software Collections
-or older Fedora releases.
+your applications with Python %{pybasever}, update your Fedora to a newer
+version once Python %{pybasever} is stable.
 
 %endif # with flatpackage
 
@@ -660,10 +634,9 @@ or older Fedora releases.
 
 # Remove bundled libraries to ensure that we're using the system copy.
 rm -r Modules/expat
-rm -r Modules/zlib
 
 %if %{with rewheel}
-%global pip_version 9.0.3
+%global pip_version 9.0.1
 sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
 %endif
 
@@ -689,12 +662,8 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 
 %patch205 -p1
 %patch251 -p1
-%patch262 -p1
 %patch274 -p1
-%patch292 -p1
-%patch294 -p1
-%patch301 -p1
-%patch302 -p1
+%patch291 -p1
 
 
 # Remove files that should be generated by the build
@@ -990,13 +959,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 # Fixup permissions for shared libraries from non-standard 555 to standard 755:
 find %{buildroot} -perm 555 -exec chmod 755 {} \;
 
-%if %{without flatpackage}
-# Install macros for rpm:
-mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
-install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d/
-install -m 644 %{SOURCE9} %{buildroot}/%{_rpmconfigdir}/macros.d/
-%endif
-
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
 # avoid the user having to know the precise version and ABI flags.
 # See e.g. https://bugzilla.redhat.com/show_bug.cgi?id=676748
@@ -1013,6 +975,11 @@ mkdir -p %{buildroot}%{_libexecdir}
 ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
 %endif
 
+# There's 2to3-X.X executable and 2to3 soft link to it.
+# No reason to have both, so keep only 2to3 as an executable.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
+mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
+
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
@@ -1021,11 +988,12 @@ rm %{buildroot}%{_bindir}/pathfix.py
 rm %{buildroot}%{_bindir}/idle3
 rm %{buildroot}%{_bindir}/python3-*
 rm %{buildroot}%{_bindir}/pyvenv
-rm %{buildroot}%{_bindir}/2to3*
+rm %{buildroot}%{_bindir}/2to3
 rm %{buildroot}%{_libdir}/libpython3.so
 rm %{buildroot}%{_mandir}/man1/python3.1*
 rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
 %endif
+
 
 # ======================================================
 # Checks for packaging issues
@@ -1062,6 +1030,7 @@ for Module in %{buildroot}/%{dynload_dir}/*.so ; do
     esac
 done
 
+
 # ======================================================
 # Running the upstream test suite
 # ======================================================
@@ -1080,19 +1049,16 @@ CheckPython() {
   # our non-standard decorators take effect on the relevant tests:
   #   @unittest._skipInRpmBuild(reason)
   #   @unittest._expectedFailureInRpmBuild
-  # test_faulthandler.test_register_chain currently fails on ppc64le and
-  #   aarch64, see upstream bug http://bugs.python.org/issue21131
   WITHIN_PYTHON_RPM_BUILD= \
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest --findleaks \
     -x test_distutils \
     -x test_bdist_rpm \
-    -x test_gdb \
-    %ifarch ppc64le aarch64
-    -x test_faulthandler \
-    %endif
     %ifarch %{mips64}
     -x test_ctypes \
+    %endif
+    %ifarch %{power64} s390 s390x armv7hl %{mips}
+    -x test_gdb \
     %endif
     %ifarch ppc64le
     -x test_buffer \
@@ -1122,17 +1088,17 @@ CheckPython optimized
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %{_bindir}/pyvenv
-%{_mandir}/*/*
-%{_bindir}/pyvenv
 # Remove in Fedora 29:
 %{_libexecdir}/system-python
 %else
 %{_bindir}/pydoc%{pybasever}
-%{_mandir}/*/python%{pybasever}*
 %endif
-%{_bindir}/pyvenv-%{pybasever}
+
 %{_bindir}/python%{pybasever}
 %{_bindir}/python%{pybasever}m
+%{_bindir}/pyvenv-%{pybasever}
+%{_mandir}/*/*
+
 
 %if %{without flatpackage}
 %files libs
@@ -1224,6 +1190,7 @@ CheckPython optimized
 %{dynload_dir}/_codecs_jp.%{SOABI_optimized}.so
 %{dynload_dir}/_codecs_kr.%{SOABI_optimized}.so
 %{dynload_dir}/_codecs_tw.%{SOABI_optimized}.so
+%{dynload_dir}/_contextvars.%{SOABI_optimized}.so
 %{dynload_dir}/_crypt.%{SOABI_optimized}.so
 %{dynload_dir}/_csv.%{SOABI_optimized}.so
 %{dynload_dir}/_ctypes.%{SOABI_optimized}.so
@@ -1245,6 +1212,7 @@ CheckPython optimized
 %{dynload_dir}/_opcode.%{SOABI_optimized}.so
 %{dynload_dir}/_pickle.%{SOABI_optimized}.so
 %{dynload_dir}/_posixsubprocess.%{SOABI_optimized}.so
+%{dynload_dir}/_queue.%{SOABI_optimized}.so
 %{dynload_dir}/_random.%{SOABI_optimized}.so
 %{dynload_dir}/_socket.%{SOABI_optimized}.so
 %{dynload_dir}/_sqlite3.%{SOABI_optimized}.so
@@ -1271,6 +1239,7 @@ CheckPython optimized
 %{dynload_dir}/termios.%{SOABI_optimized}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_optimized}.so
 %{dynload_dir}/unicodedata.%{SOABI_optimized}.so
+%{dynload_dir}/_uuid.%{SOABI_optimized}.so
 %{dynload_dir}/xxlimited.%{SOABI_optimized}.so
 %{dynload_dir}/zlib.%{SOABI_optimized}.so
 
@@ -1364,12 +1333,11 @@ CheckPython optimized
 %{_libdir}/libpython3.so
 %endif
 
+
 %if %{without flatpackage}
 %files devel
 %defattr(-,root,root)
 %{_bindir}/2to3
-# TODO: Remove 2to3-3.7 once rebased to 3.7
-%{_bindir}/2to3-%{pybasever}
 %endif
 
 %{pylibdir}/config-%{LDVERSION_optimized}-%{_arch}-linux%{_gnu}/*
@@ -1384,8 +1352,6 @@ CheckPython optimized
 %if %{without flatpackage}
 %{_bindir}/python3-config
 %{_libdir}/pkgconfig/python3.pc
-%{_rpmconfigdir}/macros.d/macros.pybytecompile%{pybasever}
-%{_rpmconfigdir}/macros.d/macros.systempython
 %{_bindir}/pathfix.py
 %endif
 
@@ -1395,6 +1361,7 @@ CheckPython optimized
 %{_libdir}/libpython%{LDVERSION_optimized}.so
 %{_libdir}/pkgconfig/python-%{LDVERSION_optimized}.pc
 %{_libdir}/pkgconfig/python-%{pybasever}.pc
+
 
 %if %{without flatpackage}
 %files idle
@@ -1431,10 +1398,12 @@ CheckPython optimized
 %dir %{pylibdir}/turtledemo/__pycache__/
 %{pylibdir}/turtledemo/__pycache__/*%{bytecode_suffixes}
 
+
 %if %{without flatpackage}
 %files test
 %defattr(-, root, root)
 %endif
+
 %{pylibdir}/ctypes/test
 %{pylibdir}/distutils/tests
 %{pylibdir}/sqlite3/test
@@ -1443,6 +1412,7 @@ CheckPython optimized
 %{dynload_dir}/_testbuffer.%{SOABI_optimized}.so
 %{dynload_dir}/_testcapi.%{SOABI_optimized}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_optimized}.so
+%{dynload_dir}/_xxtestfuzz.%{SOABI_optimized}.so
 %{pylibdir}/lib2to3/tests
 %{pylibdir}/tkinter/test
 %{pylibdir}/unittest/test
@@ -1483,6 +1453,7 @@ CheckPython optimized
 %{dynload_dir}/_codecs_jp.%{SOABI_debug}.so
 %{dynload_dir}/_codecs_kr.%{SOABI_debug}.so
 %{dynload_dir}/_codecs_tw.%{SOABI_debug}.so
+%{dynload_dir}/_contextvars.%{SOABI_debug}.so
 %{dynload_dir}/_crypt.%{SOABI_debug}.so
 %{dynload_dir}/_csv.%{SOABI_debug}.so
 %{dynload_dir}/_ctypes.%{SOABI_debug}.so
@@ -1504,6 +1475,7 @@ CheckPython optimized
 %{dynload_dir}/_opcode.%{SOABI_debug}.so
 %{dynload_dir}/_pickle.%{SOABI_debug}.so
 %{dynload_dir}/_posixsubprocess.%{SOABI_debug}.so
+%{dynload_dir}/_queue.%{SOABI_debug}.so
 %{dynload_dir}/_random.%{SOABI_debug}.so
 %{dynload_dir}/_socket.%{SOABI_debug}.so
 %{dynload_dir}/_sqlite3.%{SOABI_debug}.so
@@ -1530,6 +1502,8 @@ CheckPython optimized
 %{dynload_dir}/termios.%{SOABI_debug}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 %{dynload_dir}/unicodedata.%{SOABI_debug}.so
+%{dynload_dir}/_uuid.%{SOABI_debug}.so
+%{dynload_dir}/_xxtestfuzz.%{SOABI_debug}.so
 %{dynload_dir}/zlib.%{SOABI_debug}.so
 
 # No need to split things out the "Makefile" and the config-32/64.h file as we
@@ -1583,6 +1557,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 12 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.20.rc1
+- Update to 3.7.0rc1
+
 * Mon Apr 23 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.5-4
 - Fix multiprocessing regression on newer glibcs
 - Enable test_multiprocessing_fork(server) and _spawn again

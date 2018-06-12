@@ -1,5 +1,5 @@
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 9474e9c..c0ce4c6 100644
+index 0258d3d..4b969bf 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -30,14 +30,14 @@ WINDOWS_SCHEME = {
@@ -20,10 +20,10 @@ index 9474e9c..c0ce4c6 100644
          'scripts': '$base/bin',
          'data'   : '$base',
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 026cca7..6d3e077 100644
+index e07a6c8..554740d 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -132,8 +132,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -129,8 +129,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
              prefix = plat_specific and EXEC_PREFIX or PREFIX
  
      if os.name == "posix":
@@ -37,10 +37,11 @@ index 026cca7..6d3e077 100644
          if standard_lib:
              return libpython
          else:
-diff a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
+diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
+index 287ab19..d4c05e0 100644
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
-@@ -57,8 +57,9 @@
+@@ -57,8 +57,9 @@ class InstallTestCase(support.TempdirManager,
              self.assertEqual(got, expected)
  
          libdir = os.path.join(destination, "lib", "python")
@@ -52,10 +53,10 @@ diff a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
          check_path(cmd.install_headers,
                     os.path.join(destination, "include", "python", "foopkg"))
 diff --git a/Lib/site.py b/Lib/site.py
-index a84e3bb..ba0d3ea 100644
+index 7dc1b04..85016b4 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -303,11 +303,15 @@ def getsitepackages(prefixes=None):
+@@ -334,11 +334,15 @@ def getsitepackages(prefixes=None):
          seen.add(prefix)
  
          if os.sep == '/':
@@ -69,10 +70,10 @@ index a84e3bb..ba0d3ea 100644
              sitepackages.append(prefix)
 +            sitepackages.append(os.path.join(prefix, "lib64", "site-packages"))
              sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
-         if sys.platform == "darwin":
-             # for framework builds *only* we add the standard Apple
+     return sitepackages
+ 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index b9bbfe5..2a5f29c 100644
+index 9ee4d31..53c8606 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -20,10 +20,10 @@ __all__ = [
@@ -89,7 +90,7 @@ index b9bbfe5..2a5f29c 100644
          'include':
              '{installed_base}/include/python{py_version_short}{abiflags}',
          'platinclude':
-@@ -61,10 +61,10 @@ _INSTALL_SCHEMES = {
+@@ -62,10 +62,10 @@ _INSTALL_SCHEMES = {
          'data': '{userbase}',
          },
      'posix_user': {
@@ -104,13 +105,13 @@ index b9bbfe5..2a5f29c 100644
          'scripts': '{userbase}/bin',
          'data': '{userbase}',
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index f698927..bc977b5 100644
+index 266adf0..e8513b6 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -248,8 +248,8 @@ class HelperFunctionsTests(unittest.TestCase):
-             self.assertEqual(dirs[1], wanted)
-         elif os.sep == '/':
-             # OS X non-framework builds, Linux, FreeBSD, etc
+@@ -275,8 +275,8 @@ class HelperFunctionsTests(unittest.TestCase):
+         dirs = site.getsitepackages()
+         if os.sep == '/':
+             # OS X, Linux, FreeBSD, etc
 -            self.assertEqual(len(dirs), 1)
 -            wanted = os.path.join('xoxo', 'lib',
 +            self.assertEqual(len(dirs), 2)
@@ -119,10 +120,10 @@ index f698927..bc977b5 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 8fa7934..a693917 100644
+index 59ba9d4..5780ed8 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -126,7 +126,7 @@ LIBDIR=		@libdir@
+@@ -133,7 +133,7 @@ LIBDIR=		@libdir@
  MANDIR=		@mandir@
  INCLUDEDIR=	@includedir@
  CONFINCLUDEDIR=	$(exec_prefix)/include
@@ -132,41 +133,41 @@ index 8fa7934..a693917 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index 65b47a3..eaa756c 100644
+index 85e737b..2a1fc79 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -494,7 +494,7 @@ calculate_path(void)
-     _pythonpath = Py_DecodeLocale(PYTHONPATH, NULL);
-     _prefix = Py_DecodeLocale(PREFIX, NULL);
-     _exec_prefix = Py_DecodeLocale(EXEC_PREFIX, NULL);
--    lib_python = Py_DecodeLocale("lib/python" VERSION, NULL);
-+    lib_python = Py_DecodeLocale("lib64/python" VERSION, NULL);
- 
-     if (!_pythonpath || !_prefix || !_exec_prefix || !lib_python) {
-         Py_FatalError(
-@@ -683,7 +683,7 @@ calculate_path(void)
-     }
-     else
-         wcsncpy(zip_path, _prefix, MAXPATHLEN);
--    joinpath(zip_path, L"lib/python00.zip");
-+    joinpath(zip_path, L"lib64/python00.zip");
-     bufsz = wcslen(zip_path);   /* Replace "00" with version */
-     zip_path[bufsz - 6] = VERSION[0];
-     zip_path[bufsz - 5] = VERSION[2];
-@@ -695,7 +695,7 @@ calculate_path(void)
-             fprintf(stderr,
+@@ -500,7 +500,7 @@ calculate_exec_prefix(const _PyCoreConfig *core_config,
                  "Could not find platform dependent libraries <exec_prefix>\n");
-         wcsncpy(exec_prefix, _exec_prefix, MAXPATHLEN);
+         }
+         wcsncpy(exec_prefix, calculate->exec_prefix, MAXPATHLEN);
 -        joinpath(exec_prefix, L"lib/lib-dynload");
 +        joinpath(exec_prefix, L"lib64/lib-dynload");
      }
      /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
+ }
+@@ -742,7 +742,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix)
+     else {
+         wcsncpy(calculate->zip_path, calculate->prefix, MAXPATHLEN);
+     }
+-    joinpath(calculate->zip_path, L"lib/python00.zip");
++    joinpath(calculate->zip_path, L"lib64/python00.zip");
  
+     /* Replace "00" with version */
+     size_t bufsz = wcslen(calculate->zip_path);
+@@ -867,7 +867,7 @@ calculate_init(PyCalculatePath *calculate,
+     if (!calculate->prefix) {
+         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
+     }
+-    calculate->lib_python = Py_DecodeLocale("lib/python" VERSION, &len);
++    calculate->lib_python = Py_DecodeLocale("lib64/python" VERSION, &len);
+     if (!calculate->lib_python) {
+         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
+     }
 diff --git a/setup.py b/setup.py
-index 0f2dfc4..da37896 100644
+index f1933f7..450cd8a 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -492,7 +492,7 @@ class PyBuildExt(build_ext):
+@@ -531,7 +531,7 @@ class PyBuildExt(build_ext):
          # directories (i.e. '.' and 'Include') must be first.  See issue
          # 10520.
          if not cross_compiling:
@@ -175,7 +176,7 @@ index 0f2dfc4..da37896 100644
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
          if cross_compiling:
-@@ -780,11 +780,11 @@ class PyBuildExt(build_ext):
+@@ -830,11 +830,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(lib_dirs +
@@ -189,14 +190,3 @@ index 0f2dfc4..da37896 100644
                                     extra_link_args=readline_extra_link_args,
                                     libraries=readline_libs) )
          else:
-@@ -821,8 +821,8 @@ class PyBuildExt(build_ext):
-             if krb5_h:
-                 ssl_incs += krb5_h
-         ssl_libs = find_library_file(self.compiler, 'ssl',lib_dirs,
--                                     ['/usr/local/ssl/lib',
--                                      '/usr/contrib/ssl/lib/'
-+                                     ['/usr/local/ssl/lib64',
-+                                      '/usr/contrib/ssl/lib64/'
-                                      ] )
- 
-         if (ssl_incs is not None and
