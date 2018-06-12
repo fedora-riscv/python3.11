@@ -12,7 +12,7 @@ Summary:  Version %{pybasever} of the Python interpreter
 URL: https://www.python.org/
 
 
-# Third beta
+# First rc
 %global prerel rc1
 
 #  WARNING  When rebasing to a new Python version,
