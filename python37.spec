@@ -13,12 +13,12 @@ URL: https://www.python.org/
 
 
 # Third beta
-%global prerel b5
+%global prerel rc1
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.19.%{?prerel}%{?dist}
+Release: 0.20.%{?prerel}%{?dist}
 License: Python
 
 
@@ -1557,6 +1557,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 12 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.20.rc1
+- Update to 3.7.0rc1
+
 * Thu May 31 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.19.b5
 - Update to 3.7.0b5
 
