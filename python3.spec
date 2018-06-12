@@ -54,7 +54,7 @@ License: Python
 %if %{with flatpackage}
 %bcond_with rewheel
 %else
-%bcond_without rewheel
+%bcond_with rewheel
 %endif
 
 # Extra build for debugging the interpreter or C-API extensions
@@ -1559,6 +1559,7 @@ CheckPython optimized
 %changelog
 * Tue Jun 12 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.20.rc1
 - Update to 3.7.0rc1
+- Bootstrap, disable rewheel
 
 * Mon Apr 23 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.5-4
 - Fix multiprocessing regression on newer glibcs
