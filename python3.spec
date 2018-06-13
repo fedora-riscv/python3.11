@@ -636,7 +636,7 @@ version once Python %{pybasever} is stable.
 rm -r Modules/expat
 
 %if %{with rewheel}
-%global pip_version 9.0.1
+%global pip_version %(pip3 --version | cut -d' ' -f2)
 sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
 %endif
 
