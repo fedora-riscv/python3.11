@@ -18,7 +18,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.20.%{?prerel}%{?dist}
+Release: 0.21.%{?prerel}%{?dist}
 License: Python
 
 
@@ -40,7 +40,7 @@ License: Python
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %ifarch %{ix86} x86_64
-%bcond_with optimizations
+%bcond_without optimizations
 %else
 # On some architectures, the optimized build takes tens of hours, possibly
 # longer than Koji's 24-hour timeout. Disable optimizations here.
@@ -48,13 +48,13 @@ License: Python
 %endif
 
 # Run the test suite in %%check
-%bcond_with tests
+%bcond_without tests
 
 # Ability to reuse RPM-installed pip using rewheel
 %if %{with flatpackage}
 %bcond_with rewheel
 %else
-%bcond_with rewheel
+%bcond_without rewheel
 %endif
 
 # Extra build for debugging the interpreter or C-API extensions
@@ -1557,6 +1557,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jun 13 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.21.rc1
+- Finish bootstrapping, enable rewheel, tests, optimizations
+
 * Tue Jun 12 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.20.rc1
 - Update to 3.7.0rc1
 - Bootstrap, disable rewheel, tests, optimizations
