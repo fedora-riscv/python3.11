@@ -40,7 +40,7 @@ License: Python
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %ifarch %{ix86} x86_64
-%bcond_without optimizations
+%bcond_with optimizations
 %else
 # On some architectures, the optimized build takes tens of hours, possibly
 # longer than Koji's 24-hour timeout. Disable optimizations here.
@@ -48,7 +48,7 @@ License: Python
 %endif
 
 # Run the test suite in %%check
-%bcond_without tests
+%bcond_with tests
 
 # Ability to reuse RPM-installed pip using rewheel
 %if %{with flatpackage}
@@ -1559,7 +1559,7 @@ CheckPython optimized
 %changelog
 * Tue Jun 12 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.20.rc1
 - Update to 3.7.0rc1
-- Bootstrap, disable rewheel
+- Bootstrap, disable rewheel, tests, optimizations
 
 * Mon Apr 23 2018 Miro Hrončok <mhroncok@redhat.com> - 3.6.5-4
 - Fix multiprocessing regression on newer glibcs
