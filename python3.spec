@@ -893,9 +893,9 @@ install -D -m 0644 Lib/idlelib/Icons/idle_48.png %{buildroot}%{_datadir}/icons/h
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE10}
 
 # Install and validate appdata file
-mkdir -p %{buildroot}%{_datadir}/appdata
-cp -a %{SOURCE11} %{buildroot}%{_datadir}/appdata
-appstream-util validate-relax --nonet %{buildroot}%{_datadir}/appdata/idle3.appdata.xml
+mkdir -p %{buildroot}%{_metainfodir}
+cp -a %{SOURCE11} %{buildroot}%{_metainfodir}
+appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/idle3.appdata.xml
 %endif
 
 # Make sure distutils looks at the right pyconfig.h file
@@ -1371,7 +1371,7 @@ CheckPython optimized
 %{pylibdir}/idlelib
 
 %if %{without flatpackage}
-%{_datadir}/appdata/idle3.appdata.xml
+%{_metainfodir}/idle3.appdata.xml
 %{_datadir}/applications/idle3.desktop
 %{_datadir}/icons/hicolor/*/apps/idle3.*
 %endif
