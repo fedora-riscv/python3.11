@@ -11,14 +11,10 @@ Name: python3
 Summary: Interpreter of the Python programming language
 URL: https://www.python.org/
 
-
-# First rc
-%global prerel rc1
-
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 0.21.%{?prerel}%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -237,7 +233,7 @@ BuildRequires: python3-pip
 # Source code and patches
 # =======================
 
-Source: https://www.python.org/ftp/python/%{version}/Python-%{version}%{prerel}.tar.xz
+Source: https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
@@ -1550,6 +1546,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jun 27 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-1
+- Update to 3.7.0 final
+
 * Wed Jun 13 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-0.21.rc1
 - Finish bootstrapping, enable rewheel, tests, optimizations
 
