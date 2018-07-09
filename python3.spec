@@ -79,40 +79,8 @@ License: Python
 %endif
 
 
-# ==================================
-# Notes from bootstraping Python 3.6
-# ==================================
-#
-# New Python major version (3.X) break ABI and bytecode compatibility,
-# so all packages depending on it need to be rebuilt.
-#
-# Due to a dependency cycle between Python, gdb, rpm, pip, setuptools, wheel,
-# and other packages, this isn't straightforward.
-# Build in the following order:
-#
-# 1. At the same time:
-#     - gdb without python support (add %%global _without_python 1 on top of
-#       gdb's SPEC file)
-#     - python-rpm-generators
-#       (this can be done also during step 2., but should be done before 3.)
-# 2. python3 without rewheel (use %%bcond_with rewheel instead of
-#     %%bcond_without)
-# 3. gdb with python support (remove %%global _without_python 1 on top of
-#    gdb's SPEC file)
-# 4. rpm
-# 5. python-setuptools with bootstrap set to 1
-# 6. python-pip with build_wheel set to 0
-# 7. python-wheel with %%bcond_without bootstrap
-# 8. python-setuptools with bootstrap set to 0 and also with_check set to 0
-# 9. python-pip with build_wheel set to 1
-# 10. pyparsing
-# 11. python3 with rewheel
-#
-# Then the most important packages have to be built, in dependency order.
-# These were:
-#   python-sphinx, pytest, python-requests, cloud-init, dnf, anaconda, abrt
-#
-# After these have been built, a targeted rebuild should be done for the rest.
+# Notes from bootstraping Python 3.7:
+# https://fedoraproject.org/wiki/SIGs/Python/UpgradingPython
 
 
 # =====================
