@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1546,6 +1546,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jul 12 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.7.0-2
+- Rebuild for new gdbm
+
 * Wed Jun 27 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-1
 - Update to 3.7.0 final
 
