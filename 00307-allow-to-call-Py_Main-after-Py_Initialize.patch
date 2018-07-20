@@ -1,0 +1,150 @@
+From bbd6fc7e77dbd33ae7d3670eaf7800b5d3ff42d3 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@redhat.com>
+Date: Fri, 20 Jul 2018 17:34:23 +0200
+Subject: [PATCH] bpo-34008: Allow to call Py_Main() after Py_Initialize()
+ (GH-8043)
+
+Py_Main() can again be called after Py_Initialize(), as in Python
+3.6. The new configuration is ignored, except of
+_PyMainInterpreterConfig.argv which is used to update sys.argv.
+(cherry picked from commit fb47bca9ee2d07ce96df94b4e4abafd11826eb01)
+
+Co-authored-by: Victor Stinner <vstinner@redhat.com>
+---
+ Lib/test/test_embed.py                             |  8 ++++++++
+ .../C API/2018-07-02-10-58-11.bpo-34008.COewz-.rst |  1 +
+ Modules/main.c                                     | 10 +++++++---
+ Programs/_testembed.c                              | 16 +++++++++++++++
+ Python/pylifecycle.c                               | 23 +++++++++++++++++++---
+ 5 files changed, 52 insertions(+), 6 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/C API/2018-07-02-10-58-11.bpo-34008.COewz-.rst
+
+diff --git a/Lib/test/test_embed.py b/Lib/test/test_embed.py
+index f3b60433ccc1..024c3f99a85d 100644
+--- a/Lib/test/test_embed.py
++++ b/Lib/test/test_embed.py
+@@ -238,6 +238,14 @@ def test_initialize_twice(self):
+         self.assertEqual(out, '')
+         self.assertEqual(err, '')
+ 
++    def test_initialize_pymain(self):
++        """
++        bpo-34008: Calling Py_Main() after Py_Initialize() must not fail.
++        """
++        out, err = self.run_embedded_interpreter("initialize_pymain")
++        self.assertEqual(out.rstrip(), "Py_Main() after Py_Initialize: sys.argv=['-c', 'arg2']")
++        self.assertEqual(err, '')
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/Misc/NEWS.d/next/C API/2018-07-02-10-58-11.bpo-34008.COewz-.rst b/Misc/NEWS.d/next/C API/2018-07-02-10-58-11.bpo-34008.COewz-.rst
+new file mode 100644
+index 000000000000..d9881b9945df
+--- /dev/null
++++ b/Misc/NEWS.d/next/C API/2018-07-02-10-58-11.bpo-34008.COewz-.rst	
+@@ -0,0 +1 @@
++Py_Main() can again be called after Py_Initialize(), as in Python 3.6.
+diff --git a/Modules/main.c b/Modules/main.c
+index 3809fa4abef5..31ebbceb83e0 100644
+--- a/Modules/main.c
++++ b/Modules/main.c
+@@ -2647,9 +2647,13 @@ pymain_main(_PyMain *pymain)
+ 
+     pymain_init_stdio(pymain);
+ 
+-    pymain->err = _Py_InitializeCore(&pymain->config);
+-    if (_Py_INIT_FAILED(pymain->err)) {
+-        _Py_FatalInitError(pymain->err);
++    /* bpo-34008: For backward compatibility reasons, calling Py_Main() after
++       Py_Initialize() ignores the new configuration. */
++    if (!_PyRuntime.initialized) {
++        pymain->err = _Py_InitializeCore(&pymain->config);
++        if (_Py_INIT_FAILED(pymain->err)) {
++            _Py_FatalInitError(pymain->err);
++        }
+     }
+ 
+     if (pymain_init_python_main(pymain) < 0) {
+diff --git a/Programs/_testembed.c b/Programs/_testembed.c
+index b8827f074b9c..b1be682f7adc 100644
+--- a/Programs/_testembed.c
++++ b/Programs/_testembed.c
+@@ -276,6 +276,21 @@ static int test_initialize_twice(void)
+     return 0;
+ }
+ 
++static int test_initialize_pymain(void)
++{
++    wchar_t *argv[] = {L"PYTHON", L"-c",
++                       L"import sys; print(f'Py_Main() after Py_Initialize: sys.argv={sys.argv}')",
++                       L"arg2"};
++    _testembed_Py_Initialize();
++
++    /* bpo-34008: Calling Py_Main() after Py_Initialize() must not crash */
++    Py_Main(Py_ARRAY_LENGTH(argv), argv);
++
++    Py_Finalize();
++
++    return 0;
++}
++
+ 
+ /* *********************************************************
+  * List of test cases and the function that implements it.
+@@ -302,6 +317,7 @@ static struct TestCase TestCases[] = {
+     { "pre_initialization_sys_options", test_pre_initialization_sys_options },
+     { "bpo20891", test_bpo20891 },
+     { "initialize_twice", test_initialize_twice },
++    { "initialize_pymain", test_initialize_pymain },
+     { NULL, NULL }
+ };
+ 
+diff --git a/Python/pylifecycle.c b/Python/pylifecycle.c
+index fdb759f480be..219a46558825 100644
+--- a/Python/pylifecycle.c
++++ b/Python/pylifecycle.c
+@@ -775,6 +775,22 @@ _Py_InitializeCore(const _PyCoreConfig *core_config)
+     return _Py_INIT_OK();
+ }
+ 
++/* Py_Initialize() has already been called: update the main interpreter
++   configuration. Example of bpo-34008: Py_Main() called after
++   Py_Initialize(). */
++static _PyInitError
++_Py_ReconfigureMainInterpreter(PyInterpreterState *interp,
++                               const _PyMainInterpreterConfig *config)
++{
++    if (config->argv != NULL) {
++        int res = PyDict_SetItemString(interp->sysdict, "argv", config->argv);
++        if (res < 0) {
++            return _Py_INIT_ERR("fail to set sys.argv");
++        }
++    }
++    return _Py_INIT_OK();
++}
++
+ /* Update interpreter state based on supplied configuration settings
+  *
+  * After calling this function, most of the restrictions on the interpreter
+@@ -796,9 +812,6 @@ _Py_InitializeMainInterpreter(const _PyMainInterpreterConfig *config)
+     if (!_PyRuntime.core_initialized) {
+         return _Py_INIT_ERR("runtime core not initialized");
+     }
+-    if (_PyRuntime.initialized) {
+-        return _Py_INIT_ERR("main interpreter already initialized");
+-    }
+ 
+     /* Get current thread state and interpreter pointer */
+     tstate = PyThreadState_GET();
+@@ -813,6 +826,10 @@ _Py_InitializeMainInterpreter(const _PyMainInterpreterConfig *config)
+         return _Py_INIT_ERR("failed to copy main interpreter config");
+     }
+ 
++    if (_PyRuntime.initialized) {
++        return _Py_ReconfigureMainInterpreter(interp, config);
++    }
++
+     if (interp->core_config._disable_importlib) {
+         /* Special mode for freeze_importlib: run with no import system
+          *
