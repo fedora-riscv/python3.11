@@ -7,6 +7,10 @@ import sys
 # list of test and other files that we expect not to have bytecode
 not_compiled = [
     '/usr/bin/pathfix.py',
+    '/usr/bin/pygettext3.py',
+    f'/usr/bin/pygettext{sys.version[:3]}.py',
+    '/usr/bin/msgfmt3.py',
+    f'/usr/bin/msgfmt{sys.version[:3]}.py',
     'test/bad_coding.py',
     'test/bad_coding2.py',
     'test/badsyntax_3131.py',
