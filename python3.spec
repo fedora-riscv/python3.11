@@ -200,8 +200,8 @@ Source: https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
-# Written by bkabrda
-Source8: check-pyc-and-pyo-timestamps.py
+# Originally written by bkabrda
+Source8: check-pyc-timestamps.py
 
 # Desktop menu entry for idle3
 Source10: idle3.desktop
