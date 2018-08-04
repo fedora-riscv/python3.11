@@ -71,10 +71,9 @@ License: Python
 %bcond_without computed_gotos
 
 # Support for the Valgrind debugger/profiler
-%ifnarch s390 %{mips} riscv64
+%ifarch %{valgrind_arches}
 %bcond_without valgrind
 %else
-# Some arches don't have valgrind, disable support for it there.
 %bcond_with valgrind
 %endif
 
