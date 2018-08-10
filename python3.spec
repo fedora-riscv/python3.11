@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 
 
@@ -411,7 +411,7 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 
 %if %{with gdbm}
 # When built with this (as guarded by the BuildRequires above), require it
-Requires: gdbm%{?_isa} >= 1:1.13
+Requires: gdbm-libs%{?_isa} >= 1:1.13
 %endif
 
 # There are files in the standard library that have python shebang.
@@ -1520,6 +1520,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Aug 10 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.7.0-5
+- Fix wrong requirement on gdbm
+
 * Fri Jul 20 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-4
 - Allow to call Py_Main() after Py_Initialize()
 Resolves: rhbz#1595421
