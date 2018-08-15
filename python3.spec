@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 
 
@@ -33,6 +33,9 @@ License: Python
 # WARNING: This does not change the package name and summary above
 %bcond_with flatpackage
 
+# Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
+# Uses upstream bundled prebuilt wheels otherwise
+%bcond_without rpmwheels
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %ifarch %{ix86} x86_64
@@ -45,13 +48,6 @@ License: Python
 
 # Run the test suite in %%check
 %bcond_without tests
-
-# Ability to reuse RPM-installed pip using rewheel
-%if %{with flatpackage}
-%bcond_with rewheel
-%else
-%bcond_without rewheel
-%endif
 
 # Extra build for debugging the interpreter or C-API extensions
 # (the -debug subpackages)
@@ -190,9 +186,9 @@ BuildRequires: /usr/bin/dtrace
 # workaround http://bugs.python.org/issue19804 (test_uuid requires ifconfig)
 BuildRequires: /usr/sbin/ifconfig
 
-%if %{with rewheel}
-BuildRequires: python3-setuptools
-BuildRequires: python3-pip
+%if %{with rpmwheels}
+BuildRequires: python-setuptools-wheel
+BuildRequires: python-pip-wheel
 %endif
 
 
@@ -283,10 +279,9 @@ Patch170: 00170-gc-assertions.patch
 Patch178: 00178-dont-duplicate-flags-in-sysconfig.patch
 
 # 00189 #
-# Add the rewheel module, allowing to recreate wheels from already installed
-# ones
-# https://github.com/bkabrda/rewheel
-Patch189: 00189-add-rewheel-module.patch
+# Instead of bundled wheels, use our RPM packaged wheels from
+# /usr/share/python-wheels
+Patch189: 00189-use-rpm-wheels.patch
 
 # 00205 #
 # LIBPL variable in makefile takes LIBPL from configure.ac
@@ -363,11 +358,6 @@ Obsoletes: python%{pyshortver}
 %global platpyver 3.6.2-20
 Obsoletes: platform-python < %{platpyver}
 
-%if %{with rewheel}
-Requires: python3-setuptools
-Requires: python3-pip
-%endif
-
 # This prevents ALL subpackages built from this spec to require
 # /usr/bin/python3*. Granularity per subpackage is impossible.
 # It's intended for the libs package not to drag in the interpreter, see
@@ -414,6 +404,14 @@ Requires: glibc%{?_isa} >= 2.24.90-26
 Requires: gdbm-libs%{?_isa} >= 1:1.13
 %endif
 
+%if %{with rpmwheels}
+Requires: python-setuptools-wheel
+Requires: python-pip-wheel
+%else
+Provides: bundled(python3-pip) = 10.0.1
+Provides: bundled(python3-setuptools) = 39.0.1
+%endif
+
 # There are files in the standard library that have python shebang.
 # We've filtered the automatic requirement out so libs are installable without
 # the main package. This however makes it pulled in by default.
@@ -443,12 +441,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
-
-%if %{with rewheel}
-# without rewheel is used to bootstrap setuptools+pip
-# python3-rpm-generators needs python3-setuptools, so we cannot have it yet
 Requires: python3-rpm-generators
-%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 # https://bugzilla.redhat.com/show_bug.cgi?id=1496757
@@ -579,9 +572,13 @@ Requires: redhat-rpm-config
 %global __requires_exclude ^python\\(abi\\) = 3\\..$
 %global __provides_exclude ^python\\(abi\\) = 3\\..$
 
-# We keep those inside on purpose
+%if %{with rpmwheels}
+Requires: python-setuptools-wheel
+Requires: python-pip-wheel
+%else
 Provides: bundled(python3-pip) = 10.0.1
 Provides: bundled(python3-setuptools) = 39.0.1
+%endif
 
 # The description for the flat package
 %description
@@ -604,11 +601,6 @@ version once Python %{pybasever} is stable.
 # Remove bundled libraries to ensure that we're using the system copy.
 rm -r Modules/expat
 
-%if %{with rewheel}
-%global pip_version %(pip3 --version | cut -d' ' -f2)
-sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/ensurepip/__init__.py
-%endif
-
 #
 # Apply patches:
 #
@@ -625,8 +617,9 @@ sed -r -i s/'_PIP_VERSION = "[0-9.]+"'/'_PIP_VERSION = "%{pip_version}"'/ Lib/en
 %patch170 -p1
 %patch178 -p1
 
-%if %{with rewheel}
+%if %{with rpmwheels}
 %patch189 -p1
+rm Lib/ensurepip/_bundled/*.whl
 %endif
 
 %patch205 -p1
@@ -1107,18 +1100,11 @@ CheckPython optimized
 %{pylibdir}/ensurepip/*.py
 %{pylibdir}/ensurepip/__pycache__/*%{bytecode_suffixes}
 
-%if %{without flatpackage}
+%if %{with rpmwheels}
 %exclude %{pylibdir}/ensurepip/_bundled
 %else
 %dir %{pylibdir}/ensurepip/_bundled
 %{pylibdir}/ensurepip/_bundled/*.whl
-%endif
-
-%if %{with rewheel}
-%dir %{pylibdir}/ensurepip/rewheel/
-%dir %{pylibdir}/ensurepip/rewheel/__pycache__/
-%{pylibdir}/ensurepip/rewheel/*.py
-%{pylibdir}/ensurepip/rewheel/__pycache__/*%{bytecode_suffixes}
 %endif
 
 %dir %{pylibdir}/test/
@@ -1520,6 +1506,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Aug 15 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-6
+- Use RPM built wheels of pip and setuptools in ensurepip instead of our rewheel patch
+
 * Fri Aug 10 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.7.0-5
 - Fix wrong requirement on gdbm
 
