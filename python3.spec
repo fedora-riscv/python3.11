@@ -358,6 +358,12 @@ Obsoletes: python%{pyshortver}
 %global platpyver 3.6.2-20
 Obsoletes: platform-python < %{platpyver}
 
+# Previously, this was required for our rewheel patch to work.
+# This is technically no longer needed, but we keep it recommended
+# for the developer experience.
+Recommends: python3-setuptools
+Recommends: python3-pip
+
 # This prevents ALL subpackages built from this spec to require
 # /usr/bin/python3*. Granularity per subpackage is impossible.
 # It's intended for the libs package not to drag in the interpreter, see
