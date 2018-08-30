@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Python
 
 
@@ -457,6 +457,15 @@ BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
 Requires: python3-rpm-generators
+
+# This is not "API" (packages that need setuptools should still BuildRequire it)
+# However some packages apparently can build both with and without setuptools
+# producing egg-info as file or directory (depending on setuptools presence).
+# Directory-to-file updates are problematic in RPM, so we ensure setuptools is
+# installed when -devel is required.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1623914
+# See https://fedoraproject.org/wiki/Packaging:Directory_Replacement
+Requires: python3-setuptools
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 # https://bugzilla.redhat.com/show_bug.cgi?id=1496757
@@ -1544,6 +1553,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Aug 30 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-9
+- Require python3-setuptools from python3-devel to prevent packaging errors (#1623914)
+
 * Fri Aug 17 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-8
 - Add /usr/bin/pygettext3.py and msgfmt3.py to python3-devel
 Resolves: rhbz#1571474
