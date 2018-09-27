@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Python
 
 
@@ -742,7 +742,7 @@ BuildPython() {
 %if %{with debug_build}
 BuildPython debug \
   "--without-ensurepip --with-pydebug" \
-  "-O0"
+  "-Og"
 %endif # with debug_build
 
 BuildPython optimized \
@@ -1551,6 +1551,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Sep 27 2018 Petr Viktorin <pviktori@redhat.com> - 3.7.0-10
+- Compile the debug build with -Og rather than -O0
+
 * Thu Aug 30 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.0-9
 - Require python3-setuptools from python3-devel to prevent packaging errors (#1623914)
 
