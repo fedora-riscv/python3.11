@@ -53,15 +53,16 @@ index c772dea..5729797 100644
  }
  #endif
 diff --git a/Lib/test/test_gc.py b/Lib/test/test_gc.py
-index 904fc7d..288e242 100644
+index 8d806db..dc8bb16 100644
 --- a/Lib/test/test_gc.py
 +++ b/Lib/test/test_gc.py
-@@ -1,10 +1,11 @@
+@@ -1,10 +1,12 @@
  import unittest
  from test.support import (verbose, refcount_test, run_unittest,
                            strip_python_stderr, cpython_only, start_threads,
--                          temp_dir, requires_type_collecting)
-+                          temp_dir, import_module, requires_type_collecting)
+-                          temp_dir, requires_type_collecting, TESTFN, unlink)
++                          temp_dir, requires_type_collecting, TESTFN, unlink,
++                          import_module)
  from test.support.script_helper import assert_python_ok, make_script
  
  import sys
@@ -69,7 +70,7 @@ index 904fc7d..288e242 100644
  import time
  import gc
  import weakref
-@@ -46,6 +47,8 @@ class GC_Detector(object):
+@@ -46,6 +48,8 @@ class GC_Detector(object):
          # gc collects it.
          self.wr = weakref.ref(C1055820(666), it_happened)
  
@@ -78,7 +79,7 @@ index 904fc7d..288e242 100644
  @with_tp_del
  class Uncollectable(object):
      """Create a reference cycle with multiple __del__ methods.
-@@ -863,6 +866,50 @@ class GCCallbackTests(unittest.TestCase):
+@@ -878,6 +882,50 @@ class GCCallbackTests(unittest.TestCase):
          self.assertEqual(len(gc.garbage), 0)
  
  
@@ -130,7 +131,7 @@ index 904fc7d..288e242 100644
      def setUp(self):
          gc.enable()
 diff --git a/Modules/gcmodule.c b/Modules/gcmodule.c
-index 8ba1093..e795308 100644
+index 4d701cb..388dd78 100644
 --- a/Modules/gcmodule.c
 +++ b/Modules/gcmodule.c
 @@ -239,7 +239,8 @@ update_refs(PyGC_Head *containers)
@@ -251,7 +252,7 @@ index 8ba1093..e795308 100644
  
          /* copy-paste of weakrefobject.c's handle_callback() */
          temp = PyObject_CallFunctionObjArgs(callback, wr, NULL);
-@@ -720,12 +726,14 @@ check_garbage(PyGC_Head *collectable)
+@@ -717,12 +723,14 @@ check_garbage(PyGC_Head *collectable)
      for (gc = collectable->gc.gc_next; gc != collectable;
           gc = gc->gc.gc_next) {
          _PyGCHead_SET_REFS(gc, Py_REFCNT(FROM_GC(gc)));
