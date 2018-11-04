@@ -1,0 +1,168 @@
+From 583bb07116505dcc73c0fc4aa3c1cf5074f3522d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 2 Nov 2018 14:01:28 +0100
+Subject: [PATCH] Revert "bpo-6721: Hold logging locks across fork() (GH-4071)
+ (#9291)"
+
+This reverts commit 3b699932e5ac3e76031bbb6d700fbea07492641d.
+---
+ Lib/logging/__init__.py  | 50 ------------------------------
+ Lib/test/test_logging.py | 67 ----------------------------------------
+ 2 files changed, 117 deletions(-)
+
+diff --git a/Lib/logging/__init__.py b/Lib/logging/__init__.py
+index 3ad2cc38f6..53780cd600 100644
+--- a/Lib/logging/__init__.py
++++ b/Lib/logging/__init__.py
+@@ -225,55 +225,6 @@ def _releaseLock():
+     if _lock:
+         _lock.release()
+ 
+-
+-# Prevent a held logging lock from blocking a child from logging.
+-
+-if not hasattr(os, 'register_at_fork'):  # Windows and friends.
+-    def _register_at_fork_acquire_release(instance):
+-        pass  # no-op when os.register_at_fork does not exist.
+-else:  # The os.register_at_fork API exists
+-    os.register_at_fork(before=_acquireLock,
+-                        after_in_child=_releaseLock,
+-                        after_in_parent=_releaseLock)
+-
+-    # A collection of instances with acquire and release methods (logging.Handler)
+-    # to be called before and after fork.  The weakref avoids us keeping discarded
+-    # Handler instances alive forever in case an odd program creates and destroys
+-    # many over its lifetime.
+-    _at_fork_acquire_release_weakset = weakref.WeakSet()
+-
+-
+-    def _register_at_fork_acquire_release(instance):
+-        # We put the instance itself in a single WeakSet as we MUST have only
+-        # one atomic weak ref. used by both before and after atfork calls to
+-        # guarantee matched pairs of acquire and release calls.
+-        _at_fork_acquire_release_weakset.add(instance)
+-
+-
+-    def _at_fork_weak_calls(method_name):
+-        for instance in _at_fork_acquire_release_weakset:
+-            method = getattr(instance, method_name)
+-            try:
+-                method()
+-            except Exception as err:
+-                # Similar to what PyErr_WriteUnraisable does.
+-                print("Ignoring exception from logging atfork", instance,
+-                      method_name, "method:", err, file=sys.stderr)
+-
+-
+-    def _before_at_fork_weak_calls():
+-        _at_fork_weak_calls('acquire')
+-
+-
+-    def _after_at_fork_weak_calls():
+-        _at_fork_weak_calls('release')
+-
+-
+-    os.register_at_fork(before=_before_at_fork_weak_calls,
+-                        after_in_child=_after_at_fork_weak_calls,
+-                        after_in_parent=_after_at_fork_weak_calls)
+-
+-
+ #---------------------------------------------------------------------------
+ #   The logging record
+ #---------------------------------------------------------------------------
+@@ -844,7 +795,6 @@ class Handler(Filterer):
+         Acquire a thread lock for serializing access to the underlying I/O.
+         """
+         self.lock = threading.RLock()
+-        _register_at_fork_acquire_release(self)
+ 
+     def acquire(self):
+         """
+diff --git a/Lib/test/test_logging.py b/Lib/test/test_logging.py
+index 1ea2967f5b..5d5eba7357 100644
+--- a/Lib/test/test_logging.py
++++ b/Lib/test/test_logging.py
+@@ -35,7 +35,6 @@ import os
+ import queue
+ import random
+ import re
+-import signal
+ import socket
+ import struct
+ import sys
+@@ -667,72 +666,6 @@ class HandlerTest(BaseTest):
+                 if os.path.exists(fn):
+                     os.unlink(fn)
+ 
+-    # The implementation relies on os.register_at_fork existing, but we test
+-    # based on os.fork existing because that is what users and this test use.
+-    # This helps ensure that when fork exists (the important concept) that the
+-    # register_at_fork mechanism is also present and used.
+-    @unittest.skipIf(not hasattr(os, 'fork'), 'Test requires os.fork().')
+-    def test_post_fork_child_no_deadlock(self):
+-        """Ensure forked child logging locks are not held; bpo-6721."""
+-        refed_h = logging.Handler()
+-        refed_h.name = 'because we need at least one for this test'
+-        self.assertGreater(len(logging._handlers), 0)
+-
+-        locks_held__ready_to_fork = threading.Event()
+-        fork_happened__release_locks_and_end_thread = threading.Event()
+-
+-        def lock_holder_thread_fn():
+-            logging._acquireLock()
+-            try:
+-                refed_h.acquire()
+-                try:
+-                    # Tell the main thread to do the fork.
+-                    locks_held__ready_to_fork.set()
+-
+-                    # If the deadlock bug exists, the fork will happen
+-                    # without dealing with the locks we hold, deadlocking
+-                    # the child.
+-
+-                    # Wait for a successful fork or an unreasonable amount of
+-                    # time before releasing our locks.  To avoid a timing based
+-                    # test we'd need communication from os.fork() as to when it
+-                    # has actually happened.  Given this is a regression test
+-                    # for a fixed issue, potentially less reliably detecting
+-                    # regression via timing is acceptable for simplicity.
+-                    # The test will always take at least this long. :(
+-                    fork_happened__release_locks_and_end_thread.wait(0.5)
+-                finally:
+-                    refed_h.release()
+-            finally:
+-                logging._releaseLock()
+-
+-        lock_holder_thread = threading.Thread(
+-                target=lock_holder_thread_fn,
+-                name='test_post_fork_child_no_deadlock lock holder')
+-        lock_holder_thread.start()
+-
+-        locks_held__ready_to_fork.wait()
+-        pid = os.fork()
+-        if pid == 0:  # Child.
+-            logging.error(r'Child process did not deadlock. \o/')
+-            os._exit(0)
+-        else:  # Parent.
+-            fork_happened__release_locks_and_end_thread.set()
+-            lock_holder_thread.join()
+-            start_time = time.monotonic()
+-            while True:
+-                waited_pid, status = os.waitpid(pid, os.WNOHANG)
+-                if waited_pid == pid:
+-                    break  # child process exited.
+-                if time.monotonic() - start_time > 7:
+-                    break  # so long? implies child deadlock.
+-                time.sleep(0.05)
+-            if waited_pid != pid:
+-                os.kill(pid, signal.SIGKILL)
+-                waited_pid, status = os.waitpid(pid, 0)
+-                self.fail("child process deadlocked.")
+-            self.assertEqual(status, 0, msg="child process error")
+-
+ 
+ class BadStream(object):
+     def write(self, data):
+-- 
+2.19.1
+
