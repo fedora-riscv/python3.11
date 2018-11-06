@@ -1,0 +1,61 @@
+commit c36e8721f276e7cc09cecdb9c04783630f0ba82a
+Author: Victor Stinner <vstinner@redhat.com>
+Date:   Wed Nov 7 00:34:22 2018 +0100
+
+    bpo-23420: Verify the value of '-s' when execute the CLI of cProfile
+    
+    Verify the value for the parameter '-s' of the cProfile CLI. Patch by Robert
+    Kuska.
+    
+    Resolves: rhbz#1160640
+
+diff --git a/Lib/cProfile.py b/Lib/cProfile.py
+index c044be8..f6e423b 100755
+--- a/Lib/cProfile.py
++++ b/Lib/cProfile.py
+@@ -124,6 +124,7 @@ def main():
+     import os
+     import sys
+     import runpy
++    import pstats
+     from optparse import OptionParser
+     usage = "cProfile.py [-o output_file_path] [-s sort] [-m module | scriptfile] [arg] ..."
+     parser = OptionParser(usage=usage)
+@@ -132,7 +133,8 @@ def main():
+         help="Save stats to <outfile>", default=None)
+     parser.add_option('-s', '--sort', dest="sort",
+         help="Sort order when printing to stdout, based on pstats.Stats class",
+-        default=-1)
++        default=-1,
++        choices=sorted(pstats.Stats.sort_arg_dict_default))
+     parser.add_option('-m', dest="module", action="store_true",
+         help="Profile a library module", default=False)
+ 
+diff --git a/Lib/test/test_cprofile.py b/Lib/test/test_cprofile.py
+index 1430d22..5c4ec5b 100644
+--- a/Lib/test/test_cprofile.py
++++ b/Lib/test/test_cprofile.py
+@@ -2,6 +2,7 @@
+ 
+ import sys
+ from test.support import run_unittest, TESTFN, unlink
++import unittest
+ 
+ # rip off all interesting stuff from test_profile
+ import cProfile
+@@ -50,8 +51,14 @@ class CProfileTest(ProfileTest):
+         assert_python_ok('-m', 'cProfile', '-m', 'timeit', '-n', '1')
+ 
+ 
++class TestCommandLine(unittest.TestCase):
++    def test_sort(self):
++        rc, out, err = assert_python_failure('-m', 'cProfile', '-s', 'demo')
++        self.assertGreater(rc, 0)
++        self.assertIn(b"option -s: invalid choice: 'demo'", err)
++
+ def test_main():
+-    run_unittest(CProfileTest)
++    run_unittest(CProfileTest, TestCommandLine)
+ 
+ def main():
+     if '-r' not in sys.argv:
