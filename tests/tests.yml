@@ -11,7 +11,17 @@
     - smoke:
         dir: python/smoke
         run: VERSION=3.7 ./venv.sh
+    - selftest:
+        dir: python/selftest
+        run: VERSION=3.7 X="-x test_socket -x test_asyncgen -x test_asyncio -x test_compile -x test_concurrent_futures -x test_itertools -x test_multiprocessing_fork -x test_multiprocessing_forkserver -x test_shutil -x test_time -x test_multiprocessing_spawn -x test_threading -x test_wsgiref" ./parallel.sh
+    - findleaks:
+        dir: python/selftest
+        run: VERSION=3.7 X="-x test_socket -x test_asyncgen -x test_asyncio -x test_compile -x test_concurrent_futures -x test_itertools -x test_multiprocessing_fork -x test_multiprocessing_forkserver -x test_shutil -x test_time -x test_multiprocessing_spawn -x test_threading -x test_wsgiref" ./findleaks.sh
     required_packages:
-    - gcc
-    - python3-tox
-    - python3-devel
+    - gcc  # for extension building in venv and selftest
+    - python3-debug  # for leak testing
+    - python3-devel  # for extension building in venv and selftest
+    - python3-tkinter  # for selftest
+    - python3-test  # for selftest
+    - python3-tox  # for venv tests
+    - glibc-all-langpacks # for locale tests
