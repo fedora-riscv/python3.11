@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 
 
@@ -540,6 +540,7 @@ the Python programming language.
 %package test
 Summary: The self-test suite for the main python3 package
 Requires: %{name} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-test < %{platpyver}
@@ -1145,14 +1146,19 @@ CheckPython optimized
 %{pylibdir}/ensurepip/_bundled/*.whl
 %endif
 
+# The majority of the test module lives in the test subpackage
+# However test.support is in libs - it contains stuff used when testing your code
+# https://bugzilla.redhat.com/show_bug.cgi?id=596258
+%if %{without flatpackage}
 %dir %{pylibdir}/test/
 %dir %{pylibdir}/test/__pycache__/
 %dir %{pylibdir}/test/support/
 %dir %{pylibdir}/test/support/__pycache__/
 %{pylibdir}/test/__init__.py
 %{pylibdir}/test/__pycache__/__init__%{bytecode_suffixes}
-%{pylibdir}/test/support/__init__.py
-%{pylibdir}/test/support/__pycache__/__init__%{bytecode_suffixes}
+%{pylibdir}/test/support/*.py
+%{pylibdir}/test/support/__pycache__/*%{bytecode_suffixes}
+%endif
 
 %dir %{pylibdir}/concurrent/
 %dir %{pylibdir}/concurrent/__pycache__/
@@ -1410,6 +1416,15 @@ CheckPython optimized
 %{pylibdir}/tkinter/test
 %{pylibdir}/unittest/test
 
+# stuff already owned by the libs subpackage
+# test requires libs, so we are safe not owning those dirs
+%if %{without flatpackage}
+%exclude %dir %{pylibdir}/test/
+%exclude %dir %{pylibdir}/test/__pycache__/
+%exclude %{pylibdir}/test/__init__.py
+%exclude %{pylibdir}/test/__pycache__/__init__%{bytecode_suffixes}
+%exclude %{pylibdir}/test/support/
+%endif
 
 # We don't bother splitting the debug build out into further subpackages:
 # if you need it, you're probably a developer.
@@ -1549,6 +1564,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Nov 21 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.1-4
+- Make sure the entire test.support module is in python3-libs (#1651245)
+
 * Tue Nov 06 2018 Victor Stinner <vstinner@redhat.com> - 3.7.1-3
 - Verify the value of '-s' when execute the CLI of cProfile (rhbz#1160640)
 
