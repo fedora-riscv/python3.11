@@ -1,0 +1,46 @@
+From 0165caf04ef9c615c8b86dd16f7c201ca7a0befa Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@redhat.com>
+Date: Tue, 27 Nov 2018 12:40:50 +0100
+Subject: [PATCH] bpo-35317: Fix mktime() error in test_email (GH-10721)
+
+Fix mktime() overflow error in test_email: run
+test_localtime_daylight_true_dst_true() and
+test_localtime_daylight_false_dst_true() with a specific timezone.
+(cherry picked from commit cfaafda8e3e19764682abb4bd4c574accb784c42)
+
+Co-authored-by: Victor Stinner <vstinner@redhat.com>
+---
+ Lib/test/test_email/test_utils.py                              | 2 ++
+ .../NEWS.d/next/Tests/2018-11-26-16-54-21.bpo-35317.jByGP2.rst | 3 +++
+ 2 files changed, 5 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Tests/2018-11-26-16-54-21.bpo-35317.jByGP2.rst
+
+diff --git a/Lib/test/test_email/test_utils.py b/Lib/test/test_email/test_utils.py
+index 6dcb3bbe7aab..4e3c3f3a195f 100644
+--- a/Lib/test/test_email/test_utils.py
++++ b/Lib/test/test_email/test_utils.py
+@@ -75,6 +75,7 @@ def test_localtime_daylight_false_dst_false(self):
+         t2 = utils.localtime(t1)
+         self.assertEqual(t1, t2)
+ 
++    @test.support.run_with_tz('Europe/Minsk')
+     def test_localtime_daylight_true_dst_true(self):
+         test.support.patch(self, time, 'daylight', True)
+         t0 = datetime.datetime(2012, 3, 12, 1, 1)
+@@ -82,6 +83,7 @@ def test_localtime_daylight_true_dst_true(self):
+         t2 = utils.localtime(t1)
+         self.assertEqual(t1, t2)
+ 
++    @test.support.run_with_tz('Europe/Minsk')
+     def test_localtime_daylight_false_dst_true(self):
+         test.support.patch(self, time, 'daylight', False)
+         t0 = datetime.datetime(2012, 3, 12, 1, 1)
+diff --git a/Misc/NEWS.d/next/Tests/2018-11-26-16-54-21.bpo-35317.jByGP2.rst b/Misc/NEWS.d/next/Tests/2018-11-26-16-54-21.bpo-35317.jByGP2.rst
+new file mode 100644
+index 000000000000..73a30f71927f
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2018-11-26-16-54-21.bpo-35317.jByGP2.rst
+@@ -0,0 +1,3 @@
++Fix ``mktime()`` overflow error in ``test_email``: run
++``test_localtime_daylight_true_dst_true()`` and
++``test_localtime_daylight_false_dst_true()`` with a specific timezone.
