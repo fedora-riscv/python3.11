@@ -1066,7 +1066,7 @@ CheckPython() {
   #   @unittest._expectedFailureInRpmBuild
   WITHIN_PYTHON_RPM_BUILD= \
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
-    -wW --slowest --findleaks \
+    -wW --slowest -j0 \
     -x test_distutils \
     -x test_bdist_rpm \
     -x test_gdb \
