@@ -13,8 +13,8 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-Version: %{pybasever}.1
-Release: 5%{?dist}
+Version: %{pybasever}.2
+Release: 1%{?dist}
 License: Python
 
 
@@ -307,18 +307,6 @@ Patch274: 00274-fix-arch-names.patch
 # See: https://bugzilla.redhat.com/show_bug.cgi?id=1644936
 Patch312: 00312-revert-bpo-6721.patch
 
-# 00313 #
-# Verify the value of '-s' when execute the CLI of cProfile
-# http://bugs.python.org/issue23420
-# https://bugzilla.redhat.com/show_bug.cgi?id=1160640
-Patch313: 00313-cprofile-sort-option.patch
-
-# 00315 #
-# Fix mktime() error in test_email
-# http://bugs.python.org/issue35317
-# https://bugzilla.redhat.com/show_bug.cgi?id=1652843
-Patch315: 00315-test_email-mktime.patch
-
 # 00316 #
 # We remove the exe files from distutil's bdist_wininst
 # So we mark the command as unsupported - and the tests are skipped
@@ -427,8 +415,8 @@ Requires: gdbm-libs%{?_isa} >= 1:1.13
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 10.0.1
-Provides: bundled(python3-setuptools) = 39.0.1
+Provides: bundled(python3-pip) = 18.1
+Provides: bundled(python3-setuptools) = 40.6.2
 %endif
 
 # There are files in the standard library that have python shebang.
@@ -605,8 +593,8 @@ Requires: redhat-rpm-config
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 10.0.1
-Provides: bundled(python3-setuptools) = 39.0.1
+Provides: bundled(python3-pip) = 18.1
+Provides: bundled(python3-setuptools) = 40.6.2
 %endif
 
 # The description for the flat package
@@ -659,8 +647,6 @@ rm Lib/ensurepip/_bundled/*.whl
 %patch251 -p1
 %patch274 -p1
 %patch312 -p1
-%patch313 -p1
-%patch315 -p1
 %patch316 -p1
 
 
@@ -1356,6 +1342,7 @@ CheckPython optimized
 %exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 %endif
 %{_includedir}/python%{LDVERSION_optimized}/*.h
+%{_includedir}/python%{LDVERSION_optimized}/internal/
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
 
 %if %{without flatpackage}
@@ -1576,6 +1563,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Dec 25 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.2-1
+- Update to 3.7.2
+
 * Fri Dec 07 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.1-5
 - Make sure we don't ship any exe files (not needed an prebuilt)
 
