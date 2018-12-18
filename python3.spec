@@ -300,12 +300,6 @@ Patch251: 00251-change-user-install-location.patch
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
 
-# 00291 #
-# Build fails with undefined references to dlopen / dlsym otherwise.
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=1537489
-# and: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af19
-Patch291: 00291-setup-Link-ctypes-against-dl-explicitly.patch
-
 # 00312 #
 # Revert "bpo-6721: Hold logging locks across fork() 3b699932e5ac3e7
 # This is a TEMPORARY WORKAROUND for an urgent Fedora bug
@@ -659,7 +653,6 @@ rm Lib/ensurepip/_bundled/*.whl
 %patch205 -p1
 %patch251 -p1
 %patch274 -p1
-%patch291 -p1
 %patch312 -p1
 %patch313 -p1
 %patch315 -p1
