@@ -152,6 +152,7 @@ BuildRequires: gcc-c++
 %if %{with gdbm}
 BuildRequires: gdbm-devel >= 1:1.13
 %endif
+BuildRequires: glibc-all-langpacks
 BuildRequires: glibc-devel
 BuildRequires: gmp-devel
 BuildRequires: libappstream-glib
