@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -299,13 +299,6 @@ Patch251: 00251-change-user-install-location.patch
 # 00274 #
 # Upstream uses Debian-style architecture naming. Change to match Fedora.
 Patch274: 00274-fix-arch-names.patch
-
-# 00312 #
-# Revert "bpo-6721: Hold logging locks across fork() 3b699932e5ac3e7
-# This is a TEMPORARY WORKAROUND for an urgent Fedora bug
-# TODO Investigate properly and get a real fix (here or in anaconda)!
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=1644936
-Patch312: 00312-revert-bpo-6721.patch
 
 # 00316 #
 # We remove the exe files from distutil's bdist_wininst
@@ -646,7 +639,6 @@ rm Lib/ensurepip/_bundled/*.whl
 %patch205 -p1
 %patch251 -p1
 %patch274 -p1
-%patch312 -p1
 %patch316 -p1
 
 
@@ -1563,6 +1555,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jan 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.7.2-2
+- No longer revert upstream commit 3b699932e5ac3e7
+- This was a dirty workaround for (#1644936)
+
 * Tue Dec 25 2018 Miro Hrončok <mhroncok@redhat.com> - 3.7.2-1
 - Update to 3.7.2
 
