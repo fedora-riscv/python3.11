@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 Version: %{pybasever}.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1555,6 +1555,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 3.7.2-3
+- Rebuilt for libcrypt.so.2 (#1666033)
+
 * Fri Jan 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.7.2-2
 - No longer revert upstream commit 3b699932e5ac3e7
 - This was a dirty workaround for (#1644936)
