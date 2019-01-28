@@ -150,7 +150,7 @@ BuildRequires: expat-devel
 BuildRequires: findutils
 BuildRequires: gcc-c++
 %if %{with gdbm}
-BuildRequires: gdbm-devel >= 1:1.13
+BuildRequires: gdbm-devel
 %endif
 BuildRequires: glibc-all-langpacks
 BuildRequires: glibc-devel
@@ -324,17 +324,15 @@ Patch317: 00317-CVE-2019-5010.patch
 # Descriptions, and metadata for subpackages
 # ==========================================
 
+# People might want to dnf install pythonX.Y instead of pythonXY;
+# we enable this in both flat and nonflat package.
+Provides: python%{pybasever} = %{version}-%{release}
+
 %if %{without flatpackage}
 
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
-
-# For backward compatibility only, remove in F29:
-Provides: system-python(abi) = %{pybasever}
-Provides: system-python = %{version}-%{release}
-Provides: system-python%{?_isa} = %{version}-%{release}
-Obsoletes: system-python < %{version}-%{release}
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -395,20 +393,6 @@ the "%{name}-" prefix.
 %package libs
 Summary:        Python runtime libraries
 
-# The "enum" module is included in the standard library.
-# Provide an upgrade path from the external library.
-Provides: python3-enum34 = 1.0.4-5%{?dist}
-Obsoletes: python3-enum34 < 1.0.4-5%{?dist}
-
-# Python 3 built with glibc >= 2.24.90-26 needs to require it
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1410644
-Requires: glibc%{?_isa} >= 2.24.90-26
-
-%if %{with gdbm}
-# When built with this (as guarded by the BuildRequires above), require it
-Requires: gdbm-libs%{?_isa} >= 1:1.13
-%endif
-
 %if %{with rpmwheels}
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
@@ -422,11 +406,6 @@ Provides: bundled(python3-setuptools) = 40.6.2
 # the main package. This however makes it pulled in by default.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
 Recommends: %{name}%{?_isa} = %{version}-%{release}
-
-# For backward compatibility only, remove in F29:
-Provides: system-python-libs = %{version}-%{release}
-Provides: system-python-libs%{?_isa} = %{version}-%{release}
-Obsoletes: system-python-libs < %{version}-%{release}
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-libs < %{platpyver}
@@ -467,16 +446,6 @@ Provides: %{name}-2to3 = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
 
 Conflicts: %{name} < %{version}-%{release}
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-# /usr/bin/2to3 was moved from python2-tools to python3-tools
-# TODO Remove in Fedora 29
-Conflicts: python2-tools < 2.7.13-17
-Conflicts: python-tools < 2.7.13-17
-# https://bugzilla.redhat.com/show_bug.cgi?id=1312030
-# /usr/bin/2to3 was moved from python3-tools to python3-devel
-# TODO Remove in Fedora 30
-Conflicts: python3-tools < 3.7
 
 # Shall be removed in Fedora 31
 Obsoletes: platform-python-devel < %{platpyver}
@@ -959,13 +928,6 @@ ln -s \
   %{buildroot}%{_bindir}/python3-debug
 %endif
 
-# System Python: Link the executable to libexec
-# This is for backwards compatibility only and should be removed in Fedora 29
-%if %{without flatpackage}
-mkdir -p %{buildroot}%{_libexecdir}
-ln -s %{_bindir}/python%{pybasever} %{buildroot}%{_libexecdir}/system-python
-%endif
-
 # There's 2to3-X.X executable and 2to3 soft link to it.
 # No reason to have both, so keep only 2to3 as an executable.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
@@ -1087,8 +1049,6 @@ CheckPython optimized
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %{_bindir}/pyvenv
-# Remove in Fedora 29:
-%{_libexecdir}/system-python
 %else
 %{_bindir}/pydoc%{pybasever}
 %endif
