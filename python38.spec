@@ -7,8 +7,8 @@
 # pybasever without the dot:
 %global pyshortver 38
 
-Name: python3
-Summary: Interpreter of the Python programming language
+Name: python%{pyshortver}
+Summary: Version %{pybasever} of the Python interpreter
 URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
@@ -34,7 +34,7 @@ License: Python
 # in Fedora, never turn this on for the python3 package
 # and always keep it on for python37 etc.
 # WARNING: This does not change the package name and summary above
-%bcond_with flatpackage
+%bcond_without flatpackage
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
