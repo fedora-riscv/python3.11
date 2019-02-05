@@ -1,17 +1,17 @@
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 0db0dd0..bd8f769 100644
+index f8ff1ce..f297d05 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -574,7 +574,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+@@ -573,7 +573,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
  	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
 -$(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
 +$(BUILDPYTHON):	Programs/python.o $(LDLIBRARY) $(PY3LIBRARY)
- 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -622,12 +622,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -621,12 +621,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -21,19 +21,19 @@ index 0db0dd0..bd8f769 100644
 -	-rm -f $@
 -	$(AR) $(ARFLAGS) $@ $(LIBRARY_OBJS)
 -
- libpython$(LDVERSION).so: $(LIBRARY_OBJS)
+ libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
- 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM) $(LDLAST); \
-@@ -715,7 +709,7 @@ Modules/Setup: $(srcdir)/Modules/Setup.dist
- 		echo "-----------------------------------------------"; \
- 	fi
+ 		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
+@@ -704,7 +698,7 @@ Makefile Modules/config.c: Makefile.pre \
+ 	@echo "The Makefile was updated, you may need to re-run make."
+ 
  
 -Programs/_testembed: Programs/_testembed.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
 +Programs/_testembed: Programs/_testembed.o $(LDLIBRARY) $(PY3LIBRARY)
- 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1483,17 +1477,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1545,17 +1539,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

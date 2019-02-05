@@ -1,6 +1,20 @@
-diff -up Python-3.2.2/Lib/unittest/case.py.add-rpmbuild-hooks-to-unittest Python-3.2.2/Lib/unittest/case.py
---- Python-3.2.2/Lib/unittest/case.py.add-rpmbuild-hooks-to-unittest	2011-09-03 12:16:44.000000000 -0400
-+++ Python-3.2.2/Lib/unittest/case.py	2011-09-09 06:35:16.365568382 -0400
+diff --git a/Lib/unittest/__init__.py b/Lib/unittest/__init__.py
+index 5ff1bf3..4d63954 100644
+--- a/Lib/unittest/__init__.py
++++ b/Lib/unittest/__init__.py
+@@ -58,7 +58,7 @@ __unittest = True
+ 
+ from .result import TestResult
+ from .case import (addModuleCleanup, TestCase, FunctionTestCase, SkipTest, skip,
+-                   skipIf, skipUnless, expectedFailure)
++                   skipIf, skipUnless, expectedFailure, _skipInRpmBuild)
+ from .suite import BaseTestSuite, TestSuite
+ from .loader import (TestLoader, defaultTestLoader, makeSuite, getTestCaseNames,
+                      findTestCases)
+diff --git a/Lib/unittest/case.py b/Lib/unittest/case.py
+index a157ae8..64f912c 100644
+--- a/Lib/unittest/case.py
++++ b/Lib/unittest/case.py
 @@ -3,6 +3,7 @@
  import sys
  import functools
@@ -9,7 +23,8 @@ diff -up Python-3.2.2/Lib/unittest/case.py.add-rpmbuild-hooks-to-unittest Python
  import logging
  import pprint
  import re
-@@ -101,5 +102,21 @@ def expectedFailure(func):
+@@ -158,6 +159,22 @@ class _BaseTestCaseContext:
+         msg = self.test_case._formatMessage(self.msg, standardMsg)
          raise self.test_case.failureException(msg)
  
 +# Non-standard/downstream-only hooks for handling issues with specific test
@@ -31,16 +46,3 @@ diff -up Python-3.2.2/Lib/unittest/case.py.add-rpmbuild-hooks-to-unittest Python
  class _AssertRaisesBaseContext(_BaseTestCaseContext):
  
      def __init__(self, expected, test_case, expected_regex=None):
-diff -up Python-3.2.2/Lib/unittest/__init__.py.add-rpmbuild-hooks-to-unittest Python-3.2.2/Lib/unittest/__init__.py
---- Python-3.2.2/Lib/unittest/__init__.py.add-rpmbuild-hooks-to-unittest	2011-09-03 12:16:44.000000000 -0400
-+++ Python-3.2.2/Lib/unittest/__init__.py	2011-09-09 06:35:16.366568382 -0400
-@@ -57,7 +57,8 @@ __unittest = True
- 
- from .result import TestResult
- from .case import (TestCase, FunctionTestCase, SkipTest, skip, skipIf,
--                   skipUnless, expectedFailure)
-+                   skipUnless, expectedFailure,
-+                   _skipInRpmBuild)
- from .suite import BaseTestSuite, TestSuite
- from .loader import (TestLoader, defaultTestLoader, makeSuite, getTestCaseNames,
-                      findTestCases)
