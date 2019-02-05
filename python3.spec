@@ -329,13 +329,6 @@ Provides: python%{pyshortver} = %{version}-%{release}
 # replace python36-3.6.2.
 Obsoletes: python%{pyshortver}
 
-# Shall be removed in Fedora 31
-# The release is bumped to 20, so we can do f27 platform-python updates
-# If the release in f27 ever goes >= 20, raise it here
-# If platform-python is ever reintroduced, make it higher version than this:
-%global platpyver 3.6.2-20
-Obsoletes: platform-python < %{platpyver}
-
 # Previously, this was required for our rewheel patch to work.
 # This is technically no longer needed, but we keep it recommended
 # for the developer experience.
@@ -388,10 +381,6 @@ Provides: bundled(python3-setuptools) = 40.6.2
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
 Recommends: %{name}%{?_isa} = %{version}-%{release}
 
-# Shall be removed in Fedora 31
-Obsoletes: platform-python-libs < %{platpyver}
-Obsoletes: platform-python-libs-devel < %{platpyver}
-
 %description libs
 This package contains runtime libraries for use by Python:
 - the majority of the Python standard library
@@ -428,9 +417,6 @@ Provides: 2to3 = %{version}-%{release}
 
 Conflicts: %{name} < %{version}-%{release}
 
-# Shall be removed in Fedora 31
-Obsoletes: platform-python-devel < %{platpyver}
-
 %description devel
 This package contains the header files and configuration needed to compile
 Python extension modules (typically written in C or C++), to embed Python
@@ -451,9 +437,6 @@ Provides: %{name}-tools = %{version}-%{release}
 Provides: %{name}-tools%{?_isa} = %{version}-%{release}
 Obsoletes: %{name}-tools < %{version}-%{release}
 
-# Shall be removed in Fedora 31
-Obsoletes: platform-python-tools < %{platpyver}
-
 %description idle
 IDLE is Python’s Integrated Development and Learning Environment.
 
@@ -471,9 +454,6 @@ configuration, browsers, and other dialogs.
 Summary: A GUI toolkit for Python
 Requires: %{name} = %{version}-%{release}
 
-# Shall be removed in Fedora 31
-Obsoletes: platform-python-tkinter < %{platpyver}
-
 %description tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
 the Python programming language.
@@ -483,9 +463,6 @@ the Python programming language.
 Summary: The self-test suite for the main python3 package
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-
-# Shall be removed in Fedora 31
-Obsoletes: platform-python-test < %{platpyver}
 
 %description test
 The self-test suite for the Python interpreter.
