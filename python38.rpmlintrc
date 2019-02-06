@@ -71,5 +71,8 @@ addFilter(r'read-error /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc \[Errno 2\]')
 # we need this macro to evaluate, even if the line starts with #
 addFilter(r'macro-in-comment %\{_pyconfig(32|64)_h\}')
 
+# Python modules don't need to be linked against libc
+addFilter(r'E: library-not-linked-against-libc /usr/lib(64)?/python3.\d/lib-dynload/')
+
 # SPELLING ERRORS
 addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
