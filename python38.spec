@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1478,5 +1478,8 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sun Feb 17 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.8.0~a1-2
+- Rebuild for readline 8.0
+
 * Tue Feb 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a1-1
 - Update to 3.8.0a1
