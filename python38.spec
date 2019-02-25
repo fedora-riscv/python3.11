@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a1
+%global prerel a2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1479,6 +1479,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Feb 25 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a2-1
+- Update to 3.8.0a2
+
 * Mon Feb 18 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a1-3
 - Reduced default build flags used to build extension modules
   https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
