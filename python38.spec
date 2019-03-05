@@ -261,12 +261,6 @@ Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
 # Not yet sent upstream
 Patch160: 00160-disable-test_fs_holes-in-rpm-build.patch
 
-# 00163 #
-# Some tests within test_socket fail intermittently when run inside Koji;
-# disable them using unittest._skipInRpmBuild
-# Not yet sent upstream
-Patch163: 00163-disable-parts-of-test_socket-in-rpm-build.patch
-
 # 00178 #
 # Don't duplicate various FLAGS in sysconfig values
 # http://bugs.python.org/issue17679
@@ -561,7 +555,6 @@ rm -r Modules/expat
 %patch111 -p1
 %patch132 -p1
 %patch160 -p1
-%patch163 -p1
 %patch178 -p1
 
 %if %{with rpmwheels}
