@@ -239,28 +239,6 @@ Patch102: 00102-lib64.patch
 # Downstream only: not appropriate for upstream
 Patch111: 00111-no-static-lib.patch
 
-# 00132 #
-# Add non-standard hooks to unittest for use in the "check" phase below, when
-# running selftests within the build:
-#   @unittest._skipInRpmBuild(reason)
-# for tests that hang or fail intermittently within the build environment, and:
-#   @unittest._expectedFailureInRpmBuild
-# for tests that always fail within the build environment
-#
-# The hooks only take effect if WITHIN_PYTHON_RPM_BUILD is set in the
-# environment, which we set manually in the appropriate portion of the "check"
-# phase below (and which potentially other python-* rpms could set, to reuse
-# these unittest hooks in their own "check" phases)
-Patch132: 00132-add-rpmbuild-hooks-to-unittest.patch
-
-# 00160 #
-# Python 3.3 added os.SEEK_DATA and os.SEEK_HOLE, which may be present in the
-# header files in the build chroot, but may not be supported in the running
-# kernel, hence we disable this test in an rpm build.
-# Adding these was upstream issue http://bugs.python.org/issue10142
-# Not yet sent upstream
-Patch160: 00160-disable-test_fs_holes-in-rpm-build.patch
-
 # 00178 #
 # Don't duplicate various FLAGS in sysconfig values
 # http://bugs.python.org/issue17679
@@ -553,8 +531,6 @@ rm -r Modules/expat
 %patch102 -p1
 %endif
 %patch111 -p1
-%patch132 -p1
-%patch160 -p1
 %patch178 -p1
 
 %if %{with rpmwheels}
@@ -967,17 +943,13 @@ CheckPython() {
   # Show some info, helpful for debugging test failures
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.pythoninfo
 
-  # Run the upstream test suite, setting "WITHIN_PYTHON_RPM_BUILD" so that the
-  # our non-standard decorators take effect on the relevant tests:
-  #   @unittest._skipInRpmBuild(reason)
-  #   @unittest._expectedFailureInRpmBuild
+  # Run the upstream test suite
   # test_gdb skipped on armv7hl:
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1196181
   # test_gdb skipped on s390x:
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
   # test_asyncio skipped:
   #   https://bugs.python.org/issue35998
-  WITHIN_PYTHON_RPM_BUILD= \
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 \
     -x test_distutils \
