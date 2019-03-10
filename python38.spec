@@ -36,6 +36,17 @@ License: Python
 # WARNING: This does not change the package name and summary above
 %bcond_without flatpackage
 
+# When bootstrapping python3, we need to build setuptools.
+# but setuptools BR python3-devel and that brings in python3-rpm-generators;
+# python3-rpm-generators needs python3-setuptools, so we cannot have it yet.
+#
+# Procedure: https://fedoraproject.org/wiki/SIGs/Python/UpgradingPython
+#
+#   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
+#   setuptools are not available. Turn off the rpmwheels bcond until
+#   the two packages are built with wheels to get around the issue.
+%bcond_with bootstrap
+
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
 %bcond_without rpmwheels
@@ -75,10 +86,6 @@ License: Python
 %else
 %bcond_with valgrind
 %endif
-
-
-# Notes from bootstraping Python 3.7:
-# https://fedoraproject.org/wiki/SIGs/Python/UpgradingPython
 
 
 # =====================
@@ -396,8 +403,8 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 Requires: python-rpm-macros
 Requires: python3-rpm-macros
-Requires: python3-rpm-generators
 
+%if %{without bootstrap}
 # This is not "API" (packages that need setuptools should still BuildRequire it)
 # However some packages apparently can build both with and without setuptools
 # producing egg-info as file or directory (depending on setuptools presence).
@@ -406,6 +413,9 @@ Requires: python3-rpm-generators
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1623914
 # See https://fedoraproject.org/wiki/Packaging:Directory_Replacement
 Requires: python3-setuptools
+
+Requires: python3-rpm-generators
+%endif
 
 Provides: %{name}-2to3 = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
