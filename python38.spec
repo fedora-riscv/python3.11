@@ -978,6 +978,8 @@ CheckPython() {
   # our non-standard decorators take effect on the relevant tests:
   #   @unittest._skipInRpmBuild(reason)
   #   @unittest._expectedFailureInRpmBuild
+  # test_asyncio skipped:
+  #   https://bugs.python.org/issue35998
   WITHIN_PYTHON_RPM_BUILD= \
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 \
@@ -990,6 +992,7 @@ CheckPython() {
     %ifarch ppc64le
     -x test_buffer \
     %endif
+    -x test_asyncio \
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
