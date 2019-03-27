@@ -23,7 +23,7 @@ diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
 index e07a6c8..554740d 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -129,8 +129,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -140,8 +140,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
              prefix = plat_specific and EXEC_PREFIX or PREFIX
  
      if os.name == "posix":
@@ -108,7 +108,7 @@ diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
 index 266adf0..e8513b6 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -275,8 +275,8 @@ class HelperFunctionsTests(unittest.TestCase):
+@@ -266,8 +266,8 @@ class HelperFunctionsTests(unittest.TestCase):
          dirs = site.getsitepackages()
          if os.sep == '/':
              # OS X, Linux, FreeBSD, etc
@@ -123,7 +123,7 @@ diff --git a/Makefile.pre.in b/Makefile.pre.in
 index 59ba9d4..5780ed8 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -133,7 +133,7 @@ LIBDIR=		@libdir@
+@@ -140,7 +140,7 @@ LIBDIR=		@libdir@
  MANDIR=		@mandir@
  INCLUDEDIR=	@includedir@
  CONFINCLUDEDIR=	$(exec_prefix)/include
@@ -133,28 +133,28 @@ index 59ba9d4..5780ed8 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index 85e737b..2a1fc79 100644
+index dd188c6..6e69eed 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -500,7 +500,7 @@ calculate_exec_prefix(const _PyCoreConfig *core_config,
-                 "Could not find platform dependent libraries <exec_prefix>\n");
+@@ -688,7 +688,7 @@ calculate_exec_prefix(const _PyCoreConfig *core_config,
+         if (safe_wcscpy(exec_prefix, calculate->exec_prefix, exec_prefix_len) < 0) {
+             return PATHLEN_ERR();
          }
-         wcsncpy(exec_prefix, calculate->exec_prefix, MAXPATHLEN);
--        joinpath(exec_prefix, L"lib/lib-dynload");
-+        joinpath(exec_prefix, L"lib64/lib-dynload");
+-        err = joinpath(exec_prefix, L"lib/lib-dynload", exec_prefix_len);
++        err = joinpath(exec_prefix, L"lib64/lib-dynload", exec_prefix_len);
+         if (_Py_INIT_FAILED(err)) {
+             return err;
+         }
+@@ -1015,7 +1015,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix)
+             return PATHLEN_ERR();
+         }
      }
-     /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
- }
-@@ -742,7 +742,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix)
-     else {
-         wcsncpy(calculate->zip_path, calculate->prefix, MAXPATHLEN);
+-    err = joinpath(calculate->zip_path, L"lib/python00.zip", zip_path_len);
++    err = joinpath(calculate->zip_path, L"lib64/python00.zip", zip_path_len);
+     if (_Py_INIT_FAILED(err)) {
+         return err;
      }
--    joinpath(calculate->zip_path, L"lib/python00.zip");
-+    joinpath(calculate->zip_path, L"lib64/python00.zip");
- 
-     /* Replace "00" with version */
-     size_t bufsz = wcslen(calculate->zip_path);
-@@ -867,7 +867,7 @@ calculate_init(PyCalculatePath *calculate,
+@@ -1144,7 +1144,7 @@ calculate_init(PyCalculatePath *calculate,
      if (!calculate->prefix) {
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
@@ -164,29 +164,29 @@ index 85e737b..2a1fc79 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 diff --git a/setup.py b/setup.py
-index f1933f7..450cd8a 100644
+index 0258d3d..4b969bf 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -531,7 +531,7 @@ class PyBuildExt(build_ext):
+@@ -610,7 +610,7 @@ class PyBuildExt(build_ext):
          # directories (i.e. '.' and 'Include') must be first.  See issue
          # 10520.
-         if not cross_compiling:
+         if not CROSS_COMPILING:
 -            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
 +            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib64')
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
-         if cross_compiling:
-@@ -830,11 +830,11 @@ class PyBuildExt(build_ext):
+         if CROSS_COMPILING:
+@@ -902,11 +902,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
-             elif self.compiler.find_library_file(lib_dirs +
+             elif self.compiler.find_library_file(self.lib_dirs +
 -                                                     ['/usr/lib/termcap'],
 +                                                     ['/usr/lib64/termcap'],
                                                       'termcap'):
                  readline_libs.append('termcap')
-             exts.append( Extension('readline', ['readline.c'],
--                                   library_dirs=['/usr/lib/termcap'],
-+                                   library_dirs=['/usr/lib64/termcap'],
-                                    extra_link_args=readline_extra_link_args,
-                                    libraries=readline_libs) )
+             self.add(Extension('readline', ['readline.c'],
+-                               library_dirs=['/usr/lib/termcap'],
++                               library_dirs=['/usr/lib64/termcap'],
+                                extra_link_args=readline_extra_link_args,
+                                libraries=readline_libs))
          else:

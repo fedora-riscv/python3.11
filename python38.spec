@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a2
+%global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -379,8 +379,8 @@ Summary:        Python runtime libraries
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 18.1
-Provides: bundled(python3-setuptools) = 40.6.2
+Provides: bundled(python3-pip) = 19.0.3
+Provides: bundled(python3-setuptools) = 40.8.0
 %endif
 
 # There are files in the standard library that have python shebang.
@@ -521,8 +521,8 @@ so extensions for both versions can co-exist in the same directory.
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 18.1
-Provides: bundled(python3-setuptools) = 40.6.2
+Provides: bundled(python3-pip) = 19.0.3
+Provides: bundled(python3-setuptools) = 40.8.0
 %endif
 
 # The description for the flat package
@@ -1489,6 +1489,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Mar 26 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a3-1
+- Update to 3.8.0a3
+
 * Mon Feb 25 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a2-1
 - Update to 3.8.0a2
 

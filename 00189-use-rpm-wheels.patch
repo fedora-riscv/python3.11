@@ -16,9 +16,9 @@ index 4748ba4..fc02255 100644
  
 +_WHEEL_DIR = "/usr/share/python-wheels/"
  
--_SETUPTOOLS_VERSION = "40.6.2"
+-_SETUPTOOLS_VERSION = "40.8.0"
  
--_PIP_VERSION = "18.1"
+-_PIP_VERSION = "19.0.3"
 +def _get_most_recent_wheel_version(pkg):
 +    prefix = os.path.join(_WHEEL_DIR, "{}-".format(pkg))
 +    suffix = "-py2.py3-none-any.whl"
