@@ -868,6 +868,9 @@ ln -s \
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
 mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
 
+# make man python3.Xm work https://bugzilla.redhat.com/show_bug.cgi?id=1612241
+ln -s ./python%{pybasever}.1 %{buildroot}%{_mandir}/man1/python%{pybasever}m.1
+
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
