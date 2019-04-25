@@ -203,6 +203,10 @@ BuildRequires: python-setuptools-wheel
 BuildRequires: python-pip-wheel
 %endif
 
+%if %{without bootstrap}
+# for make regen-all
+BuildRequires: python3
+%endif
 
 # =======================
 # Source code and patches
@@ -632,8 +636,14 @@ BuildPython() {
   $ExtraConfigArgs \
   %{nil}
 
+%if %{without bootstrap}
+  # Regenerate generated files (needs python3)
+  %make_build regen-all PYTHON_FOR_REGEN="python3"
+%endif
+
+
   # Invoke the build
-  make EXTRA_CFLAGS="$CFLAGS $MoreCFlags" %{?_smp_mflags}
+  %make_build EXTRA_CFLAGS="$CFLAGS $MoreCFlags"
 
   popd
   echo FINISHED: BUILD OF PYTHON FOR CONFIGURATION: $ConfName
