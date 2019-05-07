@@ -1,7 +1,22 @@
-diff -up Python-3.5.0/Makefile.pre.in.lib Python-3.5.0/Makefile.pre.in
---- Python-3.5.0/Makefile.pre.in.lib	2015-09-21 15:39:47.928286620 +0200
-+++ Python-3.5.0/Makefile.pre.in	2015-09-21 15:42:58.004042762 +0200
-@@ -1340,7 +1340,7 @@ inclinstall:
+From 5ee8362bd5cc991b956efa9cf06eb6ad2607f57c Mon Sep 17 00:00:00 2001
+From: Robert Kuska <rkuska@redhat.com>
+Date: Mon, 21 Sep 2015 15:55:00 +0200
+Subject: [PATCH 6/9] 00205: Make LIBPL variable respect the libdir macro
+
+LIBPL variable in Makefile takes LIBPL from configure.ac,
+but the LIBPL variable defined there doesn't respect the libdir macro.
+
+Co-authored-by: Robert Kuska <rkuska@redhat.com>
+Co-authored-by: Charalampos Stratakis <cstratak@redhat.com>
+---
+ Makefile.pre.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 414aa96008..a07bd6718d 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -1512,7 +1512,7 @@ inclinstall:
  
  # Install the library and miscellaneous stuff needed for extending/embedding
  # This goes into $(exec_prefix)
@@ -10,3 +25,6 @@ diff -up Python-3.5.0/Makefile.pre.in.lib Python-3.5.0/Makefile.pre.in
  
  # pkgconfig directory
  LIBPC=		$(LIBDIR)/pkgconfig
+-- 
+2.21.0
+

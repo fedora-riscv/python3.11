@@ -1,19 +1,25 @@
-From 3b0d3a25576e74c2ac1eb25136ae811bdbdd7c6c Mon Sep 17 00:00:00 2001
-From: Tomas Orsava <torsava@redhat.com>
-Date: Thu, 14 Feb 2019 16:08:57 +0100
-Subject: [PATCH] Upstream uses Debian-style architecture naming. Change to
- match Fedora / RHEL
+From e108d7026aab241d89ff3a90d6421af3e9ee8e12 Mon Sep 17 00:00:00 2001
+From: Petr Viktorin <pviktori@redhat.com>
+Date: Mon, 28 Aug 2017 17:16:46 +0200
+Subject: [PATCH 8/9] 00274: Upstream uses Debian-style architecture naming,
+ change to match Fedora
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Co-authored-by: Petr Viktorin <pviktori@redhat.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+Co-authored-by: Tomas Orsava <torsava@redhat.com>
 ---
  config.sub   |  2 +-
  configure.ac | 16 ++++++++--------
  2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/config.sub b/config.sub
-index 40ea5df..932128b 100755
+index ba37cf99e2..52a9ec6662 100755
 --- a/config.sub
 +++ b/config.sub
-@@ -1045,7 +1045,7 @@ case $basic_machine in
+@@ -1042,7 +1042,7 @@ case $basic_machine in
  		;;
  	ppc64)	basic_machine=powerpc64-unknown
  		;;
@@ -23,10 +29,10 @@ index 40ea5df..932128b 100755
  	ppc64le | powerpc64little)
  		basic_machine=powerpc64le-unknown
 diff --git a/configure.ac b/configure.ac
-index a075ce3..b7f2ee3 100644
+index a02597da2d..5742ef4176 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -788,9 +788,9 @@ cat >> conftest.c <<EOF
+@@ -740,9 +740,9 @@ cat >> conftest.c <<EOF
          alpha-linux-gnu
  # elif defined(__ARM_EABI__) && defined(__ARM_PCS_VFP)
  #  if defined(__ARMEL__)
@@ -38,7 +44,7 @@ index a075ce3..b7f2ee3 100644
  #  endif
  # elif defined(__ARM_EABI__) && !defined(__ARM_PCS_VFP)
  #  if defined(__ARMEL__)
-@@ -810,7 +810,7 @@ cat >> conftest.c <<EOF
+@@ -782,7 +782,7 @@ cat >> conftest.c <<EOF
  #  elif _MIPS_SIM == _ABIN32
          mips64el-linux-gnuabin32
  #  elif _MIPS_SIM == _ABI64
@@ -47,7 +53,7 @@ index a075ce3..b7f2ee3 100644
  #  else
  #   error unknown platform triplet
  #  endif
-@@ -820,22 +820,22 @@ cat >> conftest.c <<EOF
+@@ -792,22 +792,22 @@ cat >> conftest.c <<EOF
  #  elif _MIPS_SIM == _ABIN32
          mips64-linux-gnuabin32
  #  elif _MIPS_SIM == _ABI64
@@ -76,5 +82,5 @@ index a075ce3..b7f2ee3 100644
          s390x-linux-gnu
  # elif defined(__s390__)
 -- 
-2.20.1
+2.21.0
 

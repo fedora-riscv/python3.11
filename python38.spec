@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a3
+%global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -97,8 +97,8 @@ License: Python
 
 # ABIFLAGS, LDVERSION and SOABI are in the upstream configure.ac
 # See PEP 3149 for some background: http://www.python.org/dev/peps/pep-3149/
-%global ABIFLAGS_optimized m
-%global ABIFLAGS_debug     dm
+%global ABIFLAGS_optimized %{nil}
+%global ABIFLAGS_debug     d
 
 %global LDVERSION_optimized %{pybasever}%{ABIFLAGS_optimized}
 %global LDVERSION_debug     %{pybasever}%{ABIFLAGS_debug}
@@ -279,6 +279,10 @@ Patch316: 00316-mark-bdist_wininst-unsupported.patch
 # More information, and a patch number catalog, is at:
 #
 #     https://fedoraproject.org/wiki/SIGs/Python/PythonPatches
+#
+# The patches are stored and rebased at:
+#
+#     https://github.com/fedora-python/cpython
 
 
 # ==========================================
@@ -868,9 +872,6 @@ ln -s \
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
 mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
 
-# make man python3.Xm work https://bugzilla.redhat.com/show_bug.cgi?id=1612241
-ln -s ./python%{pybasever}.1 %{buildroot}%{_mandir}/man1/python%{pybasever}m.1
-
 %if %{with flatpackage}
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
@@ -992,7 +993,7 @@ CheckPython optimized
 %endif
 
 %{_bindir}/python%{pybasever}
-%{_bindir}/python%{pybasever}m
+%{_bindir}/python%{LDVERSION_optimized}
 %{_mandir}/*/*
 
 
@@ -1131,7 +1132,6 @@ CheckPython optimized
 %{dynload_dir}/spwd.%{SOABI_optimized}.so
 %{dynload_dir}/syslog.%{SOABI_optimized}.so
 %{dynload_dir}/termios.%{SOABI_optimized}.so
-%{dynload_dir}/_testmultiphase.%{SOABI_optimized}.so
 %{dynload_dir}/unicodedata.%{SOABI_optimized}.so
 %{dynload_dir}/_uuid.%{SOABI_optimized}.so
 %{dynload_dir}/xxlimited.%{SOABI_optimized}.so
@@ -1308,6 +1308,8 @@ CheckPython optimized
 %{dynload_dir}/_testbuffer.%{SOABI_optimized}.so
 %{dynload_dir}/_testcapi.%{SOABI_optimized}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_optimized}.so
+%{dynload_dir}/_testinternalcapi.%{SOABI_optimized}.so
+%{dynload_dir}/_testmultiphase.%{SOABI_optimized}.so
 %{dynload_dir}/_xxtestfuzz.%{SOABI_optimized}.so
 %{pylibdir}/lib2to3/tests
 %{pylibdir}/tkinter/test
@@ -1405,7 +1407,6 @@ CheckPython optimized
 %{dynload_dir}/spwd.%{SOABI_debug}.so
 %{dynload_dir}/syslog.%{SOABI_debug}.so
 %{dynload_dir}/termios.%{SOABI_debug}.so
-%{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 %{dynload_dir}/unicodedata.%{SOABI_debug}.so
 %{dynload_dir}/_uuid.%{SOABI_debug}.so
 %{dynload_dir}/_xxsubinterpreters.%{SOABI_debug}.so
@@ -1439,6 +1440,8 @@ CheckPython optimized
 %{dynload_dir}/_testbuffer.%{SOABI_debug}.so
 %{dynload_dir}/_testcapi.%{SOABI_debug}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_debug}.so
+%{dynload_dir}/_testinternalcapi.%{SOABI_debug}.so
+%{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 
 %endif # with debug_build
 
@@ -1463,6 +1466,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue May 07 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-1
+- Update to 3.8.0a4
+
 * Tue Mar 26 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a3-1
 - Update to 3.8.0a3
 

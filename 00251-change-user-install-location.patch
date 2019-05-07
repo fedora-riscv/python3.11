@@ -1,11 +1,26 @@
+From e9d8db2d243cf27b66083e0c6a9bb5d28866f937 Mon Sep 17 00:00:00 2001
+From: Michal Cyprian <m.cyprian@gmail.com>
+Date: Mon, 26 Jun 2017 16:32:56 +0200
+Subject: [PATCH 7/9] 00251: Change user install location
+
+Set values of prefix and exec_prefix in distutils install command
+to /usr/local if executable is /usr/bin/python* and RPM build
+is not detected to make pip and distutils install into separate location.
+
+Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+---
+ Lib/distutils/command/install.py | 15 +++++++++++++--
+ Lib/site.py                      |  9 ++++++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 0258d3d..4ebf50a 100644
+index ae4f915669..0e4fd5b74a 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -418,8 +418,19 @@ class install(Command):
                      raise DistutilsOptionError(
                            "must not supply exec-prefix without prefix")
-
+ 
 -                self.prefix = os.path.normpath(sys.prefix)
 -                self.exec_prefix = os.path.normpath(sys.exec_prefix)
 +                # self.prefix is set to sys.prefix + /local/
@@ -21,16 +36,16 @@ index 0258d3d..4ebf50a 100644
 +
 +                self.prefix = os.path.normpath(sys.prefix) + addition
 +                self.exec_prefix = os.path.normpath(sys.exec_prefix) + addition
-
+ 
              else:
                  if self.exec_prefix is None:
 diff --git a/Lib/site.py b/Lib/site.py
-index 0fc9200..c95202e 100644
+index 99149a564f..1107324848 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -322,7 +322,14 @@ def getsitepackages(prefixes=None):
+@@ -347,7 +347,14 @@ def getsitepackages(prefixes=None):
      return sitepackages
-
+ 
  def addsitepackages(known_paths, prefixes=None):
 -    """Add site-packages to sys.path"""
 +    """Add site-packages to sys.path
@@ -44,3 +59,6 @@ index 0fc9200..c95202e 100644
      for sitedir in getsitepackages(prefixes):
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
+-- 
+2.21.0
+

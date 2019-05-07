@@ -1,7 +1,21 @@
-diff -r 39b9b05c3085 Lib/distutils/sysconfig.py
---- a/Lib/distutils/sysconfig.py	Wed Apr 10 00:27:23 2013 +0200
-+++ b/Lib/distutils/sysconfig.py	Wed Apr 10 10:14:18 2013 +0200
-@@ -362,7 +362,10 @@
+From b9a703e3d37e325defe5baec111e1fbf5d42bede Mon Sep 17 00:00:00 2001
+From: Bohuslav Kabrda <bkabrda@redhat.com>
+Date: Wed, 10 Apr 2013 14:30:09 +0200
+Subject: [PATCH 4/9] 00178: Don't duplicate various FLAGS in sysconfig values
+
+http://bugs.python.org/issue17679
+
+Does not affect python2 AFAICS (different sysconfig values initialization)
+---
+ Lib/distutils/sysconfig.py | 5 ++++-
+ Lib/sysconfig.py           | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 9a4892a737..ad4cef088b 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -373,7 +373,10 @@ def parse_makefile(fn, g=None):
                      done[n] = item = ""
                  if found:
                      after = value[m.end():]
@@ -13,10 +27,11 @@ diff -r 39b9b05c3085 Lib/distutils/sysconfig.py
                      if "$" in after:
                          notdone[name] = value
                      else:
-diff -r 39b9b05c3085 Lib/sysconfig.py
---- a/Lib/sysconfig.py	Wed Apr 10 00:27:23 2013 +0200
-+++ b/Lib/sysconfig.py	Wed Apr 10 10:14:18 2013 +0200
-@@ -296,7 +296,10 @@
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index cf64d79c4d..fd972d658c 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -295,7 +295,10 @@ def _parse_makefile(filename, vars=None):
  
                  if found:
                      after = value[m.end():]
@@ -28,3 +43,6 @@ diff -r 39b9b05c3085 Lib/sysconfig.py
                      if "$" in after:
                          notdone[name] = value
                      else:
+-- 
+2.21.0
+

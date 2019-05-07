@@ -1,5 +1,16 @@
+From 1ef328c38ad0ef7fad1652edddd3710885b0a778 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Thu, 20 Dec 2018 12:46:25 +0100
+Subject: [PATCH 9/9] 00316: Mark bdist_wininst unsupported
+
+We remove the exe files from distutil's bdist_wininst.
+So we mark the command as unsupported - and the tests are skipped.
+---
+ Lib/distutils/command/bdist_wininst.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
 diff --git a/Lib/distutils/command/bdist_wininst.py b/Lib/distutils/command/bdist_wininst.py
-index 0871a4f..8796b68 100644
+index 3a616883be..ba299a4028 100644
 --- a/Lib/distutils/command/bdist_wininst.py
 +++ b/Lib/distutils/command/bdist_wininst.py
 @@ -12,6 +12,8 @@ from distutils.sysconfig import get_python_version
@@ -11,3 +22,6 @@ index 0871a4f..8796b68 100644
  
      description = "create an executable installer for MS Windows"
  
+-- 
+2.21.0
+

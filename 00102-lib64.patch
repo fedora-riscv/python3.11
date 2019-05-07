@@ -1,5 +1,37 @@
+From 972d1ce207285b7b29407b95ea6519c289c71d89 Mon Sep 17 00:00:00 2001
+From: David Malcolm <dmalcolm@redhat.com>
+Date: Wed, 13 Jan 2010 21:25:18 +0000
+Subject: [PATCH 2/9] 00102: Change the various install paths to use
+ /usr/lib64/ instead or /usr/lib/
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Only used when "%{_lib}" == "lib64".
+
+Co-authored-by: David Malcolm <dmalcolm@redhat.com>
+Co-authored-by: Thomas Spura <tomspur@fedoraproject.org>
+Co-authored-by: Slavek Kabrda <bkabrda@redhat.com>
+Co-authored-by: Matej Stuchlik <mstuchli@redhat.com>
+Co-authored-by: Tomas Orsava <torsava@redhat.com>
+Co-authored-by: Charalampos Stratakis <cstratak@redhat.com>
+Co-authored-by: Petr Viktorin <pviktori@redhat.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+Co-authored-by: Iryna Shcherbina <shcherbina.iryna@gmail.com>
+---
+ Lib/distutils/command/install.py    |  4 ++--
+ Lib/distutils/sysconfig.py          |  6 +++++-
+ Lib/distutils/tests/test_install.py |  3 ++-
+ Lib/site.py                         |  4 ++++
+ Lib/sysconfig.py                    | 12 ++++++------
+ Lib/test/test_site.py               |  4 ++--
+ Makefile.pre.in                     |  2 +-
+ Modules/getpath.c                   |  6 +++---
+ setup.py                            |  6 +++---
+ 9 files changed, 28 insertions(+), 19 deletions(-)
+
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 0258d3d..4b969bf 100644
+index c625c95bf7..ae4f915669 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -30,14 +30,14 @@ WINDOWS_SCHEME = {
@@ -20,10 +52,10 @@ index 0258d3d..4b969bf 100644
          'scripts': '$base/bin',
          'data'   : '$base',
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index e07a6c8..554740d 100644
+index b51629eb94..9a4892a737 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -140,8 +140,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -146,8 +146,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
              prefix = plat_specific and EXEC_PREFIX or PREFIX
  
      if os.name == "posix":
@@ -38,7 +70,7 @@ index e07a6c8..554740d 100644
              return libpython
          else:
 diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
-index 287ab19..d4c05e0 100644
+index 287ab1989e..d4c05e0ab1 100644
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
 @@ -57,8 +57,9 @@ class InstallTestCase(support.TempdirManager,
@@ -53,7 +85,7 @@ index 287ab19..d4c05e0 100644
          check_path(cmd.install_headers,
                     os.path.join(destination, "include", "python", "foopkg"))
 diff --git a/Lib/site.py b/Lib/site.py
-index 7dc1b04..85016b4 100644
+index ad1146332b..99149a564f 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -334,11 +334,15 @@ def getsitepackages(prefixes=None):
@@ -73,7 +105,7 @@ index 7dc1b04..85016b4 100644
      return sitepackages
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 9ee4d31..53c8606 100644
+index 8446c8deb2..cf64d79c4d 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -20,10 +20,10 @@ __all__ = [
@@ -105,7 +137,7 @@ index 9ee4d31..53c8606 100644
          'scripts': '{userbase}/bin',
          'data': '{userbase}',
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index 266adf0..e8513b6 100644
+index 41c4229919..543c88432a 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -266,8 +266,8 @@ class HelperFunctionsTests(unittest.TestCase):
@@ -120,10 +152,10 @@ index 266adf0..e8513b6 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 59ba9d4..5780ed8 100644
+index 75eb66be3c..f1e21784af 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -140,7 +140,7 @@ LIBDIR=		@libdir@
+@@ -143,7 +143,7 @@ LIBDIR=		@libdir@
  MANDIR=		@mandir@
  INCLUDEDIR=	@includedir@
  CONFINCLUDEDIR=	$(exec_prefix)/include
@@ -133,7 +165,7 @@ index 59ba9d4..5780ed8 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index dd188c6..6e69eed 100644
+index 3991ad719c..1baf8a2ff4 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
 @@ -688,7 +688,7 @@ calculate_exec_prefix(const _PyCoreConfig *core_config,
@@ -164,7 +196,7 @@ index dd188c6..6e69eed 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 diff --git a/setup.py b/setup.py
-index 0258d3d..4b969bf 100644
+index 96a49b4e35..64420838af 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -610,7 +610,7 @@ class PyBuildExt(build_ext):
@@ -176,7 +208,7 @@ index 0258d3d..4b969bf 100644
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
          if CROSS_COMPILING:
-@@ -902,11 +902,11 @@ class PyBuildExt(build_ext):
+@@ -906,11 +906,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(self.lib_dirs +
@@ -190,3 +222,6 @@ index 0258d3d..4b969bf 100644
                                 extra_link_args=readline_extra_link_args,
                                 libraries=readline_libs))
          else:
+-- 
+2.21.0
+
