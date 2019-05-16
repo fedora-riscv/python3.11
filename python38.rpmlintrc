@@ -72,7 +72,9 @@ addFilter(r'read-error /usr/lib(64)?/pkgconfig/python-3\.\ddm\.pc \[Errno 2\]')
 addFilter(r'macro-in-comment %\{_pyconfig(32|64)_h\}')
 
 # Python modules don't need to be linked against libc
+# Since 3.8 they are no longer linked against libpython3.8.so.1.0
 addFilter(r'E: library-not-linked-against-libc /usr/lib(64)?/python3.\d/lib-dynload/')
+addFilter(r'E: shared-lib-without-dependency-information /usr/lib(64)?/python3.\d/lib-dynload/')
 
 # SPELLING ERRORS
 addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
