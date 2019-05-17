@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -243,21 +243,10 @@ Patch102: 00102-lib64.patch
 # Downstream only: not appropriate for upstream
 Patch111: 00111-no-static-lib.patch
 
-# 00178 #
-# Don't duplicate various FLAGS in sysconfig values
-# http://bugs.python.org/issue17679
-# Does not affect python2 AFAICS (different sysconfig values initialization)
-Patch178: 00178-dont-duplicate-flags-in-sysconfig.patch
-
 # 00189 #
 # Instead of bundled wheels, use our RPM packaged wheels from
 # /usr/share/python-wheels
 Patch189: 00189-use-rpm-wheels.patch
-
-# 00205 #
-# LIBPL variable in makefile takes LIBPL from configure.ac
-# but the LIBPL variable defined there doesn't respect libdir macro
-Patch205: 00205-make-libpl-respect-lib64.patch
 
 # 00251
 # Set values of prefix and exec_prefix in distutils install command
@@ -539,14 +528,12 @@ rm -r Modules/expat
 %patch102 -p1
 %endif
 %patch111 -p1
-%patch178 -p1
 
 %if %{with rpmwheels}
 %patch189 -p1
 rm Lib/ensurepip/_bundled/*.whl
 %endif
 
-%patch205 -p1
 %patch251 -p1
 %patch274 -p1
 %patch316 -p1
@@ -1476,6 +1463,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri May 17 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-2
+- Remove a faulty patch that resulted in invalid value of
+  distutils.sysconfig.get_config_var('LIBPL') (#1710767)
+
 * Tue May 07 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-1
 - Update to 3.8.0a4
 

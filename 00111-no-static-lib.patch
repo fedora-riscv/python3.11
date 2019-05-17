@@ -1,7 +1,7 @@
-From 031249155111abf6e971fff6516c4e828c394c05 Mon Sep 17 00:00:00 2001
+From 0acdfa7c697ffb1087ded14819c7dcfe4784ca7c Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
-Subject: [PATCH 3/9] 00111: Don't try to build a libpythonMAJOR.MINOR.a
+Subject: [PATCH 3/7] 00111: Don't try to build a libpythonMAJOR.MINOR.a
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
