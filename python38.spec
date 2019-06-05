@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a4
+%global prerel b1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -882,6 +882,7 @@ rm %{buildroot}%{_bindir}/2to3
 rm %{buildroot}%{_libdir}/libpython3.so
 rm %{buildroot}%{_mandir}/man1/python3.1*
 rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
+rm %{buildroot}%{_libdir}/pkgconfig/python3-embed.pc
 %endif
 
 
@@ -1184,6 +1185,11 @@ CheckPython optimized
 %{pylibdir}/importlib/*.py
 %{pylibdir}/importlib/__pycache__/*%{bytecode_suffixes}
 
+%dir %{pylibdir}/importlib/metadata/
+%dir %{pylibdir}/importlib/metadata/__pycache__/
+%{pylibdir}/importlib/metadata/*.py
+%{pylibdir}/importlib/metadata/__pycache__/*%{bytecode_suffixes}
+
 %dir %{pylibdir}/json/
 %dir %{pylibdir}/json/__pycache__/
 %{pylibdir}/json/*.py
@@ -1243,6 +1249,7 @@ CheckPython optimized
 %if %{without flatpackage}
 %{_bindir}/python3-config
 %{_libdir}/pkgconfig/python3.pc
+%{_libdir}/pkgconfig/python3-embed.pc
 %{_bindir}/pathfix.py
 %{_bindir}/pygettext3.py
 %{_bindir}/msgfmt3.py
@@ -1256,7 +1263,9 @@ CheckPython optimized
 %{_bindir}/python%{LDVERSION_optimized}-*-config
 %{_libdir}/libpython%{LDVERSION_optimized}.so
 %{_libdir}/pkgconfig/python-%{LDVERSION_optimized}.pc
+%{_libdir}/pkgconfig/python-%{LDVERSION_optimized}-embed.pc
 %{_libdir}/pkgconfig/python-%{pybasever}.pc
+%{_libdir}/pkgconfig/python-%{pybasever}-embed.pc
 
 
 %if %{without flatpackage}
@@ -1424,6 +1433,7 @@ CheckPython optimized
 %{_libdir}/libpython%{LDVERSION_debug}.so
 %{_libdir}/libpython%{LDVERSION_debug}.so.1.0
 %{_libdir}/pkgconfig/python-%{LDVERSION_debug}.pc
+%{_libdir}/pkgconfig/python-%{LDVERSION_debug}-embed.pc
 
 # Analog of the -tools subpackage's files:
 #  None for now; we could build precanned versions that have the appropriate
@@ -1463,6 +1473,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jun 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b1-1
+- Update to 3.8.0b1
+
 * Fri May 17 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-2
 - Remove a faulty patch that resulted in invalid value of
   distutils.sysconfig.get_config_var('LIBPL') (#1710767)
