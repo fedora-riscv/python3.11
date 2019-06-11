@@ -954,8 +954,6 @@ CheckPython() {
   #   https://bugs.python.org/issue35998
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 \
-    -x test_distutils \
-    -x test_bdist_rpm \
     %ifarch %{arm} s390x
     -x test_gdb \
     %endif
