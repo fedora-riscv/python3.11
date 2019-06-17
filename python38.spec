@@ -204,8 +204,8 @@ BuildRequires: python-pip-wheel
 %endif
 
 %if %{without bootstrap}
-# for make regen-all
-BuildRequires: python3
+# for make regen-all and distutils.tests.test_bdist_rpm
+BuildRequires: python%{pyshortver}
 %endif
 
 # =======================
@@ -625,7 +625,7 @@ BuildPython() {
 
 %if %{without bootstrap}
   # Regenerate generated files (needs python3)
-  %make_build regen-all PYTHON_FOR_REGEN="python3"
+  %make_build regen-all PYTHON_FOR_REGEN="python%{pybasever}"
 %endif
 
 
@@ -952,8 +952,14 @@ CheckPython() {
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
   # test_asyncio skipped:
   #   https://bugs.python.org/issue35998
+  # test_distutils
+  #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
+  #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 \
+    %if %{with bootstrap}
+    -x test_distutils \
+    %endif
     %ifarch %{arm} s390x
     -x test_gdb \
     %endif
