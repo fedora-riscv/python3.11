@@ -925,12 +925,6 @@ CheckPython() {
   ConfName=$1
   ConfDir=$(pwd)/build/$ConfName
 
-  # Fedora sets TLSv1 as explicit minimum version.
-  # Python's test suite assumes that the minimum protocol version is set to
-  # a magic marker. We workaround the test problem by setting:
-  export OPENSSL_CONF=/non-existing-file
-  # https://bugzilla.redhat.com/show_bug.cgi?id=1618753
-
   echo STARTING: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
   # Note that we're running the tests using the version of the code in the
