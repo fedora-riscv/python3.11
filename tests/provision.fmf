@@ -1,0 +1,4 @@
+---
+standard-inventory-qcow2:
+  qemu:
+    m: 3G  # Amount of VM memory
