@@ -1,4 +1,4 @@
-From 56d0cce46e634840578af18492f3dffea55774a5 Mon Sep 17 00:00:00 2001
+From 2edaa31dec042fb8720add80814ca4a3cc4f788f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH 4/7] 00189: Instead of bundled wheels, use our RPM packaged
@@ -10,7 +10,7 @@ We keep them in /usr/share/python-wheels
  1 file changed, 17 insertions(+), 9 deletions(-)
 
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index 526dfd004a..fc02255feb 100644
+index 6f2569da81..4d17e413db 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
 @@ -1,16 +1,27 @@
@@ -44,7 +44,7 @@ index 526dfd004a..fc02255feb 100644
  
  _PROJECTS = [
      ("setuptools", _SETUPTOOLS_VERSION),
-@@ -94,12 +105,9 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+@@ -96,12 +107,9 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          additional_paths = []
          for project, version in _PROJECTS:
              wheel_name = "{}-{}-py2.py3-none-any.whl".format(project, version)

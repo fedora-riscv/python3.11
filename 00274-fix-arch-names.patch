@@ -1,4 +1,4 @@
-From d63983e350f673cf9a5f4267e73475535432ebe7 Mon Sep 17 00:00:00 2001
+From b92e29a8cc17f9c02a08b7a005e5ece71a409a0b Mon Sep 17 00:00:00 2001
 From: Petr Viktorin <pviktori@redhat.com>
 Date: Mon, 28 Aug 2017 17:16:46 +0200
 Subject: [PATCH 6/7] 00274: Upstream uses Debian-style architecture naming,
@@ -29,7 +29,7 @@ index ba37cf99e2..52a9ec6662 100755
  	ppc64le | powerpc64little)
  		basic_machine=powerpc64le-unknown
 diff --git a/configure.ac b/configure.ac
-index 3bb44e6993..98b5e32ad9 100644
+index 9a587f3c3f..695ff85e4b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -741,9 +741,9 @@ cat >> conftest.c <<EOF

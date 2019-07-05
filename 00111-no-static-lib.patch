@@ -1,4 +1,4 @@
-From 79544450450248e4967a8b41aa6d08d32d5cd41a Mon Sep 17 00:00:00 2001
+From efbafc6328f45da6d38a1848933a37497206fb3f Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
 Subject: [PATCH 3/7] 00111: Don't try to build a libpythonMAJOR.MINOR.a
@@ -21,7 +21,7 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 780118c410..3431ca815e 100644
+index 6c2edf32f7..28c0cead24 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -560,7 +560,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
@@ -55,7 +55,7 @@ index 780118c410..3431ca815e 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1546,17 +1540,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1551,17 +1545,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

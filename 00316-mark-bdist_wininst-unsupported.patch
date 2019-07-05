@@ -1,4 +1,4 @@
-From 736a0ca9fd2ee3f74ebdef187c5616288cc70351 Mon Sep 17 00:00:00 2001
+From b4bb0385ffcfafb2a203b0863777b135d37feb3a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Thu, 20 Dec 2018 12:46:25 +0100
 Subject: [PATCH 7/7] 00316: Mark bdist_wininst unsupported
@@ -10,7 +10,7 @@ So we mark the command as unsupported - and the tests are skipped.
  1 file changed, 2 insertions(+)
 
 diff --git a/Lib/distutils/command/bdist_wininst.py b/Lib/distutils/command/bdist_wininst.py
-index 3a616883be..ba299a4028 100644
+index acaa184b5f..6b458cb364 100644
 --- a/Lib/distutils/command/bdist_wininst.py
 +++ b/Lib/distutils/command/bdist_wininst.py
 @@ -12,6 +12,8 @@ from distutils.sysconfig import get_python_version

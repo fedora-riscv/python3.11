@@ -1,4 +1,4 @@
-From 1b28c83def441be0e9377058b9a29a1ea3558ae0 Mon Sep 17 00:00:00 2001
+From 6a503d0ad4512af57ef8a784f12bc439701d8cc7 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH 2/7] 00102: Change the various install paths to use
@@ -87,10 +87,10 @@ index 287ab1989e..d4c05e0ab1 100644
          check_path(cmd.install_headers,
                     os.path.join(destination, "include", "python", "foopkg"))
 diff --git a/Lib/site.py b/Lib/site.py
-index ad1146332b..99149a564f 100644
+index a065ab0b5d..22d53fa562 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -334,11 +334,15 @@ def getsitepackages(prefixes=None):
+@@ -335,11 +335,15 @@ def getsitepackages(prefixes=None):
          seen.add(prefix)
  
          if os.sep == '/':
@@ -107,7 +107,7 @@ index ad1146332b..99149a564f 100644
      return sitepackages
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 8446c8deb2..cf64d79c4d 100644
+index e76e6927cb..0cfbea54b9 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -20,10 +20,10 @@ __all__ = [
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index a0bc9c1f1c..780118c410 100644
+index 88abb56360..6c2edf32f7 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -198,10 +198,10 @@ index 5f80738188..73d7913441 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 diff --git a/configure b/configure
-index b606fc808c..50b578a551 100755
+index 6e7f277bac..6cd8344c21 100755
 --- a/configure
 +++ b/configure
-@@ -15175,9 +15175,9 @@ fi
+@@ -15181,9 +15181,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index b606fc808c..50b578a551 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index 3d589ac258..3bb44e6993 100644
+index 324ce0bd99..9a587f3c3f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4649,9 +4649,9 @@ fi
+@@ -4655,9 +4655,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -230,7 +230,7 @@ index 3d589ac258..3bb44e6993 100644
  AC_SUBST(LIBPL)
  
 diff --git a/setup.py b/setup.py
-index 598f5819f8..0685620484 100644
+index edc3434242..59cfc01a2a 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -648,7 +648,7 @@ class PyBuildExt(build_ext):
