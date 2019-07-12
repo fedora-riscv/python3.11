@@ -304,6 +304,18 @@ Provides: python%{pyshortver} = %{version}-%{release}
 # replace python36-3.6.2.
 Obsoletes: python%{pyshortver}
 
+# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+# https://fedoraproject.org/wiki/Changes/Python_means_Python3
+# We recommend /usr/bin/python so users get it by default
+# Versioned recommends are problematic, and we know that the package requires
+# python3 back with fixed version, so we just use the path here:
+Recommends: %{_bindir}/python
+
+# In Fedora 31, /usr/bin/pydoc was moved here from Python 2.
+# Ideally we'd have an explicit conflict with "/usr/bin/pydoc < 3",
+# but file provides aren't versioned and the file moved across packages.
+# Instead, we rely on the conflict in python3-libs.
+
 # Previously, this was required for our rewheel patch to work.
 # This is technically no longer needed, but we keep it recommended
 # for the developer experience.
@@ -339,6 +351,22 @@ Packages containing additional libraries for Python are generally named with
 the "%{name}-" prefix.
 
 
+# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+# https://fedoraproject.org/wiki/Changes/Python_means_Python3
+%package -n python-unversioned-command
+Summary: The "python" command that runs Python 3
+BuildArch: noarch
+
+# In theory this could require any python3 version
+Requires: python3 == %{version}-%{release}
+# But since we want to provide versioned python, we require exact version
+Provides: python = %{version}-%{release}
+# This also save us an explicit conflict for older python3 builds
+
+%description -n python-unversioned-command
+This package contains /usr/bin/python - the "python" command that runs Python 3.
+
+
 %package libs
 Summary:        Python runtime libraries
 
@@ -357,6 +385,18 @@ Provides: bundled(python3-setuptools) = 40.8.0
 # the main package. This however makes it pulled in by default.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
 Recommends: %{name}%{?_isa} = %{version}-%{release}
+
+# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+# In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
+# "unversioned" provides were moved from python2 to python3.
+# So, newer python3 packages need to conflict with old Python 2 builds that
+# still provided unversioned Python.
+# Since all python packages, new and old, have versioned requires on
+# python?-libs, we do it here:
+Conflicts: python-libs < 3
+# (We explicitly conflict with python-libs and not python2-libs, so only the
+# old Python 2 builds that still provided unversioned Python are handled.)
+
 
 %description libs
 This package contains runtime libraries for use by Python:
@@ -393,6 +433,10 @@ Provides: 2to3 = %{version}-%{release}
 
 Conflicts: %{name} < %{version}-%{release}
 
+# In Fedora 31, several "unversioned" files were moved here from Python 2:
+# pygettext.py, msgfmt.py, python-config, python.pc
+Conflicts: python-devel < 3
+
 %description devel
 This package contains the header files and configuration needed to compile
 Python extension modules (typically written in C or C++), to embed Python
@@ -408,10 +452,14 @@ Requires: %{name} = %{version}-%{release}
 Requires: %{name}-tkinter = %{version}-%{release}
 
 Provides: idle3 = %{version}-%{release}
+Provides: idle = %{version}-%{release}
 
 Provides: %{name}-tools = %{version}-%{release}
 Provides: %{name}-tools%{?_isa} = %{version}-%{release}
 Obsoletes: %{name}-tools < %{version}-%{release}
+
+# In Fedora 31, /usr/bin/idle was moved here from Python 2.
+Conflicts: python-tools < 3
 
 %{?python_provide:%python_provide python3-idle}
 
@@ -467,6 +515,9 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: %{name}-test%{?_isa} = %{version}-%{release}
 Requires: %{name}-tkinter%{?_isa} = %{version}-%{release}
 Requires: %{name}-idle%{?_isa} = %{version}-%{release}
+
+# In Fedora 31, /usr/bin/python-debug was moved here from Python 2.
+Conflicts: python-debug < 3
 
 %{?python_provide:%python_provide python3-debug}
 
@@ -892,6 +943,20 @@ rm %{buildroot}%{_libdir}/libpython3.so
 rm %{buildroot}%{_mandir}/man1/python3.1*
 rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
 rm %{buildroot}%{_libdir}/pkgconfig/python3-embed.pc
+%else
+# Link the unversioned stuff
+# https://fedoraproject.org/wiki/Changes/Python_means_Python3
+ln -s ./python3 %{buildroot}%{_bindir}/python
+ln -s ./pydoc3 %{buildroot}%{_bindir}/pydoc
+ln -s ./pygettext3.py %{buildroot}%{_bindir}/pygettext.py
+ln -s ./msgfmt3.py %{buildroot}%{_bindir}/msgfmt.py
+ln -s ./idle3 %{buildroot}%{_bindir}/idle
+ln -s ./python3-config %{buildroot}%{_bindir}/python-config
+ln -s ./python3.1 %{buildroot}%{_mandir}/man1/python.1
+ln -s ./python3.pc %{buildroot}%{_libdir}/pkgconfig/python.pc
+%if %{with debug_build}
+ln -s ./python3-debug %{buildroot}%{_bindir}/python-debug
+%endif
 %endif
 
 
@@ -999,10 +1064,14 @@ CheckPython optimized
 
 %{_bindir}/python%{pybasever}
 %{_bindir}/python%{LDVERSION_optimized}
-%{_mandir}/*/*
+%{_mandir}/*/*3*
 
 
 %if %{without flatpackage}
+%files -n python-unversioned-command
+%{_bindir}/python
+%{_mandir}/*/python.1*
+
 %files libs
 %license LICENSE
 %doc README.rst
@@ -1255,11 +1324,15 @@ CheckPython optimized
 
 %if %{without flatpackage}
 %{_bindir}/python3-config
+%{_bindir}/python-config
 %{_libdir}/pkgconfig/python3.pc
+%{_libdir}/pkgconfig/python.pc
 %{_libdir}/pkgconfig/python3-embed.pc
 %{_bindir}/pathfix.py
 %{_bindir}/pygettext3.py
+%{_bindir}/pygettext.py
 %{_bindir}/msgfmt3.py
+%{_bindir}/msgfmt.py
 %endif
 
 %{_bindir}/pygettext%{pybasever}.py
@@ -1348,6 +1421,7 @@ CheckPython optimized
 %if %{without flatpackage}
 %files debug
 %{_bindir}/python3-debug
+%{_bindir}/python-debug
 %endif
 
 # Analog of the core subpackage's files:
