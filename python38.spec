@@ -1116,20 +1116,6 @@ CheckPython optimized
 %{pylibdir}/ensurepip/_bundled/*.whl
 %endif
 
-# The majority of the test module lives in the test subpackage
-# However test.support is in libs - it contains stuff used when testing your code
-# https://bugzilla.redhat.com/show_bug.cgi?id=596258
-%if %{without flatpackage}
-%dir %{pylibdir}/test/
-%dir %{pylibdir}/test/__pycache__/
-%dir %{pylibdir}/test/support/
-%dir %{pylibdir}/test/support/__pycache__/
-%{pylibdir}/test/__init__.py
-%{pylibdir}/test/__pycache__/__init__%{bytecode_suffixes}
-%{pylibdir}/test/support/*.py
-%{pylibdir}/test/support/__pycache__/*%{bytecode_suffixes}
-%endif
-
 %dir %{pylibdir}/concurrent/
 %dir %{pylibdir}/concurrent/__pycache__/
 %{pylibdir}/concurrent/*.py
@@ -1400,16 +1386,6 @@ CheckPython optimized
 %{pylibdir}/lib2to3/tests
 %{pylibdir}/tkinter/test
 %{pylibdir}/unittest/test
-
-# stuff already owned by the libs subpackage
-# test requires libs, so we are safe not owning those dirs
-%if %{without flatpackage}
-%exclude %dir %{pylibdir}/test/
-%exclude %dir %{pylibdir}/test/__pycache__/
-%exclude %{pylibdir}/test/__init__.py
-%exclude %{pylibdir}/test/__pycache__/__init__%{bytecode_suffixes}
-%exclude %{pylibdir}/test/support/
-%endif
 
 # We don't bother splitting the debug build out into further subpackages:
 # if you need it, you're probably a developer.
