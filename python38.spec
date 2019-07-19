@@ -534,15 +534,13 @@ extension modules.
 This version uses more memory and will be slower than the regular Python build,
 but is useful for tracking down reference-counting issues and other bugs.
 
-The bytecode format is unchanged, so that .pyc files are compatible between
-this and the standard version of Python, but the debugging features mean that
-C/C++ extension modules are ABI-incompatible and must be built for each version
-separately.
-
 The debug build shares installation directories with the standard Python
-runtime, so that .py and .pyc files can be shared.
-Compiled extension modules use a special ABI flag ("d") in the filename,
-so extensions for both versions can co-exist in the same directory.
+runtime. Python modules -- source (.py), bytecode (.pyc), and C-API extensions
+(.cpython*.so) -- are compatible between this and the standard version
+of Python.
+
+The debug runtime additionally supports debug builds of C-API extensions
+(with the "d" ABI flag) for debugging issues in those extensions.
 %endif # with debug_build
 
 %else  # with flatpackage
