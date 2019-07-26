@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1533,6 +1533,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0~b2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Fri Jul 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b2-1
 - Update to 3.8.0b2
 
