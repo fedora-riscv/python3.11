@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b2
+%global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -379,8 +379,8 @@ Summary:        Python runtime libraries
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 19.0.3
-Provides: bundled(python3-setuptools) = 40.8.0
+Provides: bundled(python3-pip) = 19.2.1
+Provides: bundled(python3-setuptools) = 41.0.1
 %endif
 
 %{?python_provide:%python_provide python3-libs}
@@ -554,8 +554,8 @@ The debug runtime additionally supports debug builds of C-API extensions
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 19.0.3
-Provides: bundled(python3-setuptools) = 40.8.0
+Provides: bundled(python3-pip) = 19.2.1
+Provides: bundled(python3-setuptools) = 41.0.1
 %endif
 
 # The description for the flat package
@@ -1531,6 +1531,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jul 29 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b3-1
+- Update to 3.8.0b3
+
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0~b2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 

@@ -1,8 +1,8 @@
-From 6a503d0ad4512af57ef8a784f12bc439701d8cc7 Mon Sep 17 00:00:00 2001
+From ee7b218babbed91c283445021a99d4b28fc12b2f Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
-Subject: [PATCH 2/7] 00102: Change the various install paths to use
- /usr/lib64/ instead or /usr/lib/
+Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
+ instead or /usr/lib/
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 88abb56360..6c2edf32f7 100644
+index 6a9f4b5270..61d650882f 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -198,10 +198,10 @@ index 5f80738188..73d7913441 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 diff --git a/configure b/configure
-index 6e7f277bac..6cd8344c21 100755
+index cb5f130d38..b30b4008f2 100755
 --- a/configure
 +++ b/configure
-@@ -15181,9 +15181,9 @@ fi
+@@ -15195,9 +15195,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index 6e7f277bac..6cd8344c21 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index 324ce0bd99..9a587f3c3f 100644
+index b31ed242f1..42d17bc0ad 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4655,9 +4655,9 @@ fi
+@@ -4663,9 +4663,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -230,7 +230,7 @@ index 324ce0bd99..9a587f3c3f 100644
  AC_SUBST(LIBPL)
  
 diff --git a/setup.py b/setup.py
-index edc3434242..59cfc01a2a 100644
+index 6cbbec9e12..a5092861cf 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -648,7 +648,7 @@ class PyBuildExt(build_ext):

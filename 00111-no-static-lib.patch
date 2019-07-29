@@ -1,7 +1,7 @@
-From efbafc6328f45da6d38a1848933a37497206fb3f Mon Sep 17 00:00:00 2001
+From 65208ffdf868d06e6e16eeb12e3f47205a738ed3 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
-Subject: [PATCH 3/7] 00111: Don't try to build a libpythonMAJOR.MINOR.a
+Subject: [PATCH] 00111: Don't try to build a libpythonMAJOR.MINOR.a
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -21,10 +21,10 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 6c2edf32f7..28c0cead24 100644
+index 61d650882f..3f5be819c4 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -560,7 +560,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+@@ -561,7 +561,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
  	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
@@ -33,7 +33,7 @@ index 6c2edf32f7..28c0cead24 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -608,12 +608,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -609,12 +609,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -46,7 +46,7 @@ index 6c2edf32f7..28c0cead24 100644
  libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
  		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
-@@ -691,7 +685,7 @@ Makefile Modules/config.c: Makefile.pre \
+@@ -692,7 +686,7 @@ Makefile Modules/config.c: Makefile.pre \
  	@echo "The Makefile was updated, you may need to re-run make."
  
  
@@ -55,7 +55,7 @@ index 6c2edf32f7..28c0cead24 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1551,17 +1545,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1552,17 +1546,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

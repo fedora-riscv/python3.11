@@ -1,8 +1,8 @@
-From b92e29a8cc17f9c02a08b7a005e5ece71a409a0b Mon Sep 17 00:00:00 2001
+From c827bec294a7fb9481a55c1f7d78e80007e38816 Mon Sep 17 00:00:00 2001
 From: Petr Viktorin <pviktori@redhat.com>
 Date: Mon, 28 Aug 2017 17:16:46 +0200
-Subject: [PATCH 6/7] 00274: Upstream uses Debian-style architecture naming,
- change to match Fedora
+Subject: [PATCH] 00274: Upstream uses Debian-style architecture naming, change
+ to match Fedora
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -29,7 +29,7 @@ index ba37cf99e2..52a9ec6662 100755
  	ppc64le | powerpc64little)
  		basic_machine=powerpc64le-unknown
 diff --git a/configure.ac b/configure.ac
-index 9a587f3c3f..695ff85e4b 100644
+index 42d17bc0ad..637a99f159 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -741,9 +741,9 @@ cat >> conftest.c <<EOF

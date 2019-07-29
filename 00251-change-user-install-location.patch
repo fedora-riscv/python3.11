@@ -1,7 +1,7 @@
-From 3e26b01573488b015065139689be3aa47dac17cf Mon Sep 17 00:00:00 2001
+From 27348866d660c1344a1f78a6337436443e1ed19c Mon Sep 17 00:00:00 2001
 From: Michal Cyprian <m.cyprian@gmail.com>
 Date: Mon, 26 Jun 2017 16:32:56 +0200
-Subject: [PATCH 5/7] 00251: Change user install location
+Subject: [PATCH] 00251: Change user install location
 
 Set values of prefix and exec_prefix in distutils install command
 to /usr/local if executable is /usr/bin/python* and RPM build
