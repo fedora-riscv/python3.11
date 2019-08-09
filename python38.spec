@@ -1019,8 +1019,6 @@ CheckPython() {
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
   # test_gdb skipped everywhere:
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1734327
-  # test_asyncio skipped:
-  #   https://bugs.python.org/issue35998
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
@@ -1033,7 +1031,6 @@ CheckPython() {
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
-    -x test_asyncio \
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
