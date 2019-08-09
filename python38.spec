@@ -1015,10 +1015,10 @@ CheckPython() {
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.pythoninfo
 
   # Run the upstream test suite
-  # test_gdb skipped on armv7hl:
-  #   https://bugzilla.redhat.com/show_bug.cgi?id=1196181
   # test_gdb skipped on s390x:
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
+  # test_gdb skipped everywhere:
+  #   https://bugzilla.redhat.com/show_bug.cgi?id=1734327
   # test_asyncio skipped:
   #   https://bugs.python.org/issue35998
   # test_distutils
@@ -1029,9 +1029,7 @@ CheckPython() {
     %if %{with bootstrap}
     -x test_distutils \
     %endif
-    %ifarch %{arm} s390x
     -x test_gdb \
-    %endif
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
