@@ -415,10 +415,10 @@ Summary: Libraries and header files needed for Python development
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
-Requires: python-rpm-macros
-Requires: python3-rpm-macros
-
-%{?python_provide:%python_provide python3-devel}
+# The RPM related dependencies bring nothing to a non-RPM Python developer
+# But we want them when packages BuildRequire python3-devel
+Requires: (python-rpm-macros if rpm-build)
+Requires: (python3-rpm-macros if rpm-build)
 
 %if %{without bootstrap}
 # This is not "API" (packages that need setuptools should still BuildRequire it)
@@ -428,10 +428,12 @@ Requires: python3-rpm-macros
 # installed when -devel is required.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1623914
 # See https://fedoraproject.org/wiki/Packaging:Directory_Replacement
-Requires: python3-setuptools
+Requires: (python3-setuptools if rpm-build)
 
-Requires: python3-rpm-generators
+Requires: (python3-rpm-generators if rpm-build)
 %endif
+
+%{?python_provide:%python_provide python3-devel}
 
 Provides: %{name}-2to3 = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
