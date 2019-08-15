@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -52,13 +52,7 @@ License: Python
 %bcond_without rpmwheels
 
 # Expensive optimizations (mainly, profile-guided optimizations)
-%ifarch %{ix86} x86_64
 %bcond_without optimizations
-%else
-# On some architectures, the optimized build takes tens of hours, possibly
-# longer than Koji's 24-hour timeout. Disable optimizations here.
-%bcond_with optimizations
-%endif
 
 # Run the test suite in %%check
 %bcond_without tests
@@ -1528,6 +1522,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Aug 31 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b3-2
+- Enable Profile-guided optimization for all arches, not just x86 (#1741015)
+
 * Mon Jul 29 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b3-1
 - Update to 3.8.0b3
 
