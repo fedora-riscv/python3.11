@@ -1,4 +1,4 @@
-From 65208ffdf868d06e6e16eeb12e3f47205a738ed3 Mon Sep 17 00:00:00 2001
+From 9b7b6251f0fa17d6ab9eff945b3fe43cce549f13 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
 Subject: [PATCH] 00111: Don't try to build a libpythonMAJOR.MINOR.a
