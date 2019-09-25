@@ -745,7 +745,7 @@ topdir=$(pwd)
 # information
 
 %if %{with gdb_hooks}
-DirHoldingGdbPy=%{_prefix}/lib/debug/%{_libdir}
+DirHoldingGdbPy=%{_usr}/lib/debug/%{_libdir}
 mkdir -p %{buildroot}$DirHoldingGdbPy
 %endif # with gdb_hooks
 
