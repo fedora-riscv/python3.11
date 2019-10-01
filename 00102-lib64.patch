@@ -1,4 +1,4 @@
-From 331d11692ff564f152157bffbcaaf97e4c2676d2 Mon Sep 17 00:00:00 2001
+From 81904771db8b112c8617a111e989b68e55af7a9c Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
@@ -107,7 +107,7 @@ index a065ab0b5d..22d53fa562 100644
      return sitepackages
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index e76e6927cb..0cfbea54b9 100644
+index b9e2fafbc0..0ae6d35b69 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -20,10 +20,10 @@ __all__ = [
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 6a9f4b5270..61d650882f 100644
+index 502317aa0c..4ad3df1122 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -167,10 +167,10 @@ index 6a9f4b5270..61d650882f 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index 5f80738188..73d7913441 100644
+index b727f66953..a0c5fb6139 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -689,7 +689,7 @@ calculate_exec_prefix(const PyConfig *config,
+@@ -730,7 +730,7 @@ calculate_exec_prefix(PyCalculatePath *calculate, _PyPathConfig *pathconfig,
          if (safe_wcscpy(exec_prefix, calculate->exec_prefix, exec_prefix_len) < 0) {
              return PATHLEN_ERR();
          }
@@ -179,17 +179,17 @@ index 5f80738188..73d7913441 100644
          if (_PyStatus_EXCEPTION(status)) {
              return status;
          }
-@@ -1016,7 +1016,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix)
+@@ -1067,7 +1067,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix,
              return PATHLEN_ERR();
          }
      }
--    status = joinpath(calculate->zip_path, L"lib/python00.zip", zip_path_len);
-+    status = joinpath(calculate->zip_path, L"lib64/python00.zip", zip_path_len);
+-    status = joinpath(zip_path, L"lib/python00.zip", zip_path_len);
++    status = joinpath(zip_path, L"lib64/python00.zip", zip_path_len);
      if (_PyStatus_EXCEPTION(status)) {
          return status;
      }
-@@ -1145,7 +1145,7 @@ calculate_init(PyCalculatePath *calculate,
-     if (!calculate->prefix) {
+@@ -1197,7 +1197,7 @@ calculate_init(PyCalculatePath *calculate, const PyConfig *config)
+     if (!calculate->exec_prefix) {
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 -    calculate->lib_python = Py_DecodeLocale("lib/python" VERSION, &len);
@@ -198,10 +198,10 @@ index 5f80738188..73d7913441 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
      }
 diff --git a/configure b/configure
-index 3cd9b8866c..7d4cbab2c0 100755
+index 2a933cdbeb..bec365124e 100755
 --- a/configure
 +++ b/configure
-@@ -15197,9 +15197,9 @@ fi
+@@ -15182,9 +15182,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index 3cd9b8866c..7d4cbab2c0 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index 033a93cd3f..5c8a04f61e 100644
+index a189d42c2c..154a0aa5cc 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4665,9 +4665,9 @@ fi
+@@ -4668,9 +4668,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -230,10 +230,10 @@ index 033a93cd3f..5c8a04f61e 100644
  AC_SUBST(LIBPL)
  
 diff --git a/setup.py b/setup.py
-index be2ac0b01d..624274a75b 100644
+index 20d7f35652..024a1035c0 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -648,7 +648,7 @@ class PyBuildExt(build_ext):
+@@ -649,7 +649,7 @@ class PyBuildExt(build_ext):
          # directories (i.e. '.' and 'Include') must be first.  See issue
          # 10520.
          if not CROSS_COMPILING:
@@ -242,7 +242,7 @@ index be2ac0b01d..624274a75b 100644
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
          if CROSS_COMPILING:
-@@ -946,11 +946,11 @@ class PyBuildExt(build_ext):
+@@ -953,11 +953,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(self.lib_dirs +

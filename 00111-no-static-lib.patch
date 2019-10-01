@@ -1,4 +1,4 @@
-From 9b7b6251f0fa17d6ab9eff945b3fe43cce549f13 Mon Sep 17 00:00:00 2001
+From 5b9fcc86532051bea5d0e9fa856b014f229f4794 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
 Subject: [PATCH] 00111: Don't try to build a libpythonMAJOR.MINOR.a
@@ -21,10 +21,10 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 61d650882f..3f5be819c4 100644
+index 4ad3df1122..72d202d71b 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -561,7 +561,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+@@ -562,7 +562,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
  	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
@@ -33,7 +33,7 @@ index 61d650882f..3f5be819c4 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -609,12 +609,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -610,12 +610,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -46,7 +46,7 @@ index 61d650882f..3f5be819c4 100644
  libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
  		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
-@@ -692,7 +686,7 @@ Makefile Modules/config.c: Makefile.pre \
+@@ -693,7 +687,7 @@ Makefile Modules/config.c: Makefile.pre \
  	@echo "The Makefile was updated, you may need to re-run make."
  
  
@@ -55,7 +55,7 @@ index 61d650882f..3f5be819c4 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1552,17 +1546,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1557,17 +1551,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done
