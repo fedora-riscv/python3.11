@@ -690,7 +690,7 @@ BuildPython() {
 
 
   # Invoke the build
-  %make_build EXTRA_CFLAGS="$CFLAGS $MoreCFlags"
+  %make_build CFLAGS_NODIST="$CFLAGS_NODIST $MoreCFlags"
 
   popd
   echo FINISHED: BUILD OF PYTHON FOR CONFIGURATION: $ConfName
