@@ -159,6 +159,7 @@ BuildRequires: gdbm-devel
 BuildRequires: glibc-all-langpacks
 BuildRequires: glibc-devel
 BuildRequires: gmp-devel
+BuildRequires: gnupg2
 BuildRequires: libappstream-glib
 BuildRequires: libffi-devel
 BuildRequires: libnsl2-devel
@@ -209,7 +210,9 @@ BuildRequires: python%{pyshortver}
 # Source code and patches
 # =======================
 
-Source: https://www.python.org/ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz
+Source0: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz
+Source1: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz.asc
+Source2: %{url}static/files/pubkeys.txt
 
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
@@ -570,6 +573,7 @@ version once Python %{pybasever} is stable.
 # ======================================================
 
 %prep
+%gpgverify -k2 -s1 -d0
 %setup -q -n Python-%{upstream_version}
 # Remove all exe files to ensure we are not shipping prebuilt binaries
 # note that those are only used to create Microsoft Windows installers
