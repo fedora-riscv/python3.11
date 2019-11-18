@@ -30,11 +30,20 @@ License: Python
 
 
 # Flat package, i.e. python36, python37, python38 for tox etc.
-# warning: changes some other defaults
+# WARNING: This also influences the main_python bcond below.
 # in Fedora, never turn this on for the python3 package
 # and always keep it on for python37 etc.
-# WARNING: This does not change the package name and summary above
+# WARNING: This does not change the package name and summary above.
 %bcond_without flatpackage
+
+# Main Python, i.e. whether this is the main Python version in the distribution
+# that owns /usr/bin/python3 and other unique paths
+# Default: if this is a flatpackage -> it is not the main Python
+%if %{with flatpackage}
+%bcond_with main_python
+%else
+%bcond_without main_python
+%endif
 
 # When bootstrapping python3, we need to build setuptools.
 # but setuptools BR python3-devel and that brings in python3-rpm-generators;
@@ -311,12 +320,14 @@ Provides: python%{pyshortver} = %{version}-%{release}
 # replace python36-3.6.2.
 Obsoletes: python%{pyshortver}
 
+%if %{with main_python}
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # https://fedoraproject.org/wiki/Changes/Python_means_Python3
 # We recommend /usr/bin/python so users get it by default
 # Versioned recommends are problematic, and we know that the package requires
 # python3 back with fixed version, so we just use the path here:
 Recommends: %{_bindir}/python
+%endif
 
 # In Fedora 31, /usr/bin/pydoc was moved here from Python 2.
 # Ideally we'd have an explicit conflict with "/usr/bin/pydoc < 3",
@@ -358,6 +369,7 @@ Packages containing additional libraries for Python are generally named with
 the "%{name}-" prefix.
 
 
+%if %{with main_python}
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # https://fedoraproject.org/wiki/Changes/Python_means_Python3
 %package -n python-unversioned-command
@@ -372,6 +384,8 @@ Provides: python = %{version}-%{release}
 
 %description -n python-unversioned-command
 This package contains /usr/bin/python - the "python" command that runs Python 3.
+
+%endif # with main_python
 
 
 %package libs
@@ -842,7 +856,7 @@ install -d -m 0755 %{buildroot}%{pylibdir}/site-packages/__pycache__
 install -d -m 0755 %{buildroot}%{_prefix}/lib/python%{pybasever}/site-packages/__pycache__
 %endif
 
-%if %{without flatpackage}
+%if %{with main_python}
 # add idle3 to menu
 install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
 install -D -m 0644 Lib/idlelib/Icons/idle_32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/idle3.png
@@ -921,7 +935,7 @@ find %{buildroot} -perm 555 -exec chmod 755 {} \;
 # Create "/usr/bin/python3-debug", a symlink to the python3 debug binary, to
 # avoid the user having to know the precise version and ABI flags.
 # See e.g. https://bugzilla.redhat.com/show_bug.cgi?id=676748
-%if %{with debug_build} && %{without flatpackage}
+%if %{with debug_build} && %{with main_python}
 ln -s \
   %{_bindir}/python%{LDVERSION_debug} \
   %{buildroot}%{_bindir}/python3-debug
@@ -932,7 +946,7 @@ ln -s \
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
 mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
 
-%if %{with flatpackage}
+%if %{without main_python}
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
 rm %{buildroot}%{_bindir}/pydoc3
@@ -1052,7 +1066,7 @@ CheckPython optimized
 %files
 %doc README.rst
 
-%if %{without flatpackage}
+%if %{with main_python}
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %else
@@ -1064,11 +1078,15 @@ CheckPython optimized
 %{_mandir}/*/*3*
 
 
+%if %{with main_python}
 %if %{without flatpackage}
 %files -n python-unversioned-command
+%endif
 %{_bindir}/python
 %{_mandir}/*/python.1*
+%endif
 
+%if %{without flatpackage}
 %files libs
 %doc README.rst
 %endif
@@ -1282,13 +1300,16 @@ CheckPython optimized
 %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
 
 %{_libdir}/%{py_INSTSONAME_optimized}
-%if %{without flatpackage}
+%if %{with main_python}
 %{_libdir}/libpython3.so
 %endif
 
 
 %if %{without flatpackage}
 %files devel
+%endif
+
+%if %{with main_python}
 %{_bindir}/2to3
 %endif
 
@@ -1302,7 +1323,7 @@ CheckPython optimized
 %{_includedir}/python%{LDVERSION_optimized}/cpython/
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
 
-%if %{without flatpackage}
+%if %{with main_python}
 %{_bindir}/python3-config
 %{_bindir}/python-config
 %{_libdir}/pkgconfig/python3.pc
@@ -1330,7 +1351,9 @@ CheckPython optimized
 
 %if %{without flatpackage}
 %files idle
+%endif
 
+%if %{with main_python}
 %{_bindir}/idle*
 %else
 %{_bindir}/idle%{pybasever}
@@ -1338,7 +1361,7 @@ CheckPython optimized
 
 %{pylibdir}/idlelib
 
-%if %{without flatpackage}
+%if %{with main_python}
 %{_metainfodir}/idle3.appdata.xml
 %{_datadir}/applications/idle3.desktop
 %{_datadir}/icons/hicolor/*/apps/idle3.*
@@ -1390,6 +1413,9 @@ CheckPython optimized
 %if %{with debug_build}
 %if %{without flatpackage}
 %files debug
+%endif
+
+%if %{with main_python}
 %{_bindir}/python3-debug
 %{_bindir}/python-debug
 %endif
