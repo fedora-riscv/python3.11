@@ -1,4 +1,4 @@
-From c706770ce2d951d9357ffc872b7e3f70ad36c264 Mon Sep 17 00:00:00 2001
+From 4c5bee74ff3d4033a60359640bac9f156fdf50ed Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Thu, 11 Jul 2019 13:44:13 +0200
 Subject: [PATCH] 00328: Restore pyc to TIMESTAMP invalidation mode as default
@@ -51,5 +51,5 @@ index d6677ab45f..88059b127e 100644
      return wrapper
  
 -- 
-2.21.0
+2.23.0
 

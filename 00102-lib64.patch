@@ -1,4 +1,4 @@
-From b9f1dd6be195cc3b11a80e6f0dde2096dd8b9855 Mon Sep 17 00:00:00 2001
+From 25fcefdafb47ee30f4dc802742f49e501d7b2f37 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 502317aa0c..4ad3df1122 100644
+index d08c78df39..4d2f68447d 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -167,41 +167,41 @@ index 502317aa0c..4ad3df1122 100644
  
  # Detailed destination directories
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index b727f66953..a0c5fb6139 100644
+index 8632d1fe6d..09a818609e 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -730,7 +730,7 @@ calculate_exec_prefix(PyCalculatePath *calculate, _PyPathConfig *pathconfig,
-         if (safe_wcscpy(exec_prefix, calculate->exec_prefix, exec_prefix_len) < 0) {
-             return PATHLEN_ERR();
+@@ -810,7 +810,7 @@ calculate_exec_prefix(PyCalculatePath *calculate, _PyPathConfig *pathconfig)
          }
--        status = joinpath(exec_prefix, L"lib/lib-dynload", exec_prefix_len);
-+        status = joinpath(exec_prefix, L"lib64/lib-dynload", exec_prefix_len);
-         if (_PyStatus_EXCEPTION(status)) {
-             return status;
+ 
+         calculate->exec_prefix = joinpath2(calculate->exec_prefix_macro,
+-                                           L"lib/lib-dynload");
++                                           L"lib64/lib-dynload");
+         if (calculate->exec_prefix == NULL) {
+             return _PyStatus_NO_MEMORY();
          }
-@@ -1067,7 +1067,7 @@ calculate_zip_path(PyCalculatePath *calculate, const wchar_t *prefix,
-             return PATHLEN_ERR();
-         }
+@@ -1284,7 +1284,7 @@ calculate_read_pyenv(PyCalculatePath *calculate)
+ static PyStatus
+ calculate_zip_path(PyCalculatePath *calculate)
+ {
+-    const wchar_t *lib_python = L"lib/python00.zip";
++    const wchar_t *lib_python = L"lib64/python00.zip";
+ 
+     if (calculate->prefix_found > 0) {
+         /* Use the reduced prefix returned by Py_GetPrefix()
+@@ -1435,7 +1435,7 @@ calculate_init(PyCalculatePath *calculate, const PyConfig *config)
+         return DECODE_LOCALE_ERR("VPATH macro", len);
      }
--    status = joinpath(zip_path, L"lib/python00.zip", zip_path_len);
-+    status = joinpath(zip_path, L"lib64/python00.zip", zip_path_len);
-     if (_PyStatus_EXCEPTION(status)) {
-         return status;
-     }
-@@ -1197,7 +1197,7 @@ calculate_init(PyCalculatePath *calculate, const PyConfig *config)
-     if (!calculate->exec_prefix) {
-         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
-     }
+ 
 -    calculate->lib_python = Py_DecodeLocale("lib/python" VERSION, &len);
 +    calculate->lib_python = Py_DecodeLocale("lib64/python" VERSION, &len);
      if (!calculate->lib_python) {
-         return DECODE_LOCALE_ERR("EXEC_PREFIX define", len);
+         return DECODE_LOCALE_ERR("EXEC_PREFIX macro", len);
      }
 diff --git a/configure b/configure
-index 2a933cdbeb..bec365124e 100755
+index 44f14c3c2c..020531594c 100755
 --- a/configure
 +++ b/configure
-@@ -15182,9 +15182,9 @@ fi
+@@ -15192,9 +15192,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index 2a933cdbeb..bec365124e 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index a189d42c2c..154a0aa5cc 100644
+index 0b28dda44c..4fca719c71 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4668,9 +4668,9 @@ fi
+@@ -4679,9 +4679,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -230,7 +230,7 @@ index a189d42c2c..154a0aa5cc 100644
  AC_SUBST(LIBPL)
  
 diff --git a/setup.py b/setup.py
-index 20d7f35652..024a1035c0 100644
+index 02f523c42d..559498d14b 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -649,7 +649,7 @@ class PyBuildExt(build_ext):
@@ -257,5 +257,5 @@ index 20d7f35652..024a1035c0 100644
                                 libraries=readline_libs))
          else:
 -- 
-2.21.0
+2.23.0
 

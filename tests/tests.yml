@@ -10,13 +10,13 @@
     tests:
     - smoke:
         dir: python/smoke
-        run: VERSION=3.8 ./venv.sh
+        run: VERSION=3.9 ./venv.sh
     - selftest:
         dir: python/selftest
-        run: VERSION=3.8 X="-x test_wsgiref" ./parallel.sh
+        run: VERSION=3.9 X="-x test_wsgiref" ./parallel.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
-    - python38  # the test subject
+    - python39  # the test subject
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests

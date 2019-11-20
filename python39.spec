@@ -2,10 +2,10 @@
 # Top-level metadata
 # ==================
 
-%global pybasever 3.8
+%global pybasever 3.9
 
 # pybasever without the dot:
-%global pyshortver 38
+%global pyshortver 39
 
 Name: python%{pyshortver}
 Summary: Version %{pybasever} of the Python interpreter
@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-#global prerel ...
+%global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -1529,6 +1529,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Nov 20 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-1
+- Rebased to Python 3.9.0a1
+
 * Mon Oct 14 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0-1
 - Update to Python 3.8.0 final
 
