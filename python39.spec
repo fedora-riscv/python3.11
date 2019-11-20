@@ -407,6 +407,11 @@ Provides: bundled(python3-setuptools) = 41.2.0
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
 Recommends: %{name}%{?_isa} = %{version}-%{release}
 
+# tkinter is part of the standard library,
+# but it is torn out to save an unwanted dependency on tk and X11.
+# we recommend it when tk is already installed (for better UX)
+Recommends: (%{name}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
+
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
 # "unversioned" provides were moved from python2 to python3.
