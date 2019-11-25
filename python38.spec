@@ -246,6 +246,8 @@ Patch111: 00111-no-static-lib.patch
 # 00189 #
 # Instead of bundled wheels, use our RPM packaged wheels from
 # /usr/share/python-wheels
+# Downstream only: upstream bundles
+# We might eventually pursuit upstream support, but it's low prio
 Patch189: 00189-use-rpm-wheels.patch
 
 # 00251
@@ -253,6 +255,7 @@ Patch189: 00189-use-rpm-wheels.patch
 # to /usr/local if executable is /usr/bin/python* and RPM build
 # is not detected to make pip and distutils install into separate location
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+# Downstream only: Awaiting resources to work on upstream PEP
 Patch251: 00251-change-user-install-location.patch
 
 # 00274 #
@@ -262,6 +265,8 @@ Patch274: 00274-fix-arch-names.patch
 # 00328 #
 # Restore pyc to TIMESTAMP invalidation mode as default in rpmbubild
 # See https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/57#comment-27426
+# Downstream only: only used when building RPM packages
+# Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 
 # (New patches go here ^^^)
