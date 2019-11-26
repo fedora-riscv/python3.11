@@ -1,32 +1,35 @@
-From d8ff047b2d9c510ab81e73111999554a8e54eccb Mon Sep 17 00:00:00 2001
+From dad501bdd3ee8d8e22f66416998aeb50c0e7983e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH] 00189: Instead of bundled wheels, use our RPM packaged wheels
 
 We keep them in /usr/share/python-wheels
 ---
- Lib/ensurepip/__init__.py | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ Lib/ensurepip/__init__.py | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index 386ed6c25c..7f5f639bde 100644
+index 386ed6c25c..19e7c8787e 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
-@@ -1,3 +1,5 @@
+@@ -1,19 +1,29 @@
 +import distutils.version
 +import glob
  import os
  import os.path
  import sys
-@@ -10,10 +12,20 @@ from . import _bundled
+ import tempfile
+ from importlib import resources
+ 
+-from . import _bundled
+-
+ 
  
  __all__ = ["version", "bootstrap"]
  
 +_WHEEL_DIR = "/usr/share/python-wheels/"
- 
--_SETUPTOOLS_VERSION = "41.2.0"
- 
--_PIP_VERSION = "19.2.3"
++
++
 +def _get_most_recent_wheel_version(pkg):
 +    prefix = os.path.join(_WHEEL_DIR, "{}-".format(pkg))
 +    suffix = "-py2.py3-none-any.whl"
@@ -34,14 +37,16 @@ index 386ed6c25c..7f5f639bde 100644
 +    versions = (p[len(prefix):-len(suffix)] for p in glob.glob(pattern))
 +    return str(max(versions, key=distutils.version.LooseVersion))
 +
-+
+ 
+-_SETUPTOOLS_VERSION = "41.2.0"
 +_SETUPTOOLS_VERSION = _get_most_recent_wheel_version("setuptools")
-+
+ 
+-_PIP_VERSION = "19.2.3"
 +_PIP_VERSION = _get_most_recent_wheel_version("pip")
  
  _PROJECTS = [
      ("setuptools", _SETUPTOOLS_VERSION),
-@@ -99,12 +111,9 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+@@ -99,12 +109,9 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          additional_paths = []
          for project, version in _PROJECTS:
              wheel_name = "{}-{}-py2.py3-none-any.whl".format(project, version)
