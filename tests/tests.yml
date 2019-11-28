@@ -1,5 +1,13 @@
 ---
 - hosts: localhost
+  tags:
+    - classic
+  tasks:
+    - dnf:
+        name: "*"
+        state: latest
+
+- hosts: localhost
   roles:
   - role: standard-test-basic
     tags:
