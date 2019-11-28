@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -889,10 +889,6 @@ LD_LIBRARY_PATH=./build/optimized ./build/optimized/python \
   %{buildroot}%{_bindir}/*%{pybasever}.py \
   %{?with_gdb_hooks:%{buildroot}$DirHoldingGdbPy/*.py}
 
-# Remove tests for python3-tools which was removed in
-# https://bugzilla.redhat.com/show_bug.cgi?id=1312030
-rm -rf %{buildroot}%{pylibdir}/test/test_tools
-
 # Remove shebang lines from .py files that aren't executable, and
 # remove executability from .py files that don't have a shebang line:
 find %{buildroot} -name \*.py \
@@ -1529,6 +1525,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Nov 28 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-2
+- Don't remove the test.test_tools module
+
 * Wed Nov 20 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-1
 - Rebased to Python 3.9.0a1
 
