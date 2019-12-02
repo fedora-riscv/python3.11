@@ -1027,6 +1027,15 @@ CheckPython() {
   ConfName=$1
   ConfDir=$(pwd)/build/$ConfName
 
+  # Fedora sets explicit minimum/maximum TLS versions.
+  # Python's test suite assumes that the minimum/maximum version is set to
+  # a magic marker. We workaround the test problem by setting:
+  export OPENSSL_CONF=/non-existing-file
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1618753
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1778357
+  # https://bugs.python.org/issue35045
+  # https://bugs.python.org/issue38815
+
   echo STARTING: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
   # Note that we're running the tests using the version of the code in the
