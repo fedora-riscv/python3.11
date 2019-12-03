@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -667,14 +667,14 @@ topdir=$(pwd)
 # Fedora packages utilizing %%py3_build will use them as well
 # https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
 export CFLAGS="%{extension_cflags} -D_GNU_SOURCE -fPIC -fwrapv"
-export CFLAGS_NODIST="%{build_cflags} -D_GNU_SOURCE -fPIC -fwrapv"
+export CFLAGS_NODIST="%{build_cflags} -D_GNU_SOURCE -fPIC -fwrapv -fno-semantic-interposition"
 export CXXFLAGS="%{extension_cxxflags} -D_GNU_SOURCE -fPIC -fwrapv"
 export CPPFLAGS="$(pkg-config --cflags-only-I libffi)"
 export OPT="%{extension_cflags} -D_GNU_SOURCE -fPIC -fwrapv"
 export LINKCC="gcc"
 export CFLAGS="$CFLAGS $(pkg-config --cflags openssl)"
 export LDFLAGS="%{extension_ldflags} -g $(pkg-config --libs-only-L openssl)"
-export LDFLAGS_NODIST="%{build_ldflags} -g $(pkg-config --libs-only-L openssl)"
+export LDFLAGS_NODIST="%{build_ldflags} -fno-semantic-interposition -g $(pkg-config --libs-only-L openssl)"
 
 # We can build several different configurations of Python: regular and debug.
 # Define a common function that does one build:
@@ -1565,6 +1565,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Dec 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-3
+- Build Python with -fno-semantic-interposition for better performance
+- https://fedoraproject.org/wiki/Changes/PythonNoSemanticInterpositionSpeedup
+
 * Thu Nov 28 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-2
 - Don't remove the test.test_tools module
 
