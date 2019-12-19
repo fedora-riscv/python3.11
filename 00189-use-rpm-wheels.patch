@@ -1,4 +1,4 @@
-From dad501bdd3ee8d8e22f66416998aeb50c0e7983e Mon Sep 17 00:00:00 2001
+From f85b612b86a1e688685fc2f908b50e13d75114bc Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH] 00189: Instead of bundled wheels, use our RPM packaged wheels
@@ -63,5 +63,5 @@ index 386ed6c25c..19e7c8787e 100644
              additional_paths.append(os.path.join(tmpdir, wheel_name))
  
 -- 
-2.23.0
+2.24.1
 

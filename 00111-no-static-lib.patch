@@ -1,4 +1,4 @@
-From 796f2a2d1f213e963768e7c987fb49f8c4f47dfa Mon Sep 17 00:00:00 2001
+From f7580af0bf9870c81366613213d4268ef00bff5a Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
 Subject: [PATCH] 00111: Don't try to build a libpythonMAJOR.MINOR.a
@@ -74,5 +74,5 @@ index 4d2f68447d..3cd2f25571 100644
  	$(INSTALL_DATA) Programs/python.o $(DESTDIR)$(LIBPL)/python.o
  	$(INSTALL_DATA) $(srcdir)/Modules/config.c.in $(DESTDIR)$(LIBPL)/config.c.in
 -- 
-2.23.0
+2.24.1
 

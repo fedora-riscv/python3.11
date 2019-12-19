@@ -1,4 +1,4 @@
-From dd253c4f803a5dfa2ba7dfdb01b722e47c2b02e8 Mon Sep 17 00:00:00 2001
+From 5dd33e789d3b70d5021cbceed61494110bbe1540 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00001: Fixup distutils/unixccompiler.py to remove standard
@@ -29,5 +29,5 @@ index d10a78da31..4df4b67810 100644
                     include_dirs=None, extra_preargs=None, extra_postargs=None):
          fixed_args = self._fix_compile_args(None, macros, include_dirs)
 -- 
-2.23.0
+2.24.1
 

@@ -1,4 +1,4 @@
-From 25fcefdafb47ee30f4dc802742f49e501d7b2f37 Mon Sep 17 00:00:00 2001
+From 19b5b3386f16f53e34b9d37e400b655dbfe912e8 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
@@ -87,7 +87,7 @@ index 287ab1989e..d4c05e0ab1 100644
          check_path(cmd.install_headers,
                     os.path.join(destination, "include", "python", "foopkg"))
 diff --git a/Lib/site.py b/Lib/site.py
-index a065ab0b5d..22d53fa562 100644
+index 2c71798755..653c1d7203 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -335,11 +335,15 @@ def getsitepackages(prefixes=None):
@@ -107,7 +107,7 @@ index a065ab0b5d..22d53fa562 100644
      return sitepackages
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index b9e2fafbc0..0ae6d35b69 100644
+index 64cf1560d9..f66314b203 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -20,10 +20,10 @@ __all__ = [
@@ -198,10 +198,10 @@ index 8632d1fe6d..09a818609e 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX macro", len);
      }
 diff --git a/configure b/configure
-index 44f14c3c2c..020531594c 100755
+index a2c7ddf595..966a6cae2e 100755
 --- a/configure
 +++ b/configure
-@@ -15192,9 +15192,9 @@ fi
+@@ -15205,9 +15205,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index 44f14c3c2c..020531594c 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index 0b28dda44c..4fca719c71 100644
+index 57dca35723..7ba091ebf2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4679,9 +4679,9 @@ fi
+@@ -4689,9 +4689,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -257,5 +257,5 @@ index 02f523c42d..559498d14b 100644
                                 libraries=readline_libs))
          else:
 -- 
-2.23.0
+2.24.1
 
