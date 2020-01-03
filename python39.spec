@@ -1144,6 +1144,8 @@ CheckPython optimized
 %else
 %dir %{pylibdir}/ensurepip/_bundled
 %{pylibdir}/ensurepip/_bundled/*.whl
+%{pylibdir}/ensurepip/_bundled/__init__.py
+%{pylibdir}/ensurepip/_bundled/__pycache__/*%{bytecode_suffixes}
 %endif
 
 %dir %{pylibdir}/concurrent/
