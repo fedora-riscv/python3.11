@@ -950,10 +950,17 @@ find . -name "*~" -exec rm -f {} \;
 # Do bytecompilation with the newly installed interpreter.
 # This is similar to the script in macros.pybytecompile
 # compile *.pyc
-find %{buildroot} -type f -a -name "*.py" -print0 | \
-    LD_LIBRARY_PATH="%{buildroot}%{dynload_dir}/:%{buildroot}%{_libdir}" \
-    PYTHONPATH="%{buildroot}%{_libdir}/python%{pybasever} %{buildroot}%{_libdir}/python%{pybasever}/site-packages" \
-    xargs -0 %{buildroot}%{_bindir}/python%{pybasever} -O -c 'import py_compile, sys; [py_compile.compile(f, dfile=f.partition("%{buildroot}")[2], optimize=opt) for opt in range(3) for f in sys.argv[1:]]' || :
+# Python CMD line options:
+# -s - don't add user site directory to sys.path
+# -B - don't write .pyc files on import
+# Compileall2 CMD line options:
+# -f - force rebuild even if timestamps are up to date
+# -o - optimization levels to run compilation with
+# -s - part of path to left-strip from path to source file (buildroot)
+# -p - path to add as prefix to path to source file (/ to make it absolute)
+LD_LIBRARY_PATH="%{buildroot}%{dynload_dir}/:%{buildroot}%{_libdir}" \
+PYTHONPATH="%{_rpmconfigdir}/redhat" %{buildroot}%{_bindir}/python%{pybasever} -s -B -m \
+compileall2 -f %{_smp_mflags} -o 0 -o 1 -o 2 -s %{buildroot} -p / %{buildroot} || :
 
 # Since we have pathfix.py in bindir, this is created, but we don't want it
 rm -rf %{buildroot}%{_bindir}/__pycache__
