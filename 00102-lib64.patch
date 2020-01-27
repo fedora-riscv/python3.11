@@ -1,4 +1,4 @@
-From 19b5b3386f16f53e34b9d37e400b655dbfe912e8 Mon Sep 17 00:00:00 2001
+From bc29c675016279f6f6a6b4ed140a45710d9840d9 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index d08c78df39..4d2f68447d 100644
+index cfe42b4f21..d8766ec09d 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -198,10 +198,10 @@ index 8632d1fe6d..09a818609e 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX macro", len);
      }
 diff --git a/configure b/configure
-index a2c7ddf595..966a6cae2e 100755
+index 85120e498d..a472d7fac3 100755
 --- a/configure
 +++ b/configure
-@@ -15205,9 +15205,9 @@ fi
+@@ -15216,9 +15216,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index a2c7ddf595..966a6cae2e 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index 57dca35723..7ba091ebf2 100644
+index ab8e1b7d27..56e8f3e11e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4689,9 +4689,9 @@ fi
+@@ -4706,9 +4706,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then

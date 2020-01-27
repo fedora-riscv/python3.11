@@ -1,4 +1,4 @@
-From 29524bf73ef1d39e21dff0c60f8ff76bd36549cb Mon Sep 17 00:00:00 2001
+From 5201fc9ca191439c337c238542efb85b1f91ed57 Mon Sep 17 00:00:00 2001
 From: Petr Viktorin <pviktori@redhat.com>
 Date: Mon, 28 Aug 2017 17:16:46 +0200
 Subject: [PATCH] 00274: Upstream uses Debian-style architecture naming, change
@@ -29,10 +29,10 @@ index ba37cf99e2..52a9ec6662 100755
  	ppc64le | powerpc64little)
  		basic_machine=powerpc64le-unknown
 diff --git a/configure.ac b/configure.ac
-index 7ba091ebf2..05a2568f56 100644
+index 56e8f3e11e..a66d6ebcda 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -741,9 +741,9 @@ cat >> conftest.c <<EOF
+@@ -753,9 +753,9 @@ cat >> conftest.c <<EOF
          alpha-linux-gnu
  # elif defined(__ARM_EABI__) && defined(__ARM_PCS_VFP)
  #  if defined(__ARMEL__)
@@ -44,7 +44,7 @@ index 7ba091ebf2..05a2568f56 100644
  #  endif
  # elif defined(__ARM_EABI__) && !defined(__ARM_PCS_VFP)
  #  if defined(__ARMEL__)
-@@ -783,7 +783,7 @@ cat >> conftest.c <<EOF
+@@ -795,7 +795,7 @@ cat >> conftest.c <<EOF
  #  elif _MIPS_SIM == _ABIN32
          mips64el-linux-gnuabin32
  #  elif _MIPS_SIM == _ABI64
@@ -53,7 +53,7 @@ index 7ba091ebf2..05a2568f56 100644
  #  else
  #   error unknown platform triplet
  #  endif
-@@ -793,22 +793,22 @@ cat >> conftest.c <<EOF
+@@ -805,22 +805,22 @@ cat >> conftest.c <<EOF
  #  elif _MIPS_SIM == _ABIN32
          mips64-linux-gnuabin32
  #  elif _MIPS_SIM == _ABI64

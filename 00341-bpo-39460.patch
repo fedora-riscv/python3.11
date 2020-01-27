@@ -1,0 +1,41 @@
+From e457696601c6535f65105745998662398dbab064 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Wed, 29 Jan 2020 15:23:29 +0100
+Subject: [PATCH] 00341: bpo-39460: Fix test_zipfile.test_add_file_after_2107()
+
+XFS filesystem is limited to 32-bit timestamp, but the utimensat()
+syscall doesn't fail. Moreover, there is a VFS bug which returns
+a cached timestamp which is different than the value on disk.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1795576
+https://bugs.python.org/issue39460#msg360952
+---
+ Lib/test/test_zipfile.py | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/Lib/test/test_zipfile.py b/Lib/test/test_zipfile.py
+index 66f05ac1f3..4c20bfd7e2 100644
+--- a/Lib/test/test_zipfile.py
++++ b/Lib/test/test_zipfile.py
+@@ -616,6 +616,18 @@ class StoredTestsWithSourceFile(AbstractTestsWithSourceFile,
+         except OverflowError:
+             self.skipTest('Host fs cannot set timestamp to required value.')
+ 
++        mtime_ns = os.stat(TESTFN).st_mtime_ns
++        if mtime_ns != (4386268800 * 10**9):
++            # XFS filesystem is limited to 32-bit timestamp, but the syscall
++            # didn't fail. Moreover, there is a VFS bug which returns
++            # a cached timestamp which is different than the value on disk.
++            #
++            # Test st_mtime_ns rather than st_mtime to avoid rounding issues.
++            #
++            # https://bugzilla.redhat.com/show_bug.cgi?id=1795576
++            # https://bugs.python.org/issue39460#msg360952
++            self.skipTest(f"Linux VFS/XFS kernel bug detected: {mtime_ns=}")
++
+         with zipfile.ZipFile(TESTFN2, "w") as zipfp:
+             self.assertRaises(struct.error, zipfp.write, TESTFN)
+ 
+-- 
+2.24.1
+
