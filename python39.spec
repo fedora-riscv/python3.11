@@ -1061,6 +1061,7 @@ CheckPython() {
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.pythoninfo
 
   # Run the upstream test suite
+  # --timeout=1800: kill test running for longer than 30 minutes
   # test_gdb skipped on s390x:
   #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
   # test_gdb skipped everywhere:
@@ -1069,7 +1070,7 @@ CheckPython() {
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
-    -wW --slowest -j0 \
+    -wW --slowest -j0 --timeout=1800 \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
