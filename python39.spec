@@ -63,6 +63,14 @@ License: Python
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
 
+# https://fedoraproject.org/wiki/Changes/PythonNoSemanticInterpositionSpeedup
+# Disabled on ppc64le and armv7hl: https://bugzilla.redhat.com/show_bug.cgi?id=1795575
+%ifarch %{power64} %{arm}
+%bcond_with no_semantic_interposition
+%else
+%bcond_without no_semantic_interposition
+%endif
+
 # Run the test suite in %%check
 %bcond_without tests
 
@@ -683,14 +691,14 @@ topdir=$(pwd)
 # Fedora packages utilizing %%py3_build will use them as well
 # https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
 export CFLAGS="%{extension_cflags} -D_GNU_SOURCE -fPIC -fwrapv"
-export CFLAGS_NODIST="%{build_cflags} -D_GNU_SOURCE -fPIC -fwrapv -fno-semantic-interposition"
+export CFLAGS_NODIST="%{build_cflags} -D_GNU_SOURCE -fPIC -fwrapv%{?with_no_semantic_interposition: -fno-semantic-interposition}"
 export CXXFLAGS="%{extension_cxxflags} -D_GNU_SOURCE -fPIC -fwrapv"
 export CPPFLAGS="$(pkg-config --cflags-only-I libffi)"
 export OPT="%{extension_cflags} -D_GNU_SOURCE -fPIC -fwrapv"
 export LINKCC="gcc"
 export CFLAGS="$CFLAGS $(pkg-config --cflags openssl)"
 export LDFLAGS="%{extension_ldflags} -g $(pkg-config --libs-only-L openssl)"
-export LDFLAGS_NODIST="%{build_ldflags} -fno-semantic-interposition -g $(pkg-config --libs-only-L openssl)"
+export LDFLAGS_NODIST="%{build_ldflags}%{?with_no_semantic_interposition: -fno-semantic-interposition} -g $(pkg-config --libs-only-L openssl)"
 
 # We can build several different configurations of Python: regular and debug.
 # Define a common function that does one build:
