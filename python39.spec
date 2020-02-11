@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1589,6 +1589,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Feb 11 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a3-2
+- Update the ensurepip module to work with setuptools >= 45
+
 * Mon Jan 27 2020 Victor Stinner <vstinner@python.org> - 3.9.0~a3-1
 - Update to Python 3.9.0a3
 
