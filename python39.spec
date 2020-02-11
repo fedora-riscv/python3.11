@@ -948,9 +948,13 @@ find . -name "*~" -exec rm -f {} \;
 # -o - optimization levels to run compilation with
 # -s - part of path to left-strip from path to source file (buildroot)
 # -p - path to add as prefix to path to source file (/ to make it absolute)
+# --hardlink-dupes - hardlink different optimization level pycs together if identical (saves space)
 LD_LIBRARY_PATH="%{buildroot}%{dynload_dir}/:%{buildroot}%{_libdir}" \
 PYTHONPATH="%{_rpmconfigdir}/redhat" %{buildroot}%{_bindir}/python%{pybasever} -s -B -m \
-compileall2 -f %{_smp_mflags} -o 0 -o 1 -o 2 -s %{buildroot} -p / %{buildroot} || :
+compileall2 -f %{_smp_mflags} -o 0 -o 1 -o 2 -s %{buildroot} -p / %{buildroot} --hardlink-dupes || :
+
+# Turn this BRP off, it is done by compileall2 --hardlink-dupes above
+%global __brp_python_hardlink %{nil}
 
 # Since we have pathfix.py in bindir, this is created, but we don't want it
 rm -rf %{buildroot}%{_bindir}/__pycache__
