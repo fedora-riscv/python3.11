@@ -144,16 +144,6 @@ License: Python
 # on files that test invalid syntax.
 %undefine py_auto_byte_compile
 
-# For multilib support, files that are different between 32- and 64-bit arches
-# need different filenames. Use "64" or "32" according to the word size.
-# Currently, the best way to determine an architecture's word size happens to
-# be checking %%{_lib}.
-%if "%{_lib}" == "lib64"
-%global wordsize 64
-%else
-%global wordsize 32
-%endif
-
 
 # =======================
 # Build-time requirements
@@ -803,7 +793,7 @@ mkdir -p %{buildroot}$DirHoldingGdbPy
 # Filanames are defined here:
 %global _pyconfig32_h pyconfig-32.h
 %global _pyconfig64_h pyconfig-64.h
-%global _pyconfig_h pyconfig-%{wordsize}.h
+%global _pyconfig_h pyconfig-%{__isa_bits}.h
 
 # Use a common function to do an install for all our configurations:
 InstallPython() {
