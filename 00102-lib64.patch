@@ -1,4 +1,4 @@
-From bc29c675016279f6f6a6b4ed140a45710d9840d9 Mon Sep 17 00:00:00 2001
+From de23a0cc0e2471d12aa82813e4fb6cf937ad1a51 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Wed, 13 Jan 2010 21:25:18 +0000
 Subject: [PATCH] 00102: Change the various install paths to use /usr/lib64/
@@ -154,7 +154,7 @@ index 41c4229919..543c88432a 100644
                                    'site-packages')
              self.assertEqual(dirs[0], wanted)
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index cfe42b4f21..d8766ec09d 100644
+index 3199a1aa02..8dc55c158f 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -143,7 +143,7 @@ LIBDIR=		@libdir@
@@ -198,10 +198,10 @@ index 8632d1fe6d..09a818609e 100644
          return DECODE_LOCALE_ERR("EXEC_PREFIX macro", len);
      }
 diff --git a/configure b/configure
-index 85120e498d..a472d7fac3 100755
+index 846116e112..aaadb30ef9 100755
 --- a/configure
 +++ b/configure
-@@ -15216,9 +15216,9 @@ fi
+@@ -15233,9 +15233,9 @@ fi
  
  
  if test x$PLATFORM_TRIPLET = x; then
@@ -214,10 +214,10 @@ index 85120e498d..a472d7fac3 100755
  
  
 diff --git a/configure.ac b/configure.ac
-index ab8e1b7d27..56e8f3e11e 100644
+index 840caf352d..ac4a44bdb8 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4706,9 +4706,9 @@ fi
+@@ -4711,9 +4711,9 @@ fi
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)
  if test x$PLATFORM_TRIPLET = x; then
@@ -230,7 +230,7 @@ index ab8e1b7d27..56e8f3e11e 100644
  AC_SUBST(LIBPL)
  
 diff --git a/setup.py b/setup.py
-index 02f523c42d..559498d14b 100644
+index 51e67fe4a5..bafa0bf99a 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -649,7 +649,7 @@ class PyBuildExt(build_ext):
@@ -242,7 +242,7 @@ index 02f523c42d..559498d14b 100644
              add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
          # only change this for cross builds for 3.3, issues on Mageia
          if CROSS_COMPILING:
-@@ -953,11 +953,11 @@ class PyBuildExt(build_ext):
+@@ -955,11 +955,11 @@ class PyBuildExt(build_ext):
              elif curses_library:
                  readline_libs.append(curses_library)
              elif self.compiler.find_library_file(self.lib_dirs +
