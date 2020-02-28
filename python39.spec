@@ -64,12 +64,7 @@ License: Python
 %bcond_without optimizations
 
 # https://fedoraproject.org/wiki/Changes/PythonNoSemanticInterpositionSpeedup
-# Disabled on ppc64le and armv7hl: https://bugzilla.redhat.com/show_bug.cgi?id=1795575
-%ifarch %{power64} %{arm}
-%bcond_with no_semantic_interposition
-%else
 %bcond_without no_semantic_interposition
-%endif
 
 # Run the test suite in %%check
 %bcond_without tests
