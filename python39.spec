@@ -28,21 +28,23 @@ License: Python
 # Note that the bcond macros are named for the CLI option they create.
 # "%%bcond_without" means "ENABLE by default and create a --without option"
 
-
-# Flat package, i.e. python36, python37, python38 for tox etc.
-# WARNING: This also influences the main_python bcond below.
-# in Fedora, never turn this on for the python3 package
-# and always keep it on for python37 etc.
-# WARNING: This does not change the package name and summary above.
-%bcond_without flatpackage
-
 # Main Python, i.e. whether this is the main Python version in the distribution
 # that owns /usr/bin/python3 and other unique paths
-# Default: if this is a flatpackage -> it is not the main Python
-%if %{with flatpackage}
-%bcond_with main_python
-%else
+# This also means the built subpackages are called python3 rather than python3X
+# WARNING: This also influences the flatpackage bcond below.
+# By default, this is determined by the %%__default_python3_pkgversion value
+%if 0%{?__default_python3_pkgversion} == %pyshortver
 %bcond_without main_python
+%else
+%bcond_with main_python
+%endif
+
+# Flat package, i.e. no separate subpackages
+# Default (in Fedora): if this is a main Python, it is not a flatpackage
+%if %{with main_python}
+%bcond_with flatpackage
+%else
+%bcond_without flatpackage
 %endif
 
 # When bootstrapping python3, we need to build setuptools.
@@ -97,6 +99,13 @@ License: Python
 # =====================
 # General global macros
 # =====================
+%if %{with main_python}
+%global pkgname python3
+%global exename python3
+%else
+%global pkgname python%{pyshortver}
+%global exename python%{pybasever}
+%endif
 
 %global pylibdir %{_libdir}/python%{pybasever}
 %global dynload_dir %{pylibdir}/lib-dynload
@@ -139,6 +148,12 @@ License: Python
 # on files that test invalid syntax.
 %undefine py_auto_byte_compile
 
+# When a main_python build is attempted despite the %%__default_python3_pkgversion value
+# We undefine %%python_provide so the python3-... package does not provide wrong python3X-...
+%if %{with main_python} && (0%{?__default_python3_pkgversion} != %pyshortver)
+%undefine python_provide
+%{warn:Doing a main_python build with wrong %%__default_python3_pkgversion (0%{?__default_python3_pkgversion}, but this is %pyshortver)}
+%endif
 
 # =======================
 # Build-time requirements
@@ -283,17 +298,33 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # Descriptions, and metadata for subpackages
 # ==========================================
 
+# this if branch is ~300 lines long and contains subpackages' definitions
+%if %{without flatpackage}
+%if %{with main_python}
+# Description for the python3X SRPM only:
+%description
+Python %{pybasever} is an accessible, high-level, dynamically typed, interpreted
+programming language, designed with an emphasis on code readability.
+It includes an extensive standard library, and has a vast ecosystem of
+third-party libraries.
+
+%package -n %{pkgname}
+Summary: Python %{pybasever} interpreter
+
 # People might want to dnf install pythonX.Y instead of pythonXY;
 # we enable this in both flat and nonflat package.
 Provides: python%{pybasever} = %{version}-%{release}
-
-%if %{without flatpackage}
+%else
+# Provide python3X from python3
+Provides: python%{pyshortver} = %{version}-%{release}
+Provides: python%{pyshortver}%{?_isa} = %{version}-%{release}
+%endif
 
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
 
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
 # In order to support multiple Python interpreters for development purposes,
 # packages with the naming scheme flatpackage (e.g. python35) exist for
@@ -331,29 +362,27 @@ Recommends: python3-pip
 # /usr/bin/python3*. Granularity per subpackage is impossible.
 # It's intended for the libs package not to drag in the interpreter, see
 # https://bugzilla.redhat.com/show_bug.cgi?id=1547131
-# All others require %%{name} anyway.
+# All others require %%{pkgname} anyway.
 %global __requires_exclude ^/usr/bin/python3
 
-
-# The description used both for the SRPM and the main `python3` subpackage:
-%description
-Python is an accessible, high-level, dynamically typed, interpreted programming
-language, designed with an emphasis on code readability.
+%description -n %{pkgname}
+Python %{pybasever} is an accessible, high-level, dynamically typed, interpreted
+programming language, designed with an emphasis on code readability.
 It includes an extensive standard library, and has a vast ecosystem of
 third-party libraries.
 
-The %{name} package provides the "python3" executable: the reference
+The %{pkgname} package provides the "%{exename}" executable: the reference
 interpreter for the Python language, version 3.
-The majority of its standard library is provided in the %{name}-libs package,
-which should be installed automatically along with %{name}.
+The majority of its standard library is provided in the %{pkgname}-libs package,
+which should be installed automatically along with %{pkgname}.
 The remaining parts of the Python standard library are broken out into the
-%{name}-tkinter and %{name}-test packages, which may need to be installed
+%{pkgname}-tkinter and %{pkgname}-test packages, which may need to be installed
 separately.
 
-Documentation for Python is provided in the %{name}-docs package.
+Documentation for Python is provided in the %{pkgname}-docs package.
 
 Packages containing additional libraries for Python are generally named with
-the "%{name}-" prefix.
+the "%{pkgname}-" prefix.
 
 
 %if %{with main_python}
@@ -375,7 +404,7 @@ This package contains /usr/bin/python - the "python" command that runs Python 3.
 %endif # with main_python
 
 
-%package libs
+%package -n %{pkgname}-libs
 Summary:        Python runtime libraries
 
 %if %{with rpmwheels}
@@ -392,12 +421,12 @@ Provides: bundled(python3-setuptools) = 41.2.0
 # We've filtered the automatic requirement out so libs are installable without
 # the main package. This however makes it pulled in by default.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1547131
-Recommends: %{name}%{?_isa} = %{version}-%{release}
+Recommends: %{pkgname}%{?_isa} = %{version}-%{release}
 
 # tkinter is part of the standard library,
 # but it is torn out to save an unwanted dependency on tk and X11.
 # we recommend it when tk is already installed (for better UX)
-Recommends: (%{name}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
+Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
@@ -411,17 +440,17 @@ Conflicts: python-libs < 3
 # old Python 2 builds that still provided unversioned Python are handled.)
 
 
-%description libs
+%description -n %{pkgname}-libs
 This package contains runtime libraries for use by Python:
 - the majority of the Python standard library
 - a dynamically linked library for use by applications that embed Python as
-  a scripting language, and by the main "python3" executable
+  a scripting language, and by the main "%{exename}" executable
 
 
-%package devel
+%package -n %{pkgname}-devel
 Summary: Libraries and header files needed for Python development
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{pkgname} = %{version}-%{release}
+Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: python-rpm-macros
 # The RPM related dependencies bring nothing to a non-RPM Python developer
 # But we want them when packages BuildRequire python3-devel
@@ -441,18 +470,18 @@ Requires: (python3-setuptools if rpm-build)
 Requires: (python3-rpm-generators if rpm-build)
 %endif
 
-%{?python_provide:%python_provide python3-devel}
+%{?python_provide:%python_provide %{pkgname}-devel}
 
-Provides: %{name}-2to3 = %{version}-%{release}
+Provides: %{pkgname}-2to3 = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
 
-Conflicts: %{name} < %{version}-%{release}
+Conflicts: %{pkgname} < %{version}-%{release}
 
 # In Fedora 31, several "unversioned" files were moved here from Python 2:
 # pygettext.py, msgfmt.py, python-config, python.pc
 Conflicts: python-devel < 3
 
-%description devel
+%description -n %{pkgname}-devel
 This package contains the header files and configuration needed to compile
 Python extension modules (typically written in C or C++), to embed Python
 into other programs, and to make binary distributions for Python libraries.
@@ -461,24 +490,24 @@ It also contains the necessary macros to build RPM packages with Python modules
 and 2to3 tool, an automatic source converter from Python 2.X.
 
 
-%package idle
+%package -n %{pkgname}-idle
 Summary: A basic graphical development environment for Python
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-tkinter = %{version}-%{release}
+Requires: %{pkgname} = %{version}-%{release}
+Requires: %{pkgname}-tkinter = %{version}-%{release}
 
 Provides: idle3 = %{version}-%{release}
 Provides: idle = %{version}-%{release}
 
-Provides: %{name}-tools = %{version}-%{release}
-Provides: %{name}-tools%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-tools < %{version}-%{release}
+Provides: %{pkgname}-tools = %{version}-%{release}
+Provides: %{pkgname}-tools%{?_isa} = %{version}-%{release}
+Obsoletes: %{pkgname}-tools < %{version}-%{release}
 
 # In Fedora 31, /usr/bin/idle was moved here from Python 2.
 Conflicts: python-tools < 3
 
-%{?python_provide:%python_provide python3-idle}
+%{?python_provide:%python_provide %{pkgname}-idle}
 
-%description idle
+%description -n %{pkgname}-idle
 IDLE is Python’s Integrated Development and Learning Environment.
 
 IDLE has the following features: Python shell window (interactive
@@ -491,52 +520,52 @@ breakpoints, stepping, and viewing of global and local namespaces;
 configuration, browsers, and other dialogs.
 
 
-%package tkinter
+%package -n %{pkgname}-tkinter
 Summary: A GUI toolkit for Python
-Requires: %{name} = %{version}-%{release}
+Requires: %{pkgname} = %{version}-%{release}
 
-%{?python_provide:%python_provide python3-tkinter}
+%{?python_provide:%python_provide %{pkgname}-tkinter}
 
-%description tkinter
+%description -n %{pkgname}-tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
 the Python programming language.
 
 
-%package test
+%package -n %{pkgname}-test
 Summary: The self-test suite for the main python3 package
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{pkgname} = %{version}-%{release}
+Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
-%{?python_provide:%python_provide python3-test}
+%{?python_provide:%python_provide %{pkgname}-test}
 
-%description test
+%description -n %{pkgname}-test
 The self-test suite for the Python interpreter.
 
 This is only useful to test Python itself. For testing general Python code,
-you should use the unittest module from %{name}-libs, or a library such as
-%{name}-pytest or %{name}-nose.
+you should use the unittest module from %{pkgname}-libs, or a library such as
+%{pkgname}-pytest.
 
 
 %if %{with debug_build}
-%package debug
+%package -n %{pkgname}-debug
 Summary: Debug version of the Python runtime
 
 # The debug build is an all-in-one package version of the regular build, and
 # shares the same .py/.pyc files and directories as the regular build. Hence
 # we depend on all of the subpackages of the regular build:
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
-Requires: %{name}-test%{?_isa} = %{version}-%{release}
-Requires: %{name}-tkinter%{?_isa} = %{version}-%{release}
-Requires: %{name}-idle%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-devel%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-test%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-tkinter%{?_isa} = %{version}-%{release}
+Requires: %{pkgname}-idle%{?_isa} = %{version}-%{release}
 
 # In Fedora 31, /usr/bin/python-debug was moved here from Python 2.
 Conflicts: python-debug < 3
 
-%{?python_provide:%python_provide python3-debug}
+%{?python_provide:%python_provide %{pkgname}-debug}
 
-%description debug
+%description -n %{pkgname}-debug
 python3-debug provides a version of the Python runtime with numerous debugging
 features enabled, aimed at advanced Python users such as developers of Python
 extension modules.
@@ -560,6 +589,8 @@ The debug runtime additionally supports debug builds of C-API extensions
 %global __requires_exclude ^python\\(abi\\) = 3\\..$
 %global __provides_exclude ^python\\(abi\\) = 3\\..$
 
+Provides: python%{pybasever} = %{version}-%{release}
+
 %if %{with rpmwheels}
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
@@ -568,7 +599,7 @@ Provides: bundled(python3-pip) = 19.2.3
 Provides: bundled(python3-setuptools) = 41.2.0
 %endif
 
-# The description for the flat package
+# The description for the flat package (SRPM and built)
 %description
 Python %{pybasever} package for developers.
 
@@ -1062,7 +1093,7 @@ CheckPython optimized
 %endif # with tests
 
 
-%files
+%files -n %{pkgname}
 %doc README.rst
 
 %if %{with main_python}
@@ -1086,7 +1117,7 @@ CheckPython optimized
 %endif
 
 %if %{without flatpackage}
-%files libs
+%files -n %{pkgname}-libs
 %doc README.rst
 %endif
 
@@ -1307,7 +1338,7 @@ CheckPython optimized
 
 
 %if %{without flatpackage}
-%files devel
+%files -n %{pkgname}-devel
 %endif
 
 %if %{with main_python}
@@ -1351,7 +1382,7 @@ CheckPython optimized
 
 
 %if %{without flatpackage}
-%files idle
+%files -n %{pkgname}-idle
 %endif
 
 %if %{with main_python}
@@ -1369,7 +1400,7 @@ CheckPython optimized
 %endif
 
 %if %{without flatpackage}
-%files tkinter
+%files -n %{pkgname}-tkinter
 %endif
 
 %{pylibdir}/tkinter
@@ -1387,7 +1418,7 @@ CheckPython optimized
 
 
 %if %{without flatpackage}
-%files test
+%files -n %{pkgname}-test
 %endif
 
 %{pylibdir}/ctypes/test
@@ -1413,7 +1444,7 @@ CheckPython optimized
 
 %if %{with debug_build}
 %if %{without flatpackage}
-%files debug
+%files -n %{pkgname}-debug
 %endif
 
 %if %{with main_python}
