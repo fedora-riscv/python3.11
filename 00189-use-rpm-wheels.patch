@@ -1,4 +1,4 @@
-From 1e8c543d53d2aa0c92381c1e1995a58b57361bef Mon Sep 17 00:00:00 2001
+From 0eb96d45196adaa7dc1362590ae44ddfb175e29c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH] 00189: Instead of bundled wheels, use our RPM packaged wheels
@@ -9,15 +9,16 @@ We keep them in /usr/share/python-wheels
  1 file changed, 22 insertions(+), 11 deletions(-)
 
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index 386ed6c25c..dae2ba22e4 100644
+index 545fce656f..f86992c90c 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
-@@ -1,19 +1,33 @@
+@@ -1,3 +1,5 @@
 +import distutils.version
 +import glob
  import os
  import os.path
  import sys
+@@ -5,16 +7,28 @@ import runpy
  import tempfile
  from importlib import resources
  
@@ -50,7 +51,7 @@ index 386ed6c25c..dae2ba22e4 100644
  
  _PROJECTS = [
      ("setuptools", _SETUPTOOLS_VERSION),
-@@ -98,13 +112,10 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+@@ -108,13 +122,10 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          # additional paths that need added to sys.path
          additional_paths = []
          for project, version in _PROJECTS:
@@ -69,5 +70,5 @@ index 386ed6c25c..dae2ba22e4 100644
              additional_paths.append(os.path.join(tmpdir, wheel_name))
  
 -- 
-2.24.1
+2.26.0.rc2
 

@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a4
+%global prerel a5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -231,12 +231,6 @@ Source11: idle3.appdata.xml
 # Fixup distutils/unixccompiler.py to remove standard library path from rpath:
 # Was Patch0 in ivazquez' python3000 specfile:
 Patch1:         00001-rpath.patch
-
-# 00102 #
-# Change the various install paths to use /usr/lib64/ instead or /usr/lib
-# Only used when "%%{_lib}" == "lib64"
-# Not yet sent upstream.
-Patch102: 00102-lib64.patch
 
 # 00111 #
 # Patch the Makefile.pre.in so that the generated Makefile doesn't try to build
@@ -604,10 +598,6 @@ rm -r Modules/expat
 # Apply patches:
 #
 %patch1 -p1
-
-%if "%{_lib}" == "lib64"
-%patch102 -p1
-%endif
 %patch111 -p1
 
 %if %{with rpmwheels}
@@ -691,6 +681,7 @@ BuildPython() {
   export DFLAGS=" "
 
 %configure \
+  --with-platlibdir=%{_lib} \
   --enable-ipv6 \
   --enable-shared \
   --with-computed-gotos=%{computed_gotos_flag} \
@@ -1575,6 +1566,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Mar 24 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a5-1
+- Update to Python 3.9.0a5
+
 * Thu Feb 27 2020 Marcel Plch <mplch@redhat.com> - 3.9.0~a4-1
 - Update to Python 3.9.0a4
 
