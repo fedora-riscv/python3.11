@@ -1035,10 +1035,6 @@ CheckPython() {
 
   # Run the upstream test suite
   # --timeout=1800: kill test running for longer than 30 minutes
-  # test_gdb skipped on s390x:
-  #   https://bugzilla.redhat.com/show_bug.cgi?id=1678277
-  # test_gdb skipped everywhere:
-  #   https://bugzilla.redhat.com/show_bug.cgi?id=1734327
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
@@ -1047,7 +1043,6 @@ CheckPython() {
     %if %{with bootstrap}
     -x test_distutils \
     %endif
-    -x test_gdb \
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
