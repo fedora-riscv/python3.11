@@ -210,9 +210,6 @@ BuildRequires: /usr/bin/dtrace
 # workaround http://bugs.python.org/issue19804 (test_uuid requires ifconfig)
 BuildRequires: /usr/sbin/ifconfig
 
-# For %%python_provide
-BuildRequires: python-rpm-macros
-
 %if %{with rpmwheels}
 BuildRequires: python-setuptools-wheel
 BuildRequires: python-pip-wheel
@@ -221,6 +218,8 @@ BuildRequires: python-pip-wheel
 %if %{without bootstrap}
 # for make regen-all and distutils.tests.test_bdist_rpm
 BuildRequires: python%{pyshortver}
+# for proper automatic provides
+BuildRequires: python3-rpm-generators
 %endif
 
 # =======================
@@ -415,8 +414,6 @@ Provides: bundled(python3-pip) = 19.2.3
 Provides: bundled(python3-setuptools) = 41.2.0
 %endif
 
-%{?python_provide:%python_provide python3-libs}
-
 # There are files in the standard library that have python shebang.
 # We've filtered the automatic requirement out so libs are installable without
 # the main package. This however makes it pulled in by default.
@@ -451,7 +448,6 @@ This package contains runtime libraries for use by Python:
 Summary: Libraries and header files needed for Python development
 Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
-BuildRequires: python-rpm-macros
 # The RPM related dependencies bring nothing to a non-RPM Python developer
 # But we want them when packages BuildRequire python3-devel
 Requires: (python-rpm-macros if rpm-build)
@@ -469,8 +465,6 @@ Requires: (python3-setuptools if rpm-build)
 
 Requires: (python3-rpm-generators if rpm-build)
 %endif
-
-%{?python_provide:%python_provide %{pkgname}-devel}
 
 Provides: %{pkgname}-2to3 = %{version}-%{release}
 Provides: 2to3 = %{version}-%{release}
@@ -505,8 +499,6 @@ Obsoletes: %{pkgname}-tools < %{version}-%{release}
 # In Fedora 31, /usr/bin/idle was moved here from Python 2.
 Conflicts: python-tools < 3
 
-%{?python_provide:%python_provide %{pkgname}-idle}
-
 %description -n %{pkgname}-idle
 IDLE is Python’s Integrated Development and Learning Environment.
 
@@ -524,8 +516,6 @@ configuration, browsers, and other dialogs.
 Summary: A GUI toolkit for Python
 Requires: %{pkgname} = %{version}-%{release}
 
-%{?python_provide:%python_provide %{pkgname}-tkinter}
-
 %description -n %{pkgname}-tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
 the Python programming language.
@@ -535,8 +525,6 @@ the Python programming language.
 Summary: The self-test suite for the main python3 package
 Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
-
-%{?python_provide:%python_provide %{pkgname}-test}
 
 %description -n %{pkgname}-test
 The self-test suite for the Python interpreter.
@@ -562,8 +550,6 @@ Requires: %{pkgname}-idle%{?_isa} = %{version}-%{release}
 
 # In Fedora 31, /usr/bin/python-debug was moved here from Python 2.
 Conflicts: python-debug < 3
-
-%{?python_provide:%python_provide %{pkgname}-debug}
 
 %description -n %{pkgname}-debug
 python3-debug provides a version of the Python runtime with numerous debugging
