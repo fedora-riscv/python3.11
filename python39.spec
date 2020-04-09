@@ -354,8 +354,8 @@ Recommends: %{_bindir}/python
 # Previously, this was required for our rewheel patch to work.
 # This is technically no longer needed, but we keep it recommended
 # for the developer experience.
-Recommends: python3-setuptools
-Recommends: python3-pip
+Recommends: %{pkgname}-setuptools
+Recommends: %{pkgname}-pip
 
 # This prevents ALL subpackages built from this spec to require
 # /usr/bin/python3*. Granularity per subpackage is impossible.
@@ -461,7 +461,7 @@ Requires: (python3-rpm-macros if rpm-build)
 # installed when -devel is required.
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1623914
 # See https://fedoraproject.org/wiki/Packaging:Directory_Replacement
-Requires: (python3-setuptools if rpm-build)
+Requires: (%{pkgname}-setuptools if rpm-build)
 
 Requires: (python3-rpm-generators if rpm-build)
 %endif
