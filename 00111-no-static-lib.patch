@@ -1,4 +1,4 @@
-From d6d13e87c507c77211dbd340b159ca4410849f13 Mon Sep 17 00:00:00 2001
+From 97a0ffada41660301257e303b7cbddc96e70c7a3 Mon Sep 17 00:00:00 2001
 From: David Malcolm <dmalcolm@redhat.com>
 Date: Mon, 18 Jan 2010 17:59:07 +0000
 Subject: [PATCH] 00111: Don't try to build a libpythonMAJOR.MINOR.a
@@ -21,10 +21,10 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index caa1d37648..3178f16000 100644
+index 18fa97bec3..4c8e73583b 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -563,7 +563,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+@@ -578,7 +578,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
  	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
@@ -33,7 +33,7 @@ index caa1d37648..3178f16000 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -611,12 +611,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -626,12 +626,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -46,7 +46,7 @@ index caa1d37648..3178f16000 100644
  libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
  		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
-@@ -694,7 +688,7 @@ Makefile Modules/config.c: Makefile.pre \
+@@ -709,7 +703,7 @@ Makefile Modules/config.c: Makefile.pre \
  	@echo "The Makefile was updated, you may need to re-run make."
  
  
@@ -55,7 +55,7 @@ index caa1d37648..3178f16000 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1570,17 +1564,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1598,17 +1592,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done
@@ -74,5 +74,5 @@ index caa1d37648..3178f16000 100644
  	$(INSTALL_DATA) Programs/python.o $(DESTDIR)$(LIBPL)/python.o
  	$(INSTALL_DATA) $(srcdir)/Modules/config.c.in $(DESTDIR)$(LIBPL)/config.c.in
 -- 
-2.26.0.rc2
+2.26.2
 
