@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a6
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 0.1%{?dist}
 License: Python
 
 
@@ -51,12 +51,15 @@ License: Python
 # but setuptools BR python3-devel and that brings in python3-rpm-generators;
 # python3-rpm-generators needs python3-setuptools, so we cannot have it yet.
 #
+# We also use the previous build of Python in "make regen-all"
+# and in "distutils.tests.test_bdist_rpm".
+#
 # Procedure: https://fedoraproject.org/wiki/SIGs/Python/UpgradingPython
 #
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
