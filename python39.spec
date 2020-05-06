@@ -41,6 +41,7 @@ License: Python
 
 # Flat package, i.e. no separate subpackages
 # Default (in Fedora): if this is a main Python, it is not a flatpackage
+# Not supported: Combination of flatpackage enabled and main_python enabled
 %if %{with main_python}
 %bcond_with flatpackage
 %else
@@ -313,34 +314,19 @@ third-party libraries.
 %package -n %{pkgname}
 Summary: Python %{pybasever} interpreter
 
-# People might want to dnf install pythonX.Y instead of pythonXY;
-# we enable this in both flat and nonflat package.
-Provides: python%{pybasever} = %{version}-%{release}
-%else
-# Provide python3X from python3
-Provides: python%{pyshortver} = %{version}-%{release}
-Provides: python%{pyshortver}%{?_isa} = %{version}-%{release}
-%endif
-
-# Packages with Python modules in standard locations automatically
-# depend on python(abi). Provide that here.
-Provides: python(abi) = %{pybasever}
-
-Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
-
 # In order to support multiple Python interpreters for development purposes,
 # packages with the naming scheme flatpackage (e.g. python35) exist for
 # non-default versions of Python 3.
-# For consistency, and to keep the upgrade path clean, we Provide/Obsolete
-# these names here.
+# For consistency, we provide python3X from python3 as well.
 Provides: python%{pyshortver} = %{version}-%{release}
+Provides: python%{pyshortver}%{?_isa} = %{version}-%{release}
+# To keep the upgrade path clean, we Obsolete python3X.
 # Note that using Obsoletes without package version is not standard practice.
 # Here we assert that *any* version of the system's default interpreter is
 # preferable to an "extra" interpreter. For example, python3-3.6.1 will
 # replace python36-3.6.2.
 Obsoletes: python%{pyshortver}
 
-%if %{with main_python}
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # https://fedoraproject.org/wiki/Changes/Python_means_Python3
 # We recommend /usr/bin/python so users get it by default
@@ -348,6 +334,18 @@ Obsoletes: python%{pyshortver}
 # python3 back with fixed version, so we just use the path here:
 Recommends: %{_bindir}/python
 %endif
+
+# People might want to dnf install pythonX.Y instead of pythonX/pythonXY.
+# Here it is for the nonflat package, regardless if main_pythn (e.g. python3)
+# or not (e.g. python39).
+# For the flat package, the provide is repeated many lines later.
+Provides: python%{pybasever} = %{version}-%{release}
+
+# Packages with Python modules in standard locations automatically
+# depend on python(abi). Provide that here.
+Provides: python(abi) = %{pybasever}
+
+Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
 # In Fedora 31, /usr/bin/pydoc was moved here from Python 2.
 # Ideally we'd have an explicit conflict with "/usr/bin/pydoc < 3",
