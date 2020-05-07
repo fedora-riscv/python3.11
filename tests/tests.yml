@@ -25,6 +25,6 @@
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
-    - python39  # the test subject
+    - python3.9  # the test subject
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests

@@ -7,7 +7,7 @@
 # pybasever without the dot:
 %global pyshortver 39
 
-Name: python%{pyshortver}
+Name: python%{pybasever}
 Summary: Version %{pybasever} of the Python interpreter
 URL: https://www.python.org/
 
@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a6
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -33,7 +33,7 @@ License: Python
 # This also means the built subpackages are called python3 rather than python3X
 # WARNING: This also influences the flatpackage bcond below.
 # By default, this is determined by the %%__default_python3_pkgversion value
-%if 0%{?__default_python3_pkgversion} == %pyshortver
+%if "%{?__default_python3_pkgversion}" == "%{pybasever}"
 %bcond_without main_python
 %else
 %bcond_with main_python
@@ -107,7 +107,7 @@ License: Python
 %global pkgname python3
 %global exename python3
 %else
-%global pkgname python%{pyshortver}
+%global pkgname python%{pybasever}
 %global exename python%{pybasever}
 %endif
 
@@ -154,7 +154,7 @@ License: Python
 
 # When a main_python build is attempted despite the %%__default_python3_pkgversion value
 # We undefine %%python_provide so the python3-... package does not provide wrong python3X-...
-%if %{with main_python} && (0%{?__default_python3_pkgversion} != %pyshortver)
+%if %{with main_python} && ("%{?__default_python3_pkgversion}" != "%{pybasever}")
 %undefine python_provide
 %{warn:Doing a main_python build with wrong %%__default_python3_pkgversion (0%{?__default_python3_pkgversion}, but this is %pyshortver)}
 %endif
@@ -221,7 +221,7 @@ BuildRequires: python-pip-wheel
 
 %if %{without bootstrap}
 # for make regen-all and distutils.tests.test_bdist_rpm
-BuildRequires: python%{pyshortver}
+BuildRequires: python%{pybasever}
 # for proper automatic provides
 BuildRequires: python3-rpm-generators
 %endif
@@ -315,17 +315,17 @@ third-party libraries.
 Summary: Python %{pybasever} interpreter
 
 # In order to support multiple Python interpreters for development purposes,
-# packages with the naming scheme flatpackage (e.g. python35) exist for
+# packages with the naming scheme flatpackage (e.g. python3.5) exist for
 # non-default versions of Python 3.
-# For consistency, we provide python3X from python3 as well.
-Provides: python%{pyshortver} = %{version}-%{release}
-Provides: python%{pyshortver}%{?_isa} = %{version}-%{release}
-# To keep the upgrade path clean, we Obsolete python3X.
+# For consistency, we provide python3.X from python3 as well.
+Provides: python%{pybasever} = %{version}-%{release}
+Provides: python%{pybasever}%{?_isa} = %{version}-%{release}
+# To keep the upgrade path clean, we Obsolete python3.X.
 # Note that using Obsoletes without package version is not standard practice.
 # Here we assert that *any* version of the system's default interpreter is
 # preferable to an "extra" interpreter. For example, python3-3.6.1 will
-# replace python36-3.6.2.
-Obsoletes: python%{pyshortver}
+# replace python3.6-3.6.2.
+Obsoletes: python%{pybasever}
 
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # https://fedoraproject.org/wiki/Changes/Python_means_Python3
@@ -335,11 +335,15 @@ Obsoletes: python%{pyshortver}
 Recommends: %{_bindir}/python
 %endif
 
-# People might want to dnf install pythonX.Y instead of pythonX/pythonXY.
-# Here it is for the nonflat package, regardless if main_pythn (e.g. python3)
-# or not (e.g. python39).
-# For the flat package, the provide is repeated many lines later.
-Provides: python%{pybasever} = %{version}-%{release}
+# Python interpreter packages used to be named (or provide) name pythonXY (e.g.
+# python39). However, to align it with the executable names and to prepare for
+# Python 3.10, they were renamed to pythonX.Y (e.g. python3.9, python3.10). We
+# provide and obsolete the previous names.
+# - Here are the tags for the nonflat package, regardless if main_python (e.g.
+#   python3) or not (e.g. python39). For the flat package, the provide is
+#   repeated many lines later.
+Provides: python%{pyshortver} = %{version}-%{release}
+Obsoletes: python%{pyshortver} < %{version}-%{release}
 
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
@@ -576,7 +580,14 @@ The debug runtime additionally supports debug builds of C-API extensions
 %global __requires_exclude ^python\\(abi\\) = 3\\..$
 %global __provides_exclude ^python\\(abi\\) = 3\\..$
 
-Provides: python%{pybasever} = %{version}-%{release}
+# Python interpreter packages used to be named (or provide) name pythonXY (e.g.
+# python39). However, to align it with the executable names and to prepare for
+# Python 3.10, they were renamed to pythonX.Y (e.g. python3.9, python3.10). We
+# provide and obsolete the previous names.
+# - Here are the tags for the flat package. For the nonflat package, the
+#   provide is repeated many lines above.
+Provides: python%{pyshortver} = %{version}-%{release}
+Obsoletes: python%{pyshortver} < %{version}-%{release}
 
 %if %{with rpmwheels}
 Requires: python-setuptools-wheel
@@ -1575,6 +1586,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu May 07 2020 Tomas Orsava <torsava@redhat.com> - 3.9.0~a6-2
+- Rename from python39 to python3.9
+
 * Tue Apr 28 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a6-1
 - Update to Python 3.9.0a6
 
