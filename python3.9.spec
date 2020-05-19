@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a6
+%global prerel b1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1249,6 +1249,7 @@ CheckPython optimized
 %{dynload_dir}/xxlimited.%{SOABI_optimized}.so
 %{dynload_dir}/_xxsubinterpreters.%{SOABI_optimized}.so
 %{dynload_dir}/zlib.%{SOABI_optimized}.so
+%{dynload_dir}/_zoneinfo.%{SOABI_optimized}.so
 
 %dir %{pylibdir}/site-packages/
 %dir %{pylibdir}/site-packages/__pycache__/
@@ -1531,6 +1532,7 @@ CheckPython optimized
 %{dynload_dir}/_xxsubinterpreters.%{SOABI_debug}.so
 %{dynload_dir}/_xxtestfuzz.%{SOABI_debug}.so
 %{dynload_dir}/zlib.%{SOABI_debug}.so
+%{dynload_dir}/_zoneinfo.%{SOABI_debug}.so
 
 # No need to split things out the "Makefile" and the config-32/64.h file as we
 # do for the regular build above (bug 531901), since they're all in one package
@@ -1586,6 +1588,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue May 19 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-1
+- Update to Python 3.9.0b1
+
 * Thu May 07 2020 Tomas Orsava <torsava@redhat.com> - 3.9.0~a6-2
 - Rename from python39 to python3.9
 
