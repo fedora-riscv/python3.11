@@ -1,7 +1,3 @@
-%global _without_optimizations 1
-%global _without_tests 1
-%global _without_rpmwheels 1
-%global _with_bootstrap 1
 # ==================
 # Top-level metadata
 # ==================
@@ -21,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1592,6 +1588,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu May 21 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-3
+- Rebuilt for https://fedoraproject.org/wiki/Changes/Python3.9
+
 * Thu May 21 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-2
 - Bootstrap for https://fedoraproject.org/wiki/Changes/Python3.9
 
