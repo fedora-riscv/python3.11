@@ -4,7 +4,7 @@ addFilter(r'crypto-policy-non-compliance-openssl')
 
 
 # TESTS:
-addFilter(r'(zero-length|pem-certificate|uncompressed-zip) /usr/lib(64)?/python3.\d+/test')
+addFilter(r'(zero-length|pem-certificate|uncompressed-zip) /usr/lib(64)?/python3\.\d+/test')
 
 
 # OTHER DELIBERATES:
@@ -65,7 +65,7 @@ addFilter(r'^python3(\.\d+)?-debuginfo\.[^:]+: (E|W): useless-provides debuginfo
 addFilter(r'library-without-ldconfig-post')
 
 # debug package contains devel and non-devel files
-addFilter(r'python3(\.\d+)?-debug.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-package')
+addFilter(r'python3(\.\d+)?-debug\.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-package')
 
 # this goes to other subpackage, hence not actually dangling, the read error is bogus
 addFilter(r'dangling-relative-symlink /usr/lib(64)?/pkgconfig/python-3\.\d+dm?(-embed)?\.pc python-3\.\d+(-embed)?\.pc')
@@ -80,8 +80,8 @@ addFilter(r'macro-in-comment %\{_pyconfig(32|64)_h\}')
 
 # Python modules don't need to be linked against libc
 # Since 3.8 they are no longer linked against libpython3.8.so.1.0
-addFilter(r'E: library-not-linked-against-libc /usr/lib(64)?/python3.\d+/lib-dynload/')
-addFilter(r'E: shared-lib-without-dependency-information /usr/lib(64)?/python3.\d+/lib-dynload/')
+addFilter(r'E: library-not-linked-against-libc /usr/lib(64)?/python3\.\d+/lib-dynload/')
+addFilter(r'E: shared-lib-without-dependency-information /usr/lib(64)?/python3\.\d+/lib-dynload/')
 
 # SPELLING ERRORS
 addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
