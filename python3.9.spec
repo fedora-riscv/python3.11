@@ -153,9 +153,9 @@ License: Python
 %undefine py_auto_byte_compile
 
 # When a main_python build is attempted despite the %%__default_python3_pkgversion value
-# We undefine %%python_provide so the python3-... package does not provide wrong python3X-...
+# We undefine magic macros so the python3-... package does not provide wrong python3X-...
 %if %{with main_python} && ("%{?__default_python3_pkgversion}" != "%{pybasever}")
-%undefine python_provide
+%undefine __pythonname_provides
 %{warn:Doing a main_python build with wrong %%__default_python3_pkgversion (0%{?__default_python3_pkgversion}, but this is %pyshortver)}
 %endif
 
