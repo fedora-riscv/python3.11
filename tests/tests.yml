@@ -19,12 +19,25 @@
     - smoke:
         dir: python/smoke
         run: VERSION=3.9 ./venv.sh
+    - debugsmoke:
+        dir: python/smoke
+        run: PYTHON=python3-debug TOX=false VERSION=3.9 ./venv.sh
     - selftest:
         dir: python/selftest
         run: VERSION=3.9 X="-x test_wsgiref" ./parallel.sh
+    - debugtest:
+        dir: python/selftest
+        run: VERSION=3.9 PYTHON=python3-debug X="-x test_wsgiref" ./parallel.sh
+    - debugflags:
+        dir: python/flags
+        run: python3-debug ./assertflags.py -Og
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
     - python3.9  # the test subject
+    - python3-debug  # for leak testing
+    - python3-devel  # for extension building in venv and selftest
+    - python3-tkinter  # for selftest
+    - python3-test  # for selftest
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests
