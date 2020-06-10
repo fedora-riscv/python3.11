@@ -1,4 +1,4 @@
-From f6c81506387d4e2baf08b3fc7258b5cabc388daf Mon Sep 17 00:00:00 2001
+From c18d7cb5e0217a9fb75801075354dd31d423ec66 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH] 00189: Instead of bundled wheels, use our RPM packaged wheels
