@@ -1068,6 +1068,8 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
+  # test_gdb on arm:
+  #   https://bugzilla.redhat.com/show_bug.cgi?id=1846390
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
     %if %{with bootstrap}
@@ -1075,6 +1077,9 @@ CheckPython() {
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
+    %endif
+    %ifarch %{arm}
+    -x test_gdb \
     %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
