@@ -263,6 +263,12 @@ Patch111: 00111-no-static-lib.patch
 # Downstream only: upstream bundles
 # We might eventually pursuit upstream support, but it's low prio
 Patch189: 00189-use-rpm-wheels.patch
+# The following versions of setuptools/pip are bundled when this patch is not applied.
+# The versions are written in Lib/ensurepip/__init__.py, this patch removes them.
+# When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
+# In such cases, the patch needs to be amended and the versions updated here:
+%global pip_version 19.2.3
+%global setuptools_version 41.2.0
 
 # 00251
 # Set values of prefix and exec_prefix in distutils install command
@@ -415,8 +421,8 @@ Summary:        Python runtime libraries
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 19.2.3
-Provides: bundled(python3-setuptools) = 41.2.0
+Provides: bundled(python3dist(pip)) = %{pip_version}
+Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %endif
 
 # There are files in the standard library that have python shebang.
@@ -593,8 +599,8 @@ Obsoletes: python%{pyshortver} < %{version}-%{release}
 Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
-Provides: bundled(python3-pip) = 19.2.3
-Provides: bundled(python3-setuptools) = 41.2.0
+Provides: bundled(python3dist(pip)) = %{pip_version}
+Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %endif
 
 # The description for the flat package (SRPM and built)
