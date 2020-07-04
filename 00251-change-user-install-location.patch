@@ -1,4 +1,4 @@
-From a76c823ee9a498534526aa6ad3d36d589793a6f7 Mon Sep 17 00:00:00 2001
+From 3002acfa2d914e7d7056d03f6dc25c8d2dfdeca9 Mon Sep 17 00:00:00 2001
 From: Michal Cyprian <m.cyprian@gmail.com>
 Date: Mon, 26 Jun 2017 16:32:56 +0200
 Subject: [PATCH] 00251: Change user install location
@@ -40,7 +40,7 @@ index aaa300efa9..f8d453912a 100644
              else:
                  if self.exec_prefix is None:
 diff --git a/Lib/site.py b/Lib/site.py
-index e981a14208..63e05ff2ad 100644
+index 9e617afb00..db14f715f9 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -353,7 +353,14 @@ def getsitepackages(prefixes=None):
@@ -60,5 +60,5 @@ index e981a14208..63e05ff2ad 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 -- 
-2.26.2
+2.23.0
 

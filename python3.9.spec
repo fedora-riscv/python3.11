@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b3
+%global prerel b4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -267,8 +267,8 @@ Patch189: 00189-use-rpm-wheels.patch
 # The versions are written in Lib/ensurepip/__init__.py, this patch removes them.
 # When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
 # In such cases, the patch needs to be amended and the versions updated here:
-%global pip_version 19.2.3
-%global setuptools_version 41.2.0
+%global pip_version 20.1.1
+%global setuptools_version 47.1.0
 
 # 00251
 # Set values of prefix and exec_prefix in distutils install command
@@ -1596,6 +1596,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Jul 04 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.9.0~b4-1
+- Update to 3.9.0b4
+
 * Wed Jun 10 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b3-1
 - Update to 3.9.0b3
 
