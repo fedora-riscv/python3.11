@@ -246,21 +246,26 @@ Source10: idle3.desktop
 # AppData file for idle3
 Source11: idle3.appdata.xml
 
-# 00001 #
-# Fixup distutils/unixccompiler.py to remove standard library path from rpath:
-# Was Patch0 in ivazquez' python3000 specfile:
-Patch1:         00001-rpath.patch
+# (Patches taken from github.com/fedora-python/cpython)
 
-# 00111 #
-# Patch the Makefile.pre.in so that the generated Makefile doesn't try to build
-# a libpythonMAJOR.MINOR.a
+# 00001 # d06a8853cf4bae9e115f45e1d531d2dc152c5cc8
+# Fixup distutils/unixccompiler.py to remove standard library path from rpath
+# Was Patch0 in ivazquez' python3000 specfile
+Patch1: 00001-rpath.patch
+
+# 00111 # 03918d404a40a50c9f5f93dc748b52e613d70d31
+# Don't try to build a libpythonMAJOR.MINOR.a
+#
+# Downstream only: not appropriate for upstream.
+#
 # See https://bugzilla.redhat.com/show_bug.cgi?id=556092
-# Downstream only: not appropriate for upstream
 Patch111: 00111-no-static-lib.patch
 
-# 00189 #
-# Instead of bundled wheels, use our RPM packaged wheels from
-# /usr/share/python-wheels
+# 00189 # da1624564eb80bee8c289bc0dea347774a891a10
+# Instead of bundled wheels, use our RPM packaged wheels
+#
+# We keep them in /usr/share/python-wheels
+#
 # Downstream only: upstream bundles
 # We might eventually pursuit upstream support, but it's low prio
 Patch189: 00189-use-rpm-wheels.patch
@@ -271,20 +276,30 @@ Patch189: 00189-use-rpm-wheels.patch
 %global pip_version 20.1.1
 %global setuptools_version 47.1.0
 
-# 00251
+# 00251 # 2eabd04356402d488060bc8fe316ad13fc8a3356
+# Change user install location
+#
 # Set values of prefix and exec_prefix in distutils install command
 # to /usr/local if executable is /usr/bin/python* and RPM build
-# is not detected to make pip and distutils install into separate location
+# is not detected to make pip and distutils install into separate location.
+#
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
 # Downstream only: Awaiting resources to work on upstream PEP
 Patch251: 00251-change-user-install-location.patch
 
-# 00274 #
-# Upstream uses Debian-style architecture naming. Change to match Fedora.
+# 00274 # 1e9258f6e8f70e86d5130113d3eed22993cf3da9
+# Upstream uses Debian-style architecture naming, change to match Fedora
 Patch274: 00274-fix-arch-names.patch
 
-# 00328 #
-# Restore pyc to TIMESTAMP invalidation mode as default in rpmbubild
+# 00328 # 367fdcb5a075f083aea83ac174999272a8faf75c
+# Restore pyc to TIMESTAMP invalidation mode as default in rpmbuild
+#
+# Since Fedora 31, the $SOURCE_DATE_EPOCH is set in rpmbuild to the latest
+# %%changelog date. This makes Python default to the CHECKED_HASH pyc
+# invalidation mode, bringing more reproducible builds traded for an import
+# performance decrease. To avoid that, we don't default to CHECKED_HASH
+# when $RPM_BUILD_ROOT is set (i.e. when we are building RPM packages).
+#
 # See https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/57#comment-27426
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this

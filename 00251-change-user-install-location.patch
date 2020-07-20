@@ -1,4 +1,4 @@
-From 3002acfa2d914e7d7056d03f6dc25c8d2dfdeca9 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Michal Cyprian <m.cyprian@gmail.com>
 Date: Mon, 26 Jun 2017 16:32:56 +0200
 Subject: [PATCH] 00251: Change user install location
@@ -8,6 +8,7 @@ to /usr/local if executable is /usr/bin/python* and RPM build
 is not detected to make pip and distutils install into separate location.
 
 Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+Downstream only: Awaiting resources to work on upstream PEP
 ---
  Lib/distutils/command/install.py | 15 +++++++++++++--
  Lib/site.py                      |  9 ++++++++-
@@ -59,6 +60,3 @@ index 9e617afb00..db14f715f9 100644
      for sitedir in getsitepackages(prefixes):
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
--- 
-2.23.0
-

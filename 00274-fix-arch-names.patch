@@ -1,4 +1,4 @@
-From fdd4f023f6d677f05ba0eeedc37bee72d0be9968 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Petr Viktorin <pviktori@redhat.com>
 Date: Mon, 28 Aug 2017 17:16:46 +0200
 Subject: [PATCH] 00274: Upstream uses Debian-style architecture naming, change
@@ -81,6 +81,3 @@ index 7bbceb10d8..047676a168 100644
  # elif defined(__s390x__)
          s390x-linux-gnu
  # elif defined(__s390__)
--- 
-2.23.0
-

@@ -1,9 +1,12 @@
-From 7471b64da4786004c290e6ca6637cad231e319a3 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
 Date: Wed, 15 Aug 2018 15:36:29 +0200
 Subject: [PATCH] 00189: Instead of bundled wheels, use our RPM packaged wheels
 
 We keep them in /usr/share/python-wheels
+
+Downstream only: upstream bundles
+We might eventually pursuit upstream support, but it's low prio
 ---
  Lib/ensurepip/__init__.py | 33 ++++++++++++++++++++++-----------
  1 file changed, 22 insertions(+), 11 deletions(-)
@@ -29,9 +32,11 @@ index 21320a8319..dffe4ce389 100644
  __all__ = ["version", "bootstrap"]
  
 +_WHEEL_DIR = "/usr/share/python-wheels/"
-+
+ 
+-_SETUPTOOLS_VERSION = "47.1.0"
 +_wheels = {}
-+
+ 
+-_PIP_VERSION = "20.1.1"
 +def _get_most_recent_wheel_version(pkg):
 +    prefix = os.path.join(_WHEEL_DIR, "{}-".format(pkg))
 +    _wheels[pkg] = {}
@@ -42,11 +47,9 @@ index 21320a8319..dffe4ce389 100644
 +            _wheels[pkg][version_str] = os.path.basename(path)
 +    return str(max(_wheels[pkg], key=distutils.version.LooseVersion))
 +
- 
--_SETUPTOOLS_VERSION = "47.1.0"
++
 +_SETUPTOOLS_VERSION = _get_most_recent_wheel_version("setuptools")
- 
--_PIP_VERSION = "20.1.1"
++
 +_PIP_VERSION = _get_most_recent_wheel_version("pip")
  
  _PROJECTS = [
@@ -69,6 +72,3 @@ index 21320a8319..dffe4ce389 100644
  
              additional_paths.append(os.path.join(tmpdir, wheel_name))
  
--- 
-2.23.0
-
