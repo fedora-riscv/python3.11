@@ -831,11 +831,7 @@ InstallPython() {
   mkdir -p $ConfDir
   pushd $ConfDir
 
-  make \
-    DESTDIR=%{buildroot} \
-    INSTALL="install -p" \
-    EXTRA_CFLAGS="$MoreCFlags" \
-    install
+  %make_install EXTRA_CFLAGS="$MoreCFlags"
 
   popd
 
