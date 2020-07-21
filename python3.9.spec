@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -921,7 +921,7 @@ sed -i -e "s/'pyconfig.h'/'%{_pyconfig_h}'/" \
 
 # Install pathfix.py to bindir
 # See https://github.com/fedora-python/python-rpm-porting/issues/24
-cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/
+cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{pybasever}.py
 
 # Install i18n tools to bindir
 # They are also in python2, so we version them
@@ -999,7 +999,6 @@ mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
 rm %{buildroot}%{_bindir}/pydoc3
-rm %{buildroot}%{_bindir}/pathfix.py
 rm %{buildroot}%{_bindir}/pygettext3.py
 rm %{buildroot}%{_bindir}/msgfmt3.py
 rm %{buildroot}%{_bindir}/idle3
@@ -1020,6 +1019,7 @@ ln -s ./idle3 %{buildroot}%{_bindir}/idle
 ln -s ./python3-config %{buildroot}%{_bindir}/python-config
 ln -s ./python3.1 %{buildroot}%{_mandir}/man1/python.1
 ln -s ./python3.pc %{buildroot}%{_libdir}/pkgconfig/python.pc
+ln -s ./pathfix%{pybasever}.py %{buildroot}%{_bindir}/pathfix.py
 %if %{with debug_build}
 ln -s ./python3-debug %{buildroot}%{_bindir}/python-debug
 %endif
@@ -1397,6 +1397,7 @@ CheckPython optimized
 %{_bindir}/msgfmt.py
 %endif
 
+%{_bindir}/pathfix%{pybasever}.py
 %{_bindir}/pygettext%{pybasever}.py
 %{_bindir}/msgfmt%{pybasever}.py
 
@@ -1613,6 +1614,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 24 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-2
+- Add versioned pathfix%%{pybasever}.py to main and non-main RPMs
+
 * Mon Jul 20 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b5-1
 - Update to 3.9.0b5
 
