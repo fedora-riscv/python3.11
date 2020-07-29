@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1612,6 +1612,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0~b5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Fri Jul 24 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-2
 - Add versioned pathfix%%{pybasever}.py to main and non-main RPMs
 
