@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 
 
@@ -385,11 +385,12 @@ Recommends: %{pkgname}-setuptools
 Recommends: %{pkgname}-pip
 
 # This prevents ALL subpackages built from this spec to require
-# /usr/bin/python3*. Granularity per subpackage is impossible.
+# /usr/bin/python3* or python(abi). Granularity per subpackage is impossible.
 # It's intended for the libs package not to drag in the interpreter, see
 # https://bugzilla.redhat.com/show_bug.cgi?id=1547131
-# All others require %%{pkgname} anyway.
-%global __requires_exclude ^/usr/bin/python3
+# https://bugzilla.redhat.com/show_bug.cgi?id=1862082
+# All other packages require %%{pkgname} explicitly.
+%global __requires_exclude ^(/usr/bin/python3|python\\(abi\\))
 
 %description -n %{pkgname}
 Python %{pybasever} is an accessible, high-level, dynamically typed, interpreted
@@ -1612,6 +1613,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jul 30 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b5-4
+- Make python3-libs installable without python3
+  Resolves: rhbz#1862082
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0~b5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
