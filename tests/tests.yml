@@ -31,6 +31,9 @@
     - debugflags:
         dir: python/flags
         run: python3-debug ./assertflags.py -Og
+    - marshalparser:
+        dir: python/marshalparser
+        run: VERSION=3.9 SAMPLE=10 test_marshalparser_compatibility.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
@@ -41,3 +44,4 @@
     - python3-test  # for selftest
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests
+    - marshalparser  # for testing compatibility (magic numbers) with marshalparser
