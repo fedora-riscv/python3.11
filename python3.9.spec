@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 
 
@@ -304,6 +304,27 @@ Patch274: 00274-fix-arch-names.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
+
+# 00353 # f3c11e227c715450b3c1e945a5004e84cce41a58
+# Original names for architectures with different names downstream
+#
+# Pythons in RHEL/Fedora use different names for some architectures
+# than upstream and other distros (for example ppc64 vs. powerpc64).
+# See patch 274.
+# That means that an extension built with the default upstream settings
+# (on other distro or as an manylinux wheel) cannot be found by Python
+# on RHEL/Fedora because it has a different suffix.
+# This patch adds the original names to importlib so Python is able
+# to import extensions with an original architecture name in its
+# file name.
+#
+# WARNING: This patch has no effect on Python built with bootstrap
+# enabled because Python/importlib_external.h is not regenerated
+# and therefore Python during bootstrap contains importlib from
+# upstream without this feature. It's possible to include
+# Python/importlib_external.h to this patch but it'd make rebasing
+# a nightmare because it's basically a binary file.
+Patch353: 00353-Original-names-for-architectures-with-different-name.patch
 
 # (New patches go here ^^^)
 #
@@ -1613,6 +1634,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Aug 03 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-5
+- Add support for upstream architectures' names (patch 353)
+
 * Thu Jul 30 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b5-4
 - Make python3-libs installable without python3
   Resolves: rhbz#1862082
