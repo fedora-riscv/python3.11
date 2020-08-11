@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b5
+%global prerel rc1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -261,7 +261,7 @@ Patch1: 00001-rpath.patch
 # See https://bugzilla.redhat.com/show_bug.cgi?id=556092
 Patch111: 00111-no-static-lib.patch
 
-# 00189 # da1624564eb80bee8c289bc0dea347774a891a10
+# 00189 # f722680bf606b6b0051e6b4690ce551201382f87
 # Instead of bundled wheels, use our RPM packaged wheels
 #
 # We keep them in /usr/share/python-wheels
@@ -273,8 +273,8 @@ Patch189: 00189-use-rpm-wheels.patch
 # The versions are written in Lib/ensurepip/__init__.py, this patch removes them.
 # When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
 # In such cases, the patch needs to be amended and the versions updated here:
-%global pip_version 20.1.1
-%global setuptools_version 47.1.0
+%global pip_version 20.2.1
+%global setuptools_version 49.2.1
 
 # 00251 # 2eabd04356402d488060bc8fe316ad13fc8a3356
 # Change user install location
@@ -1634,6 +1634,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Aug 11 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc1-1
+- Update to 3.9.0rc1
+
 * Mon Aug 03 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-5
 - Add support for upstream architectures' names (patch 353)
 
