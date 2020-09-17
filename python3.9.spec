@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel rc1
+%global prerel rc2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -253,7 +253,7 @@ Source11: idle3.appdata.xml
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
 
-# 00111 # 03918d404a40a50c9f5f93dc748b52e613d70d31
+# 00111 # 93b40d73360053ca68b0aeec33b6a8ca167e33e2
 # Don't try to build a libpythonMAJOR.MINOR.a
 #
 # Downstream only: not appropriate for upstream.
@@ -1640,6 +1640,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Sep 17 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc2-1
+- Update to 3.9.0rc2
+
 * Wed Aug 12 2020 Petr Viktorin <pviktori@redhat.com> - 3.9.0~rc1-2
 - In sys.version and initial REPL message, list the source commit as "default"
 

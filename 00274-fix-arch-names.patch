@@ -29,7 +29,7 @@ index ba37cf99e2..52a9ec6662 100755
  	ppc64le | powerpc64little)
  		basic_machine=powerpc64le-unknown
 diff --git a/configure.ac b/configure.ac
-index 7bbceb10d8..047676a168 100644
+index d60f05251a..6a95964657 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -759,9 +759,9 @@ cat >> conftest.c <<EOF
