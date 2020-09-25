@@ -4,15 +4,19 @@ Date: Tue, 4 Aug 2020 12:04:03 +0200
 Subject: [PATCH] 00353: Original names for architectures with different names
  downstream
 
-Pythons in RHEL/Fedora use different names for some architectures
+https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
+
+Pythons in RHEL/Fedora used different names for some architectures
 than upstream and other distros (for example ppc64 vs. powerpc64).
-See patch 274.
-That means that an extension built with the default upstream settings
-(on other distro or as an manylinux wheel) cannot be found by Python
-on RHEL/Fedora because it has a different suffix.
-This patch adds the original names to importlib so Python is able
-to import extensions with an original architecture name in its
+This was patched in patch 274, now it is sedded if %with legacy_archnames.
+
+That meant that an extension built with the default upstream settings
+(on other distro or as an manylinux wheel) could not been found by Python
+on RHEL/Fedora because it had a different suffix.
+This patch adds the legacy names to importlib so Python is able
+to import extensions with a legacy architecture name in its
 file name.
+It work both ways, so it support both %with and %without legacy_archnames.
 
 WARNING: This patch has no effect on Python built with bootstrap
 enabled because Python/importlib_external.h is not regenerated
@@ -21,11 +25,11 @@ upstream without this feature. It's possible to include
 Python/importlib_external.h to this patch but it'd make rebasing
 a nightmare because it's basically a binary file.
 ---
- Lib/importlib/_bootstrap_external.py | 31 ++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ Lib/importlib/_bootstrap_external.py | 40 ++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/importlib/_bootstrap_external.py b/Lib/importlib/_bootstrap_external.py
-index 25a3f8c0e0..db4bb4d02d 100644
+index 25a3f8c0e0..a2edbebc88 100644
 --- a/Lib/importlib/_bootstrap_external.py
 +++ b/Lib/importlib/_bootstrap_external.py
 @@ -1566,7 +1566,7 @@ def _get_supported_file_loaders():
@@ -46,7 +50,7 @@ index 25a3f8c0e0..db4bb4d02d 100644
      if builtin_os == 'nt':
          SOURCE_SUFFIXES.append('.pyw')
          if '_d.pyd' in EXTENSION_SUFFIXES:
-@@ -1635,3 +1635,30 @@ def _install(_bootstrap_module):
+@@ -1635,3 +1635,39 @@ def _install(_bootstrap_module):
      supported_loaders = _get_supported_file_loaders()
      sys.path_hooks.extend([FileFinder.path_hook(*supported_loaders)])
      sys.meta_path.append(PathFinder)
@@ -61,6 +65,15 @@ index 25a3f8c0e0..db4bb4d02d 100644
 +    "-ppc-linux-gnuspe.": "-powerpc-linux-gnuspe.",
 +    "-ppc64-linux-gnu.": "-powerpc64-linux-gnu.",
 +    "-ppc64le-linux-gnu.": "-powerpc64le-linux-gnu.",
++    # The above, but the other way around:
++    "-arm-linux-gnueabihf.": "-arm-linux-gnueabi.",
++    "-armeb-linux-gnueabihf.": "-armeb-linux-gnueabi.",
++    "-mips64-linux-gnuabi64.": "-mips64-linux-gnu.",
++    "-mips64el-linux-gnuabi64.": "-mips64el-linux-gnu.",
++    "-powerpc-linux-gnu.": "-ppc-linux-gnu.",
++    "-powerpc-linux-gnuspe.": "-ppc-linux-gnuspe.",
++    "-powerpc64-linux-gnu.": "-ppc64-linux-gnu.",
++    "-powerpc64le-linux-gnu.": "-ppc64le-linux-gnu.",
 +}
 +
 +
