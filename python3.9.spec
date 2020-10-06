@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel rc2
+#global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -287,7 +287,7 @@ Patch1: 00001-rpath.patch
 # See https://bugzilla.redhat.com/show_bug.cgi?id=556092
 Patch111: 00111-no-static-lib.patch
 
-# 00189 # f722680bf606b6b0051e6b4690ce551201382f87
+# 00189 # 7c07eec60735bd65bda7d8e821d34718497cba27
 # Instead of bundled wheels, use our RPM packaged wheels
 #
 # We keep them in /usr/share/python-wheels
@@ -299,7 +299,7 @@ Patch189: 00189-use-rpm-wheels.patch
 # The versions are written in Lib/ensurepip/__init__.py, this patch removes them.
 # When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
 # In such cases, the patch needs to be amended and the versions updated here:
-%global pip_version 20.2.1
+%global pip_version 20.2.3
 %global setuptools_version 49.2.1
 
 # 00251 # 2eabd04356402d488060bc8fe316ad13fc8a3356
@@ -1672,6 +1672,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Oct 06 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0-1
+- Update to 3.9.0 final
+
 * Fri Sep 25 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc2-2
 - Use upstream architecture names on Fedora 34+
 - https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names

@@ -12,7 +12,7 @@ We might eventually pursuit upstream support, but it's low prio
  1 file changed, 22 insertions(+), 11 deletions(-)
 
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index 8f504e7f49..dffe4ce389 100644
+index 97dfa7ea71..984e587ea0 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
 @@ -1,3 +1,5 @@
@@ -21,8 +21,8 @@ index 8f504e7f49..dffe4ce389 100644
  import os
  import os.path
  import sys
-@@ -5,16 +7,28 @@ import runpy
- import tempfile
+@@ -6,16 +8,28 @@ import tempfile
+ import subprocess
  from importlib import resources
  
 -from . import _bundled
@@ -36,7 +36,7 @@ index 8f504e7f49..dffe4ce389 100644
 -_SETUPTOOLS_VERSION = "49.2.1"
 +_wheels = {}
  
--_PIP_VERSION = "20.2.1"
+-_PIP_VERSION = "20.2.3"
 +def _get_most_recent_wheel_version(pkg):
 +    prefix = os.path.join(_WHEEL_DIR, "{}-".format(pkg))
 +    _wheels[pkg] = {}
@@ -54,7 +54,7 @@ index 8f504e7f49..dffe4ce389 100644
  
  _PROJECTS = [
      ("setuptools", _SETUPTOOLS_VERSION, "py3"),
-@@ -108,13 +122,10 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
+@@ -105,13 +119,10 @@ def _bootstrap(*, root=None, upgrade=False, user=False,
          # additional paths that need added to sys.path
          additional_paths = []
          for project, version, py_tag in _PROJECTS:

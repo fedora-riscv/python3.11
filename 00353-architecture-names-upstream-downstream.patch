@@ -3,6 +3,9 @@ From: Lumir Balhar <lbalhar@redhat.com>
 Date: Tue, 4 Aug 2020 12:04:03 +0200
 Subject: [PATCH] 00353: Original names for architectures with different names
  downstream
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
 
@@ -24,6 +27,8 @@ and therefore Python during bootstrap contains importlib from
 upstream without this feature. It's possible to include
 Python/importlib_external.h to this patch but it'd make rebasing
 a nightmare because it's basically a binary file.
+
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
 ---
  Lib/importlib/_bootstrap_external.py | 40 ++++++++++++++++++++++++++--
  1 file changed, 38 insertions(+), 2 deletions(-)
