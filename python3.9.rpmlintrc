@@ -28,6 +28,9 @@ addFilter(r'only-non-binary-in-usr-lib')
 addFilter(r'devel-file-in-non-devel-package /usr/include/python3\.\d+m?/pyconfig-(32|64)\.h')
 addFilter(r'devel-file-in-non-devel-package /usr/lib(64)?/python3\.\d+/distutils/tests/xxmodule\.c')
 
+# some bytecode is shipped without sources on purpose, as a space optimization
+# if this regex needs to be relaxed in the future, make sure it **does not** match pyc files in __pycache__
+addFilter(r'python-bytecode-without-source /usr/lib(64)?/python3\.\d+/(encodings|pydoc_data)/[^/]+.pyc')
 
 # SORRY, NOT SORRY:
 # manual pages
