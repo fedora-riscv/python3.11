@@ -12,7 +12,7 @@ We might eventually pursuit upstream support, but it's low prio
  1 file changed, 22 insertions(+), 11 deletions(-)
 
 diff --git a/Lib/ensurepip/__init__.py b/Lib/ensurepip/__init__.py
-index 97dfa7ea71..984e587ea0 100644
+index cb2882e336..984e587ea0 100644
 --- a/Lib/ensurepip/__init__.py
 +++ b/Lib/ensurepip/__init__.py
 @@ -1,3 +1,5 @@
@@ -33,7 +33,7 @@ index 97dfa7ea71..984e587ea0 100644
  
 +_WHEEL_DIR = "/usr/share/python-wheels/"
  
--_SETUPTOOLS_VERSION = "49.2.1"
+-_SETUPTOOLS_VERSION = "47.1.0"
 +_wheels = {}
  
 -_PIP_VERSION = "20.2.3"

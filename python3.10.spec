@@ -2,10 +2,10 @@
 # Top-level metadata
 # ==================
 
-%global pybasever 3.9
+%global pybasever 3.10
 
 # pybasever without the dot:
-%global pyshortver 39
+%global pyshortver 310
 
 Name: python%{pybasever}
 Summary: Version %{pybasever} of the Python interpreter
@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-#global prerel ...
+%global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -60,7 +60,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -99,20 +99,6 @@ License: Python
 %bcond_with valgrind
 %endif
 
-# https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
-# For a very long time we have converted "upstream architecture names" to "Fedora names".
-# This made sense at the time, see https://github.com/pypa/manylinux/issues/687#issuecomment-666362947
-# However, with manylinux wheels popularity growth, this is now a problem.
-# Wheels built on a Linux that doesn't do this were not compatible with ours and vice versa.
-# We now have a compatibility layer to workaround a problem,
-# but we also no longer use the legacy arch names in Fedora 34+.
-# This bcond controls the behavior. The defaults should be good for anybody.
-%if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
-%bcond_with legacy_archnames
-%else
-%bcond_without legacy_archnames
-%endif
-
 # =====================
 # General global macros
 # =====================
@@ -135,18 +121,11 @@ License: Python
 %global LDVERSION_optimized %{pybasever}%{ABIFLAGS_optimized}
 %global LDVERSION_debug     %{pybasever}%{ABIFLAGS_debug}
 
-# When we use the upstream arch triplets, we convert them from the legacy ones
-# This is reversed in prep when %%with legacy_archnames, so we keep both macros
-%global platform_triplet_legacy %{_arch}-linux%{_gnu}
-%global platform_triplet_upstream %{expand:%(echo %{platform_triplet_legacy} | sed -E \\
+# We use the upstream arch triplets, we convert them from %%{_arch}-linux%%{_gnu}
+%global platform_triplet %{expand:%(echo %{_arch}-linux%{_gnu} | sed -E \\
     -e 's/^arm(eb)?-linux-gnueabi$/arm\\1-linux-gnueabihf/' \\
     -e 's/^mips64(el)?-linux-gnu$/mips64\\1-linux-gnuabi64/' \\
     -e 's/^ppc(64)?(le)?-linux-gnu$/powerpc\\1\\2-linux-gnu/')}
-%if %{with legacy_archnames}
-%global platform_triplet %{platform_triplet_legacy}
-%else
-%global platform_triplet %{platform_triplet_upstream}
-%endif
 
 %global SOABI_optimized cpython-%{pyshortver}%{ABIFLAGS_optimized}-%{platform_triplet}
 %global SOABI_debug     cpython-%{pyshortver}%{ABIFLAGS_debug}-%{platform_triplet}
@@ -259,7 +238,8 @@ BuildRequires: python3-rpm-generators
 
 Source0: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz
 Source1: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz.asc
-Source2: %{url}static/files/pubkeys.txt
+# The release manager for Python 3.10 is pablogsal
+Source2: https://keybase.io/pablogsal/pgp_keys.asc
 
 # A simple script to check timestamps of bytecode files
 # Run in check section with Python that is currently being built
@@ -287,7 +267,7 @@ Patch1: 00001-rpath.patch
 # See https://bugzilla.redhat.com/show_bug.cgi?id=556092
 Patch111: 00111-no-static-lib.patch
 
-# 00189 # 7c07eec60735bd65bda7d8e821d34718497cba27
+# 00189 # f40d9755abf593ffd64af2e909199958c285084d
 # Instead of bundled wheels, use our RPM packaged wheels
 #
 # We keep them in /usr/share/python-wheels
@@ -300,9 +280,9 @@ Patch189: 00189-use-rpm-wheels.patch
 # When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
 # In such cases, the patch needs to be amended and the versions updated here:
 %global pip_version 20.2.3
-%global setuptools_version 49.2.1
+%global setuptools_version 47.1.0
 
-# 00251 # 2eabd04356402d488060bc8fe316ad13fc8a3356
+# 00251 # 5c445123f04d96be42a35eef5119378ba1713a96
 # Change user install location
 #
 # Set values of prefix and exec_prefix in distutils install command
@@ -313,7 +293,7 @@ Patch189: 00189-use-rpm-wheels.patch
 # Downstream only: Awaiting resources to work on upstream PEP
 Patch251: 00251-change-user-install-location.patch
 
-# 00328 # 367fdcb5a075f083aea83ac174999272a8faf75c
+# 00328 # 318e500c98f5e59eb1f23e0fcd32db69b9bd17e1
 # Restore pyc to TIMESTAMP invalidation mode as default in rpmbuild
 #
 # Since Fedora 31, the $SOURCE_DATE_EPOCH is set in rpmbuild to the latest
@@ -326,31 +306,6 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
-
-# 00353 # ab4cc97b643cfe99f567e3a03e5617b507183771
-# Original names for architectures with different names downstream
-#
-# https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
-#
-# Pythons in RHEL/Fedora used different names for some architectures
-# than upstream and other distros (for example ppc64 vs. powerpc64).
-# This was patched in patch 274, now it is sedded if %%with legacy_archnames.
-#
-# That meant that an extension built with the default upstream settings
-# (on other distro or as an manylinux wheel) could not been found by Python
-# on RHEL/Fedora because it had a different suffix.
-# This patch adds the legacy names to importlib so Python is able
-# to import extensions with a legacy architecture name in its
-# file name.
-# It work both ways, so it support both %%with and %%without legacy_archnames.
-#
-# WARNING: This patch has no effect on Python built with bootstrap
-# enabled because Python/importlib_external.h is not regenerated
-# and therefore Python during bootstrap contains importlib from
-# upstream without this feature. It's possible to include
-# Python/importlib_external.h to this patch but it'd make rebasing
-# a nightmare because it's basically a binary file.
-Patch353: 00353-architecture-names-upstream-downstream.patch
 
 # (New patches go here ^^^)
 #
@@ -709,12 +664,6 @@ rm -r Modules/expat
 # (This is after patching, so that we can use patches directly from upstream)
 rm configure pyconfig.h.in
 
-# When we use the legacy arch names, we need to change them in configure.ac
-%if %{with legacy_archnames}
-sed -i configure.ac \
-    -e 's/\b%{platform_triplet_upstream}\b/%{platform_triplet_legacy}/'
-%endif
-
 
 # ======================================================
 # Configuring and building the code:
@@ -1063,7 +1012,7 @@ rm %{buildroot}%{_bindir}/idle3
 rm %{buildroot}%{_bindir}/python3-*
 rm %{buildroot}%{_bindir}/2to3
 rm %{buildroot}%{_libdir}/libpython3.so
-rm %{buildroot}%{_mandir}/man1/python3.1*
+rm %{buildroot}%{_mandir}/man1/python3.1
 rm %{buildroot}%{_libdir}/pkgconfig/python3.pc
 rm %{buildroot}%{_libdir}/pkgconfig/python3-embed.pc
 %else
@@ -1317,7 +1266,6 @@ CheckPython optimized
 %{dynload_dir}/mmap.%{SOABI_optimized}.so
 %{dynload_dir}/nis.%{SOABI_optimized}.so
 %{dynload_dir}/ossaudiodev.%{SOABI_optimized}.so
-%{dynload_dir}/parser.%{SOABI_optimized}.so
 %{dynload_dir}/_posixshmem.%{SOABI_optimized}.so
 %{dynload_dir}/pyexpat.%{SOABI_optimized}.so
 %{dynload_dir}/readline.%{SOABI_optimized}.so
@@ -1602,7 +1550,6 @@ CheckPython optimized
 %{dynload_dir}/mmap.%{SOABI_debug}.so
 %{dynload_dir}/nis.%{SOABI_debug}.so
 %{dynload_dir}/ossaudiodev.%{SOABI_debug}.so
-%{dynload_dir}/parser.%{SOABI_debug}.so
 %{dynload_dir}/_posixshmem.%{SOABI_debug}.so
 %{dynload_dir}/pyexpat.%{SOABI_debug}.so
 %{dynload_dir}/readline.%{SOABI_debug}.so
@@ -1672,134 +1619,5 @@ CheckPython optimized
 # ======================================================
 
 %changelog
-* Tue Oct 06 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0-1
-- Update to 3.9.0 final
-
-* Fri Sep 25 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc2-2
-- Use upstream architecture names on Fedora 34+
-- https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
-
-* Thu Sep 17 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc2-1
-- Update to 3.9.0rc2
-
-* Wed Aug 12 2020 Petr Viktorin <pviktori@redhat.com> - 3.9.0~rc1-2
-- In sys.version and initial REPL message, list the source commit as "default"
-
-* Tue Aug 11 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~rc1-1
-- Update to 3.9.0rc1
-
-* Mon Aug 03 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-5
-- Add support for upstream architectures' names (patch 353)
-
-* Thu Jul 30 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b5-4
-- Make python3-libs installable without python3
-  Resolves: rhbz#1862082
-
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0~b5-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Fri Jul 24 2020 Lumír Balhar <lbalhar@redhat.com> - 3.9.0~b5-2
-- Add versioned pathfix%%{pybasever}.py to main and non-main RPMs
-
-* Mon Jul 20 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b5-1
-- Update to 3.9.0b5
-
-* Thu Jul 16 2020 Marcel Plch <mplch@redhat.com> - 3.9.0~b4-2
-- Remove large, autogenerated Python sources and redundant pycache levels to reduce filesystem footprint
-
-* Sat Jul 04 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.9.0~b4-1
-- Update to 3.9.0b4
-
-* Wed Jun 10 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b3-1
-- Update to 3.9.0b3
-
-* Tue Jun 09 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b2-1
-- Update to 3.9.0b2
-
-* Fri May 29 2020 Petr Viktorin <pviktori@redhat.com> - 3.9.0~b1-4
-- Add cherry-picks for bugs found in 3.9.0b1
-
-* Thu May 21 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-3
-- Rebuilt for https://fedoraproject.org/wiki/Changes/Python3.9
-
-* Thu May 21 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-2
-- Bootstrap for https://fedoraproject.org/wiki/Changes/Python3.9
-
-* Tue May 19 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~b1-1
-- Update to Python 3.9.0b1
-
-* Thu May 07 2020 Tomas Orsava <torsava@redhat.com> - 3.9.0~a6-2
-- Rename from python39 to python3.9
-
-* Tue Apr 28 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a6-1
-- Update to Python 3.9.0a6
-
-* Tue Mar 24 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a5-1
-- Update to Python 3.9.0a5
-
-* Thu Feb 27 2020 Marcel Plch <mplch@redhat.com> - 3.9.0~a4-1
-- Update to Python 3.9.0a4
-
-* Tue Feb 11 2020 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a3-2
-- Update the ensurepip module to work with setuptools >= 45
-
-* Mon Jan 27 2020 Victor Stinner <vstinner@python.org> - 3.9.0~a3-1
-- Update to Python 3.9.0a3
-
-* Thu Dec 19 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a2-1
-- Rebased to Python 3.9.0a2
-
-* Wed Dec 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-3
-- Build Python with -fno-semantic-interposition for better performance
-- https://fedoraproject.org/wiki/Changes/PythonNoSemanticInterpositionSpeedup
-
-* Thu Nov 28 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-2
-- Don't remove the test.test_tools module
-
-* Wed Nov 20 2019 Miro Hrončok <mhroncok@redhat.com> - 3.9.0~a1-1
-- Rebased to Python 3.9.0a1
-
-* Mon Oct 14 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0-1
-- Update to Python 3.8.0 final
-
-* Tue Oct 01 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~rc1-1
-- Rebased to Python 3.8.0rc1
-
-* Sat Aug 31 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b4-1
-- Rebased to Python 3.8.0b4
-- Enable Profile-guided optimization for all arches, not just x86 (#1741015)
-
-* Mon Jul 29 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b3-1
-- Update to 3.8.0b3
-
-* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0~b2-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
-
-* Fri Jul 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b2-1
-- Update to 3.8.0b2
-
-* Wed Jun 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~b1-1
-- Update to 3.8.0b1
-
-* Fri May 17 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-2
-- Remove a faulty patch that resulted in invalid value of
-  distutils.sysconfig.get_config_var('LIBPL') (#1710767)
-
-* Tue May 07 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a4-1
-- Update to 3.8.0a4
-
-* Tue Mar 26 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a3-1
-- Update to 3.8.0a3
-
-* Mon Feb 25 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a2-1
-- Update to 3.8.0a2
-
-* Mon Feb 18 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a1-3
-- Reduced default build flags used to build extension modules
-  https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
-
-* Sun Feb 17 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.8.0~a1-2
-- Rebuild for readline 8.0
-
-* Tue Feb 05 2019 Miro Hrončok <mhroncok@redhat.com> - 3.8.0~a1-1
-- Update to 3.8.0a1
+* Fri Oct 09 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a1-1
+- Initial Python 3.10 package forked from Python 3.9

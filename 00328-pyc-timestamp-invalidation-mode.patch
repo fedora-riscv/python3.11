@@ -19,7 +19,7 @@ Ideally, we should talk to upstream and explain why we don't want this
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/py_compile.py b/Lib/py_compile.py
-index a81f493731..bba3642bf2 100644
+index 0f9b59025c..59dc3fe50b 100644
 --- a/Lib/py_compile.py
 +++ b/Lib/py_compile.py
 @@ -70,7 +70,8 @@ class PycInvalidationMode(enum.Enum):
@@ -33,12 +33,12 @@ index a81f493731..bba3642bf2 100644
      else:
          return PycInvalidationMode.TIMESTAMP
 diff --git a/Lib/test/test_py_compile.py b/Lib/test/test_py_compile.py
-index e6791c6916..b2d3dcf7fb 100644
+index b58f28a4bc..7ede33d6c9 100644
 --- a/Lib/test/test_py_compile.py
 +++ b/Lib/test/test_py_compile.py
 @@ -19,6 +19,7 @@ def without_source_date_epoch(fxn):
      def wrapper(*args, **kwargs):
-         with support.EnvironmentVarGuard() as env:
+         with os_helper.EnvironmentVarGuard() as env:
              env.unset('SOURCE_DATE_EPOCH')
 +            env.unset('RPM_BUILD_ROOT')
              return fxn(*args, **kwargs)
@@ -46,7 +46,7 @@ index e6791c6916..b2d3dcf7fb 100644
  
 @@ -29,6 +30,7 @@ def with_source_date_epoch(fxn):
      def wrapper(*args, **kwargs):
-         with support.EnvironmentVarGuard() as env:
+         with os_helper.EnvironmentVarGuard() as env:
              env['SOURCE_DATE_EPOCH'] = '123456789'
 +            env.unset('RPM_BUILD_ROOT')
              return fxn(*args, **kwargs)
