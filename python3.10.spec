@@ -971,11 +971,6 @@ ln -s \
   %{buildroot}%{_bindir}/python3-debug
 %endif
 
-# There's 2to3-X.X executable and 2to3 soft link to it.
-# No reason to have both, so keep only 2to3 as an executable.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1111275
-mv %{buildroot}%{_bindir}/2to3-%{pybasever} %{buildroot}%{_bindir}/2to3
-
 %if %{without main_python}
 # Remove stuff that would conflict with python3 package
 rm %{buildroot}%{_bindir}/python3
@@ -1350,10 +1345,6 @@ CheckPython optimized
 %files -n %{pkgname}-devel
 %endif
 
-%if %{with main_python}
-%{_bindir}/2to3
-%endif
-
 %{pylibdir}/config-%{LDVERSION_optimized}-%{platform_triplet}/*
 %if %{without flatpackage}
 %exclude %{pylibdir}/config-%{LDVERSION_optimized}-%{platform_triplet}/Makefile
@@ -1365,6 +1356,7 @@ CheckPython optimized
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
 
 %if %{with main_python}
+%{_bindir}/2to3
 %{_bindir}/python3-config
 %{_bindir}/python-config
 %{_libdir}/pkgconfig/python3.pc
@@ -1377,6 +1369,7 @@ CheckPython optimized
 %{_bindir}/msgfmt.py
 %endif
 
+%{_bindir}/2to3-%{pybasever}
 %{_bindir}/pathfix%{pybasever}.py
 %{_bindir}/pygettext%{pybasever}.py
 %{_bindir}/msgfmt%{pybasever}.py
