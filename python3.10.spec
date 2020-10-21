@@ -375,11 +375,6 @@ Provides: python(abi) = %{pybasever}
 
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
-# In Fedora 31, /usr/bin/pydoc was moved here from Python 2.
-# Ideally we'd have an explicit conflict with "/usr/bin/pydoc < 3",
-# but file provides aren't versioned and the file moved across packages.
-# Instead, we rely on the conflict in python3-libs.
-
 # Previously, this was required for our rewheel patch to work.
 # This is technically no longer needed, but we keep it recommended
 # for the developer experience.
@@ -455,17 +450,6 @@ Recommends: %{pkgname}%{?_isa} = %{version}-%{release}
 # we recommend it when tk is already installed (for better UX)
 Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 
-# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
-# In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
-# "unversioned" provides were moved from python2 to python3.
-# So, newer python3 packages need to conflict with old Python 2 builds that
-# still provided unversioned Python.
-# Since all python packages, new and old, have versioned requires on
-# python?-libs, we do it here:
-Conflicts: python-libs < 3
-# (We explicitly conflict with python-libs and not python2-libs, so only the
-# old Python 2 builds that still provided unversioned Python are handled.)
-
 
 %description -n %{pkgname}-libs
 This package contains runtime libraries for use by Python:
@@ -501,10 +485,6 @@ Provides: 2to3 = %{version}-%{release}
 
 Conflicts: %{pkgname} < %{version}-%{release}
 
-# In Fedora 31, several "unversioned" files were moved here from Python 2:
-# pygettext.py, msgfmt.py, python-config, python.pc
-Conflicts: python-devel < 3
-
 %description -n %{pkgname}-devel
 This package contains the header files and configuration needed to compile
 Python extension modules (typically written in C or C++), to embed Python
@@ -525,9 +505,6 @@ Provides: idle = %{version}-%{release}
 Provides: %{pkgname}-tools = %{version}-%{release}
 Provides: %{pkgname}-tools%{?_isa} = %{version}-%{release}
 Obsoletes: %{pkgname}-tools < %{version}-%{release}
-
-# In Fedora 31, /usr/bin/idle was moved here from Python 2.
-Conflicts: python-tools < 3
 
 %description -n %{pkgname}-idle
 IDLE is Python’s Integrated Development and Learning Environment.
@@ -577,9 +554,6 @@ Requires: %{pkgname}-devel%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-test%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-tkinter%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-idle%{?_isa} = %{version}-%{release}
-
-# In Fedora 31, /usr/bin/python-debug was moved here from Python 2.
-Conflicts: python-debug < 3
 
 %description -n %{pkgname}-debug
 python3-debug provides a version of the Python runtime with numerous debugging
