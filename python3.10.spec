@@ -824,9 +824,7 @@ InstallPython() {
 
   # Rename the -devel script that differs on different arches to arch specific name
   mv %{buildroot}%{_bindir}/python${LDVersion}-{,`uname -m`-}config
-  echo -e '#!/bin/sh\nexec `dirname $0`/python'${LDVersion}'-`uname -m`-config "$@"' > \
-    %{buildroot}%{_bindir}/python${LDVersion}-config
-  echo '[ $? -eq 127 ] && echo "Could not find python'${LDVersion}'-`uname -m`-config. Look around to see available arches." >&2' >> \
+  echo -e '#!/bin/sh\nexec %{_bindir}/python'${LDVersion}'-`uname -m`-config "$@"' > \
     %{buildroot}%{_bindir}/python${LDVersion}-config
     chmod +x %{buildroot}%{_bindir}/python${LDVersion}-config
 
