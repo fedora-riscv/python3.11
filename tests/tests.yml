@@ -22,9 +22,6 @@
     - selftest:
         dir: python/selftest
         run: VERSION=3.10 X="" ./parallel.sh
-    - marshalparser:
-        dir: python/marshalparser
-        run: INSTALL_OR_SKIP=true VERSION=3.10 SAMPLE=10 test_marshalparser_compatibility.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
