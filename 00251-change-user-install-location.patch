@@ -18,7 +18,7 @@ diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index aaa300efa9..f8d453912a 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
-@@ -419,8 +419,19 @@ class install(Command):
+@@ -419,8 +419,19 @@ def finalize_unix(self):
                      raise DistutilsOptionError(
                            "must not supply exec-prefix without prefix")
  

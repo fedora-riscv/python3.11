@@ -21,7 +21,7 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 921bd08ea5..ddc55fa410 100644
+index a8912cd418..06ca6bb87f 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -576,7 +576,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
@@ -55,7 +55,7 @@ index 921bd08ea5..ddc55fa410 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1600,17 +1594,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1604,17 +1598,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

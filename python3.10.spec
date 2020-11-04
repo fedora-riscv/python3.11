@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a1
+%global prerel a2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1584,6 +1584,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Nov 04 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a2-1
+- Update to 3.10.0a2
+
 * Mon Oct 12 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a1-2
 - Finish initial bootstrap, build Python 3.10 with Python 3.10
 
