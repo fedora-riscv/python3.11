@@ -204,6 +204,7 @@ BuildRequires: tar
 BuildRequires: tcl-devel
 BuildRequires: tix-devel
 BuildRequires: tk-devel
+BuildRequires: tzdata
 
 %if %{with valgrind}
 BuildRequires: valgrind-devel
@@ -447,6 +448,9 @@ Recommends: %{pkgname}%{?_isa} = %{version}-%{release}
 # we recommend it when tk is already installed (for better UX)
 Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 
+# The zoneinfo module needs tzdata
+Requires: tzdata
+
 
 %description -n %{pkgname}-libs
 This package contains runtime libraries for use by Python:
@@ -592,6 +596,9 @@ Requires: python-pip-wheel
 Provides: bundled(python3dist(pip)) = %{pip_version}
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %endif
+
+# The zoneinfo module needs tzdata
+Requires: tzdata
 
 # The description for the flat package (SRPM and built)
 %description
