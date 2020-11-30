@@ -225,6 +225,9 @@ BuildRequires: python-pip-wheel
 
 %if %{without bootstrap}
 # for make regen-all and distutils.tests.test_bdist_rpm
+# Note that we're not using the %%{pkgname} macro here on purpose, because when
+# upgrading the main python3 to a new Python version, this would pull in the
+# old version instead.
 BuildRequires: python%{pybasever}
 # for proper automatic provides
 BuildRequires: python3-rpm-generators
