@@ -191,6 +191,7 @@ BuildRequires: libtirpc-devel
 BuildRequires: libGL-devel
 BuildRequires: libuuid-devel
 BuildRequires: libX11-devel
+BuildRequires: make
 BuildRequires: ncurses-devel
 
 BuildRequires: openssl-devel
