@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a2
+%global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -1592,6 +1592,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Dec 08 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a3-1
+- Update to 3.10.0a3
+
 * Wed Nov 04 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a2-1
 - Update to 3.10.0a2
 

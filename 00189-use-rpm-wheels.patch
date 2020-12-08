@@ -21,7 +21,7 @@ index cb2882e336..984e587ea0 100644
  import os
  import os.path
  import sys
-@@ -6,16 +8,28 @@
+@@ -6,16 +8,28 @@ import tempfile
  import subprocess
  from importlib import resources
  
