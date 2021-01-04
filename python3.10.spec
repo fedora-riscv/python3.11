@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a3
+%global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -1252,6 +1252,7 @@ CheckPython optimized
 %{dynload_dir}/unicodedata.%{SOABI_optimized}.so
 %{dynload_dir}/_uuid.%{SOABI_optimized}.so
 %{dynload_dir}/xxlimited.%{SOABI_optimized}.so
+%{dynload_dir}/xxlimited_35.%{SOABI_optimized}.so
 %{dynload_dir}/_xxsubinterpreters.%{SOABI_optimized}.so
 %{dynload_dir}/zlib.%{SOABI_optimized}.so
 %{dynload_dir}/_zoneinfo.%{SOABI_optimized}.so
@@ -1533,6 +1534,8 @@ CheckPython optimized
 %{dynload_dir}/termios.%{SOABI_debug}.so
 %{dynload_dir}/unicodedata.%{SOABI_debug}.so
 %{dynload_dir}/_uuid.%{SOABI_debug}.so
+%{dynload_dir}/xxlimited.%{SOABI_debug}.so
+%{dynload_dir}/xxlimited_35.%{SOABI_debug}.so
 %{dynload_dir}/_xxsubinterpreters.%{SOABI_debug}.so
 %{dynload_dir}/_xxtestfuzz.%{SOABI_debug}.so
 %{dynload_dir}/zlib.%{SOABI_debug}.so
@@ -1592,6 +1595,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jan 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a4-1
+- Update to 3.10.0a4
+
 * Tue Dec 08 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a3-1
 - Update to 3.10.0a3
 

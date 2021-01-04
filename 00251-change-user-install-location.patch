@@ -15,10 +15,10 @@ Downstream only: Awaiting resources to work on upstream PEP
  2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index aaa300efa9..f8d453912a 100644
+index bdead133bd..274ca6d340 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
-@@ -419,8 +419,19 @@ class install(Command):
+@@ -422,8 +422,19 @@ def finalize_unix(self):
                      raise DistutilsOptionError(
                            "must not supply exec-prefix without prefix")
  
@@ -41,10 +41,10 @@ index aaa300efa9..f8d453912a 100644
              else:
                  if self.exec_prefix is None:
 diff --git a/Lib/site.py b/Lib/site.py
-index 4d3b869fff..aee20de308 100644
+index 5f1b31e73d..3e97724131 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -364,8 +364,15 @@ def getsitepackages(prefixes=None):
+@@ -378,8 +378,15 @@ def getsitepackages(prefixes=None):
      return sitepackages
  
  def addsitepackages(known_paths, prefixes=None):
