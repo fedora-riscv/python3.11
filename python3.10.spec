@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -753,9 +753,13 @@ BuildPython() {
 # Call the above to build each configuration.
 
 %if %{with debug_build}
+# The debug build is compiled with the lowest level of optimizations as to not optimize
+# out frames. We also suppress the warnings as the default distro value of the FORTIFY_SOURCE
+# option produces too many warnings when compiling at the O0 optimization level.
+# See also: https://bugzilla.redhat.com/show_bug.cgi?id=1818857
 BuildPython debug \
   "--without-ensurepip --with-pydebug" \
-  "-Og"
+  "-O0 -Wno-cpp"
 %endif # with debug_build
 
 BuildPython optimized \
@@ -1073,8 +1077,6 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
-  # test_gdb on arm:
-  #   https://bugzilla.redhat.com/show_bug.cgi?id=1846390
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
     %if %{with bootstrap}
@@ -1082,9 +1084,6 @@ CheckPython() {
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
-    %endif
-    %ifarch %{arm}
-    -x test_gdb \
     %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
@@ -1595,6 +1594,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jan 15 2021 Charalampos Stratakis <cstratak@redhat.com> - 3.10.0~a4-2
+- Compile the debug build with -O0 instead of -Og (rhbz#1818857)
+
 * Mon Jan 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a4-1
 - Update to 3.10.0a4
 
