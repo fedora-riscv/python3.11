@@ -1,0 +1,28 @@
+# exclude test XML data (not always valid) from XML validity check:
+xml:
+    ignore:
+        - /usr/lib*/python*/test/xmltestdata/*
+        - /usr/lib*/python*/test/xmltestdata/*/*
+
+# exclude _socket from ipv4 only functions check, it has both ipv4 and ipv6 only
+badfuncs:
+    ignore:
+        - /usr/lib*/python*/lib-dynload/_socket.*
+
+# don't report changed content of compiled files
+# that is expected with every toolchain update and not reproducible yet
+changedfiles:
+    # note that this is a posix regex, so no \d
+    exclude_path: (\.so(\.[0-9]+(\.[0-9]+)?)?$|^/usr/bin/python[0-9]+\.[0-9]+d?m?$)
+
+# files change size all the time, we don't need to VERIFY it
+# however, the INFO is useful, so we don't disable the check entirely
+filesize:
+    # artificially large number, TODO a better way
+    size_threshold: 100000
+
+
+# completely disabled inspections:
+inspections:
+    # we know about our patches, no need to report anything
+    patches: off
