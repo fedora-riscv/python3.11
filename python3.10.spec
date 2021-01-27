@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1594,6 +1594,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~a4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Fri Jan 15 2021 Charalampos Stratakis <cstratak@redhat.com> - 3.10.0~a4-2
 - Compile the debug build with -O0 instead of -Og (rhbz#1818857)
 
