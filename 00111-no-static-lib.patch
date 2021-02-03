@@ -21,10 +21,10 @@ Co-authored-by: Miro Hrončok <miro@hroncok.cz>
  1 file changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index d8b9e8498d..5f4fbe6eb4 100644
+index 0b22bdd559..dfd21d837f 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -576,7 +576,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
+@@ -578,7 +578,7 @@ clinic: check-clean-src $(srcdir)/Modules/_blake2/blake2s_impl.c
  	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py --make --srcdir $(srcdir)
  
  # Build the interpreter
@@ -33,7 +33,7 @@ index d8b9e8498d..5f4fbe6eb4 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  platform: $(BUILDPYTHON) pybuilddir.txt
-@@ -624,12 +624,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
+@@ -626,12 +626,6 @@ sharedmods: $(BUILDPYTHON) pybuilddir.txt Modules/_math.o
  		_TCLTK_INCLUDES='$(TCLTK_INCLUDES)' _TCLTK_LIBS='$(TCLTK_LIBS)' \
  		$(PYTHON_FOR_BUILD) $(srcdir)/setup.py $$quiet build
  
@@ -46,7 +46,7 @@ index d8b9e8498d..5f4fbe6eb4 100644
  libpython$(LDVERSION).so: $(LIBRARY_OBJS) $(DTRACE_OBJS)
  	if test $(INSTSONAME) != $(LDLIBRARY); then \
  		$(BLDSHARED) -Wl,-h$(INSTSONAME) -o $(INSTSONAME) $(LIBRARY_OBJS) $(MODLIBS) $(SHLIBS) $(LIBC) $(LIBM); \
-@@ -711,7 +705,7 @@ Makefile Modules/config.c: Makefile.pre \
+@@ -713,7 +707,7 @@ Makefile Modules/config.c: Makefile.pre \
  	@echo "The Makefile was updated, you may need to re-run make."
  
  
@@ -55,7 +55,7 @@ index d8b9e8498d..5f4fbe6eb4 100644
  	$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/_testembed.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS)
  
  ############################################################################
-@@ -1647,17 +1641,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
+@@ -1661,17 +1655,6 @@ libainstall:	@DEF_MAKE_RULE@ python-config
  		else	true; \
  		fi; \
  	done

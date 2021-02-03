@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a4
+%global prerel a5
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -65,6 +65,11 @@ License: Python
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
 %bcond_without rpmwheels
+# If the rpmwheels condition is disabled, we use the bundled wheel packages
+# from Python with the versions below.
+# This needs to be manually updated when we update Python.
+%global pip_version 21.0.1
+%global setuptools_version 52.0.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
@@ -268,21 +273,6 @@ Patch1: 00001-rpath.patch
 #
 # See https://bugzilla.redhat.com/show_bug.cgi?id=556092
 Patch111: 00111-no-static-lib.patch
-
-# 00189 # f40d9755abf593ffd64af2e909199958c285084d
-# Instead of bundled wheels, use our RPM packaged wheels
-#
-# We keep them in /usr/share/python-wheels
-#
-# Downstream only: upstream bundles
-# We might eventually pursuit upstream support, but it's low prio
-Patch189: 00189-use-rpm-wheels.patch
-# The following versions of setuptools/pip are bundled when this patch is not applied.
-# The versions are written in Lib/ensurepip/__init__.py, this patch removes them.
-# When the bundled setuptools/pip wheel is updated, the patch no longer applies cleanly.
-# In such cases, the patch needs to be amended and the versions updated here:
-%global pip_version 20.2.3
-%global setuptools_version 47.1.0
 
 # 00251 # 5c445123f04d96be42a35eef5119378ba1713a96
 # Change user install location
@@ -621,18 +611,12 @@ version once Python %{pybasever} is stable.
 
 %prep
 %gpgverify -k2 -s1 -d0
-%autosetup -S git_am -N -n Python-%{upstream_version}
-
-# Apply patches up to 188
-%autopatch -M 188
+%autosetup -S git_am -n Python-%{upstream_version}
 
 %if %{with rpmwheels}
-%apply_patch -q %{PATCH189}
-rm Lib/ensurepip/_bundled/*.whl
+rm Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+rm Lib/ensurepip/_bundled/setuptools-%{setuptools_version}-py3-none-any.whl
 %endif
-
-# Apply the remaining patches
-%autopatch -m 190
 
 # Remove all exe files to ensure we are not shipping prebuilt binaries
 # note that those are only used to create Microsoft Windows installers
@@ -730,6 +714,9 @@ BuildPython() {
   --with-dtrace \
   --with-lto \
   --with-ssl-default-suites=openssl \
+%if %{with rpmwheels}
+  --with-wheel-pkg-dir=%{_datadir}/python-wheels \
+%endif
 %if %{with valgrind}
   --with-valgrind \
 %endif
@@ -1167,7 +1154,8 @@ CheckPython optimized
 %exclude %{pylibdir}/ensurepip/_bundled
 %else
 %dir %{pylibdir}/ensurepip/_bundled
-%{pylibdir}/ensurepip/_bundled/*.whl
+%{pylibdir}/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+%{pylibdir}/ensurepip/_bundled/setuptools-%{setuptools_version}-py3-none-any.whl
 %{pylibdir}/ensurepip/_bundled/__init__.py
 %{pylibdir}/ensurepip/_bundled/__pycache__/*%{bytecode_suffixes}
 %endif
@@ -1594,6 +1582,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb  3 15:01:21 CET 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a5-1
+- Update to 3.10.0a5
+
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~a4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
