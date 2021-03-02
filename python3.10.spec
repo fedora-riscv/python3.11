@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a5
+%global prerel a6
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -265,14 +265,6 @@ Source11: idle3.appdata.xml
 # Fixup distutils/unixccompiler.py to remove standard library path from rpath
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
-
-# 00111 # 93b40d73360053ca68b0aeec33b6a8ca167e33e2
-# Don't try to build a libpythonMAJOR.MINOR.a
-#
-# Downstream only: not appropriate for upstream.
-#
-# See https://bugzilla.redhat.com/show_bug.cgi?id=556092
-Patch111: 00111-no-static-lib.patch
 
 # 00251 # 5c445123f04d96be42a35eef5119378ba1713a96
 # Change user install location
@@ -714,6 +706,7 @@ BuildPython() {
   --with-dtrace \
   --with-lto \
   --with-ssl-default-suites=openssl \
+  --without-static-libpython \
 %if %{with rpmwheels}
   --with-wheel-pkg-dir=%{_datadir}/python-wheels \
 %endif
@@ -1064,8 +1057,10 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
+  # test_frozentable fails with Python 3.10.0a6 (https://bugs.python.org/issue43372)
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
+    -i test_frozentable \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
@@ -1582,6 +1577,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Mar 02 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a6-1
+- Update to 3.10.0a6
+
 * Wed Feb  3 15:01:21 CET 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a5-1
 - Update to 3.10.0a5
 
