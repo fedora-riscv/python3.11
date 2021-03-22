@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a6
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -563,8 +563,8 @@ The debug runtime additionally supports debug builds of C-API extensions
 
 # We'll not provide this, on purpose
 # No package in Fedora shall ever depend on flatpackage via this
-%global __requires_exclude ^python\\(abi\\) = 3\\..$
-%global __provides_exclude ^python\\(abi\\) = 3\\..$
+%global __requires_exclude ^python\\(abi\\) = 3\\..+
+%global __provides_exclude ^python\\(abi\\) = 3\\..+
 
 # Python interpreter packages used to be named (or provide) name pythonXY (e.g.
 # python39). However, to align it with the executable names and to prepare for
@@ -1577,6 +1577,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Mar 22 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a6-2
+- When flat, don't require/provide python(abi) = 3.10
+
 * Tue Mar 02 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a6-1
 - Update to 3.10.0a6
 
