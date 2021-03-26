@@ -13,6 +13,7 @@ addFilter(r'missing-call-to-chdir-with-chroot')
 
 # intentionally unversioned and selfobsoleted
 addFilter(r'unversioned-explicit-obsoletes python')
+addFilter(r'unversioned Obsoletes: Obsoletes: python3\.\d+$')
 addFilter(r'self-obsoletion python3\.\d+ obsoletes python3\.\d+')
 
 # intentionally hardcoded
