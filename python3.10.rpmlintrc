@@ -44,6 +44,9 @@ addFilter(r'^python3(\.\d+)?-(debug|tkinter|test|idle)\.[^:]+: (E|W): no-documen
 # platform python is obsoleted, but not provided
 addFilter(r'obsolete-not-provided platform-python')
 
+# we have extra tokens at the end of %endif/%else directives, we consider them useful
+addFilter(r'extra tokens at the end of %(endif|else) directive')
+
 
 # RPMLINT IMPERFECTIONS
 # https://github.com/rpm-software-management/rpmlint/issues/123
@@ -85,6 +88,10 @@ addFilter(r'macro-in-comment %\{_pyconfig(32|64)_h\}')
 # Since 3.8 they are no longer linked against libpython3.8.so.1.0
 addFilter(r'E: library-not-linked-against-libc /usr/lib(64)?/python3\.\d+/lib-dynload/')
 addFilter(r'E: shared-lib-without-dependency-information /usr/lib(64)?/python3\.\d+/lib-dynload/')
+
+# specfile-errors are listed twice, once with reason and once without
+# we filter out the empty ones
+addFilter(r'\bpython3(\.\d+)?\.(src|spec): (E|W): specfile-error\s+$')
 
 # SPELLING ERRORS
 addFilter(r'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ')
