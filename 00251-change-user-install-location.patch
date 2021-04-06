@@ -41,10 +41,10 @@ index bdead133bd..274ca6d340 100644
              else:
                  if self.exec_prefix is None:
 diff --git a/Lib/site.py b/Lib/site.py
-index 5f1b31e73d..3e97724131 100644
+index 939893eb5e..d1316c3355 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -378,8 +378,15 @@ def getsitepackages(prefixes=None):
+@@ -380,8 +380,15 @@ def getsitepackages(prefixes=None):
      return sitepackages
  
  def addsitepackages(known_paths, prefixes=None):

@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a6
+%global prerel a7
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1577,6 +1577,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Apr 06 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a7-1
+- Update to 3.10.0a7
+
 * Mon Mar 22 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a6-2
 - When flat, don't require/provide python(abi) = 3.10
 
