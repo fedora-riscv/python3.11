@@ -455,15 +455,6 @@ Requires: (python-rpm-macros if rpm-build)
 Requires: (python3-rpm-macros if rpm-build)
 
 %if %{without bootstrap}
-# This is not "API" (packages that need setuptools should still BuildRequire it)
-# However some packages apparently can build both with and without setuptools
-# producing egg-info as file or directory (depending on setuptools presence).
-# Directory-to-file updates are problematic in RPM, so we ensure setuptools is
-# installed when -devel is required.
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1623914
-# See https://fedoraproject.org/wiki/Packaging:Directory_Replacement
-Requires: (%{pkgname}-setuptools if rpm-build)
-
 Requires: (python3-rpm-generators if rpm-build)
 %endif
 
