@@ -359,12 +359,6 @@ Provides: python(abi) = %{pybasever}
 
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
-# Previously, this was required for our rewheel patch to work.
-# This is technically no longer needed, but we keep it recommended
-# for the developer experience.
-Recommends: %{pkgname}-setuptools
-Recommends: %{pkgname}-pip
-
 # This prevents ALL subpackages built from this spec to require
 # /usr/bin/python3* or python(abi). Granularity per subpackage is impossible.
 # It's intended for the libs package not to drag in the interpreter, see
@@ -453,6 +447,9 @@ Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 # But we want them when packages BuildRequire python3-devel
 Requires: (python-rpm-macros if rpm-build)
 Requires: (python3-rpm-macros if rpm-build)
+
+# Python developers are very likely to need pip
+Recommends: %{pkgname}-pip
 
 %if %{without bootstrap}
 Requires: (python3-rpm-generators if rpm-build)
