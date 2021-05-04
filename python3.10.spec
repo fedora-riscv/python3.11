@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a7
+%global prerel b1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -68,8 +68,8 @@ License: Python
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 21.0.1
-%global setuptools_version 52.0.0
+%global pip_version 21.1.1
+%global setuptools_version 56.0.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
@@ -1276,6 +1276,11 @@ CheckPython optimized
 %{pylibdir}/importlib/*.py
 %{pylibdir}/importlib/__pycache__/*%{bytecode_suffixes}
 
+%dir %{pylibdir}/importlib/metadata/
+%dir %{pylibdir}/importlib/metadata/__pycache__/
+%{pylibdir}/importlib/metadata/*.py
+%{pylibdir}/importlib/metadata/__pycache__/*%{bytecode_suffixes}
+
 %dir %{pylibdir}/json/
 %dir %{pylibdir}/json/__pycache__/
 %{pylibdir}/json/*.py
@@ -1565,6 +1570,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue May 04 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~b1-1
+- Update to 3.10.0b1
+
 * Tue Apr 06 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a7-1
 - Update to 3.10.0a7
 
