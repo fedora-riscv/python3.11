@@ -400,6 +400,11 @@ Requires: python3 == %{version}-%{release}
 Provides: python = %{version}-%{release}
 # This also save us an explicit conflict for older python3 builds
 
+# Also provide the name of the Ubuntu package with the same function,
+# to be nice to people who temporarily forgot which distro they're on.
+# C.f. https://packages.ubuntu.com/hirsute/all/python-is-python3/filelist
+Provides: python-is-python3 = %{version}-%{release}
+
 %description -n python-unversioned-command
 This package contains /usr/bin/python - the "python" command that runs Python 3.
 
