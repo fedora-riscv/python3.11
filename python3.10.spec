@@ -1,7 +1,3 @@
-%global _without_optimizations 1
-%global _without_tests 1
-%global _without_rpmwheels 1
-%global _with_bootstrap 1
 # ==================
 # Top-level metadata
 # ==================
@@ -21,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1582,6 +1578,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 01 2021 Python Maint <python-maint@redhat.com> - 3.10.0~b2-3
+- Rebuilt for Python 3.10
+
 * Tue Jun 01 2021 Python Maint <python-maint@redhat.com> - 3.10.0~b2-2
 - Bootstrap for Python 3.10
 
