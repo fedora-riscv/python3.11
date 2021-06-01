@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b1
+%global prerel b2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1578,6 +1578,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 01 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~b2-1
+- Update to 3.10.0b2
+
 * Fri May 14 2021 Charalampos Stratakis <cstratak@redhat.com> - 3.10.0~b1-2
 - Use the system installed mpdecimal instead of the bundled copy (#1943359)
 

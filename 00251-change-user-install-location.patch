@@ -15,10 +15,10 @@ Downstream only: Awaiting resources to work on upstream PEP
  2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index d33a889afe..41c6165cd8 100644
+index 26696cfb9d..1826cbcb38 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
-@@ -431,8 +431,19 @@ def finalize_unix(self):
+@@ -441,8 +441,19 @@ def finalize_unix(self):
                      raise DistutilsOptionError(
                            "must not supply exec-prefix without prefix")
  

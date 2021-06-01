@@ -33,7 +33,7 @@ index 0f9b59025c..59dc3fe50b 100644
      else:
          return PycInvalidationMode.TIMESTAMP
 diff --git a/Lib/test/test_py_compile.py b/Lib/test/test_py_compile.py
-index b58f28a4bc..7ede33d6c9 100644
+index 5ed98dbff1..f30c4e43de 100644
 --- a/Lib/test/test_py_compile.py
 +++ b/Lib/test/test_py_compile.py
 @@ -19,6 +19,7 @@ def without_source_date_epoch(fxn):
