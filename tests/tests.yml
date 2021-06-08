@@ -19,16 +19,29 @@
     - smoke:
         dir: python/smoke
         run: VERSION=3.10 ./venv.sh
+    - debugsmoke:
+        dir: python/smoke
+        run: PYTHON=python3-debug TOX=false VERSION=3.10 ./venv.sh
     - selftest:
         dir: python/selftest
         run: VERSION=3.10 X="" ./parallel.sh
+    - debugtest:
+        dir: python/selftest
+        run: VERSION=3.10 PYTHON=python3-debug X="" ./parallel.sh
+    - debugflags:
+        dir: python/flags
+        run: python3-debug ./assertflags.py -O0
     - marshalparser:
         dir: python/marshalparser
         run: VERSION=3.10 SAMPLE=10 test_marshalparser_compatibility.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
-    - python3.10
+    - python3.10  # the test subject
+    - python3-debug  # for leak testing
+    - python3-devel  # for extension building in venv and selftest
+    - python3-tkinter  # for selftest
+    - python3-test  # for selftest
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests
     - marshalparser  # for testing compatibility (magic numbers) with marshalparser
