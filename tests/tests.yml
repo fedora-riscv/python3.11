@@ -16,6 +16,8 @@
     - repo: "https://src.fedoraproject.org/tests/python.git"
       dest: "python"
     tests:
+    - rpm_qa:
+        run: rpm -qa
     - smoke:
         dir: python/smoke
         run: VERSION=3.10 ./venv.sh
@@ -45,3 +47,4 @@
     - python3-tox  # for venv tests
     - glibc-all-langpacks # for locale tests
     - marshalparser  # for testing compatibility (magic numbers) with marshalparser
+    - rpm  # for debugging
