@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b2
+%global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -291,6 +291,14 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
+
+# 00363 # bcb4a805ad54d3a810fb54582e67c5f5fe6d9773
+# Reset DeprecationWarning filters in test_importlib.test_entry_points_by_index
+#
+# This avoids StopIteration error when running tests.
+#
+# https://bugs.python.org/issue44451
+Patch363: 00363-reset-deprecationwarning-filters-in-test_importlib-test_entry_points_by_index.patch
 
 # (New patches go here ^^^)
 #
@@ -1578,6 +1586,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jun 17 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~b3-1
+- Update to 3.10.0b3
+
 * Tue Jun 01 2021 Python Maint <python-maint@redhat.com> - 3.10.0~b2-3
 - Rebuilt for Python 3.10
 
