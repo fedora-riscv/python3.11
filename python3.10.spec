@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -503,6 +503,10 @@ configuration, browsers, and other dialogs.
 %package -n %{pkgname}-tkinter
 Summary: A GUI toolkit for Python
 Requires: %{pkgname} = %{version}-%{release}
+
+# The importable module "turtle" is here, so provide python3-turtle.
+# (We don't provide python3-turtledemo, that's not too useful when imported.)
+%py_provides %{pkgname}-turtle
 
 %description -n %{pkgname}-tkinter
 The Tkinter (Tk interface) library is a graphical user interface toolkit for
@@ -1578,6 +1582,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 16 2021 Petr Viktorin <pviktori@redhat.com> - 3.10.0~b4-2
+- Provide python3-turtle from python3-tkinter
+
 * Sun Jul 11 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~b4-1
 - Update to 3.10.0b4
 
