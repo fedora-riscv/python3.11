@@ -453,6 +453,7 @@ Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 # But we want them when packages BuildRequire python3-devel
 Requires: (python-rpm-macros if rpm-build)
 Requires: (python3-rpm-macros if rpm-build)
+Requires: (pyproject-rpm-macros if rpm-build)
 
 # Python developers are very likely to need pip
 Recommends: %{pkgname}-pip
@@ -1584,6 +1585,7 @@ CheckPython optimized
 %changelog
 * Fri Jul 16 2021 Petr Viktorin <pviktori@redhat.com> - 3.10.0~b4-2
 - Provide python3-turtle from python3-tkinter
+- Require pyproject-rpm-macros from python3-devel
 
 * Sun Jul 11 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~b4-1
 - Update to 3.10.0b4
