@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1583,6 +1583,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~b4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 * Fri Jul 16 2021 Petr Viktorin <pviktori@redhat.com> - 3.10.0~b4-2
 - Provide python3-turtle from python3-tkinter
 - Require pyproject-rpm-macros from python3-devel
