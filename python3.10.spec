@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b4
+%global prerel rc1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1583,6 +1583,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Aug 03 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc1-1
+- Update to 3.10.0rc1
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~b4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
