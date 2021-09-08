@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel rc1
+%global prerel rc2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -68,8 +68,8 @@ License: Python
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 21.1.3
-%global setuptools_version 56.0.0
+%global pip_version 21.2.3
+%global setuptools_version 57.4.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
@@ -291,6 +291,13 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
+
+# 00367 # 35c53d99835a904129d2b0a86ad74aaf0ea78982
+# bpo-44860: Update test_sysconfig for posix_user platlib
+#
+# Update test_sysconfig.test_user_similar() for the posix_user scheme:
+# "platlib" doesn't use sys.platlibdir.
+Patch367: 00367-bpo-44860-update-test_sysconfig-for-posix_user-platlib.patch
 
 # (New patches go here ^^^)
 #
@@ -1583,6 +1590,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Sep 08 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc2-1
+- Update to 3.10.0rc2
+
 * Tue Aug 03 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc1-1
 - Update to 3.10.0rc1
 
