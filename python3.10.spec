@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel rc2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1590,6 +1590,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 3.10.0~rc2-2
+- Rebuilt with OpenSSL 3.0.0
+
 * Wed Sep 08 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc2-1
 - Update to 3.10.0rc2
 
