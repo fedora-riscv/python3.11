@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel rc2
+#global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -291,13 +291,6 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
-
-# 00367 # 35c53d99835a904129d2b0a86ad74aaf0ea78982
-# bpo-44860: Update test_sysconfig for posix_user platlib
-#
-# Update test_sysconfig.test_user_similar() for the posix_user scheme:
-# "platlib" doesn't use sys.platlibdir.
-Patch367: 00367-bpo-44860-update-test_sysconfig-for-posix_user-platlib.patch
 
 # (New patches go here ^^^)
 #
@@ -1590,6 +1583,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Oct 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0-1
+- Update to 3.10.0 final
+
 * Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 3.10.0~rc2-2
 - Rebuilt with OpenSSL 3.0.0
 
