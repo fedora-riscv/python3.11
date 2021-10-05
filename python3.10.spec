@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -267,15 +267,24 @@ Source11: idle3.appdata.xml
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
 
-# 00251 # 5c445123f04d96be42a35eef5119378ba1713a96
+# 00251 # 0952e38e5bf725ebbab48b13a35566e30635ddf8
 # Change user install location
 #
-# Set values of prefix and exec_prefix in distutils install command
-# to /usr/local if executable is /usr/bin/python* and RPM build
-# is not detected to make pip and distutils install into separate location.
+# Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
+# when RPM build or venv/virtualenv is not detected,
+# to make pip, sysconfig and distutils install into an isolated location.
+#
+# The original values are saved as an additional "rpm_prefix" install scheme.
+#
+# The site module adds the /usr/local paths to sys.path when site packages are
+# enabled and RPM build is not detected.
 #
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
-# Downstream only: Awaiting resources to work on upstream PEP
+#
+# Rewrote in Fedora 36+ to patch sysconfig instead of distutils,
+# see https://discuss.python.org/t/pep-632-deprecate-distutils-module/5134/104
+#
+# Downstream only for now, waiting for https://bugs.python.org/issue43976
 Patch251: 00251-change-user-install-location.patch
 
 # 00328 # 318e500c98f5e59eb1f23e0fcd32db69b9bd17e1
@@ -437,6 +446,10 @@ Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 # The zoneinfo module needs tzdata
 Requires: tzdata
 
+# Since patch 251 changed from distutils to sysconfig, pip needed to be adapted
+# The previous versions could cause serious bugs during `sudo pip install --upgrade ...`
+# Better safe than sorry
+Conflicts: %{pkgname}-pip < 21.2.3-3
 
 %description -n %{pkgname}-libs
 This package contains runtime libraries for use by Python:
@@ -451,8 +464,10 @@ Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 # The RPM related dependencies bring nothing to a non-RPM Python developer
 # But we want them when packages BuildRequire python3-devel
-Requires: (python-rpm-macros if rpm-build)
-Requires: (python3-rpm-macros if rpm-build)
+# 3.10-9 macros started to set $RPM_BUILD_ROOT when expanding macros like %%python3_sitearch,
+# which is necessary since patch 251 changed from distutils to sysconfig
+Requires: (python-rpm-macros >= 3.10-9 if rpm-build)
+Requires: (python3-rpm-macros >= 3.10-9 if rpm-build)
 Requires: (pyproject-rpm-macros if rpm-build)
 
 # Python developers are very likely to need pip
@@ -1583,6 +1598,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Oct 05 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0-2
+- Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
+  when RPM build or venv/virtualenv is not detected,
+  instead of patching distutils
+
 * Mon Oct 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0-1
 - Update to 3.10.0 final
 

@@ -1,45 +1,33 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Michal Cyprian <m.cyprian@gmail.com>
-Date: Mon, 26 Jun 2017 16:32:56 +0200
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Mon, 15 Feb 2021 12:19:27 +0100
 Subject: [PATCH] 00251: Change user install location
 
-Set values of prefix and exec_prefix in distutils install command
-to /usr/local if executable is /usr/bin/python* and RPM build
-is not detected to make pip and distutils install into separate location.
+Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
+when RPM build or venv/virtualenv is not detected,
+to make pip, sysconfig and distutils install into an isolated location.
+
+The original values are saved as an additional "rpm_prefix" install scheme.
+
+The site module adds the /usr/local paths to sys.path when site packages are
+enabled and RPM build is not detected.
 
 Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
-Downstream only: Awaiting resources to work on upstream PEP
----
- Lib/distutils/command/install.py | 15 +++++++++++++--
- Lib/site.py                      |  9 ++++++++-
- 2 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 26696cfb9d..1826cbcb38 100644
---- a/Lib/distutils/command/install.py
-+++ b/Lib/distutils/command/install.py
-@@ -441,8 +441,19 @@ def finalize_unix(self):
-                     raise DistutilsOptionError(
-                           "must not supply exec-prefix without prefix")
- 
--                self.prefix = os.path.normpath(sys.prefix)
--                self.exec_prefix = os.path.normpath(sys.exec_prefix)
-+                # self.prefix is set to sys.prefix + /local/
-+                # if neither RPM build nor virtual environment is
-+                # detected to make pip and distutils install packages
-+                # into the separate location.
-+                if (not (hasattr(sys, 'real_prefix') or
-+                    sys.prefix != sys.base_prefix) and
-+                    'RPM_BUILD_ROOT' not in os.environ):
-+                    addition = "/local"
-+                else:
-+                    addition = ""
-+
-+                self.prefix = os.path.normpath(sys.prefix) + addition
-+                self.exec_prefix = os.path.normpath(sys.exec_prefix) + addition
- 
-             else:
-                 if self.exec_prefix is None:
+Rewrote in Fedora 36+ to patch sysconfig instead of distutils,
+see https://discuss.python.org/t/pep-632-deprecate-distutils-module/5134/104
+
+Downstream only for now, waiting for https://bugs.python.org/issue43976
+
+Co-authored-by: Petr Viktorin <encukou@gmail.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+Co-authored-by: Michal Cyprian <m.cyprian@gmail.com>
+---
+ Lib/site.py                |  9 ++++++++-
+ Lib/sysconfig.py           | 19 +++++++++++++++++++
+ Lib/test/test_sysconfig.py |  4 +++-
+ 3 files changed, 30 insertions(+), 2 deletions(-)
+
 diff --git a/Lib/site.py b/Lib/site.py
 index 939893eb5e..d1316c3355 100644
 --- a/Lib/site.py
@@ -61,3 +49,55 @@ index 939893eb5e..d1316c3355 100644
      for sitedir in getsitepackages(prefixes):
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 95b48f6429..226b55a556 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -58,6 +58,25 @@
+         },
+     }
+ 
++# backup the original posix_prefix as rpm_prefix
++# RPM packages use it and we need to be able to read it even when changed
++_INSTALL_SCHEMES['rpm_prefix'] = _INSTALL_SCHEMES['posix_prefix']
++
++if (not (hasattr(sys, 'real_prefix') or
++    sys.prefix != sys.base_prefix) and
++    'RPM_BUILD_ROOT' not in os.environ):
++        _INSTALL_SCHEMES['posix_prefix'] = {
++            'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
++            'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++            'purelib': '{base}/local/lib/python{py_version_short}/site-packages',
++            'platlib': '{platbase}/local/{platlibdir}/python{py_version_short}/site-packages',
++            'include':
++                '{installed_base}/include/python{py_version_short}{abiflags}',
++            'platinclude':
++                '{installed_platbase}/include/python{py_version_short}{abiflags}',
++            'scripts': '{base}/local/bin',
++            'data': '{base}/local',
++        }
+ 
+ # NOTE: site.py has copy of this function.
+ # Sync it when modify this function.
+diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
+index 9408657c91..db4cbc55ec 100644
+--- a/Lib/test/test_sysconfig.py
++++ b/Lib/test/test_sysconfig.py
+@@ -263,7 +263,7 @@ def test_get_config_h_filename(self):
+         self.assertTrue(os.path.isfile(config_h), config_h)
+ 
+     def test_get_scheme_names(self):
+-        wanted = ['nt', 'posix_home', 'posix_prefix']
++        wanted = ['nt', 'posix_home', 'posix_prefix', 'rpm_prefix']
+         if HAS_USER_BASE:
+             wanted.extend(['nt_user', 'osx_framework_user', 'posix_user'])
+         self.assertEqual(get_scheme_names(), tuple(sorted(wanted)))
+@@ -274,6 +274,8 @@ def test_symlink(self): # Issue 7880
+             cmd = "-c", "import sysconfig; print(sysconfig.get_platform())"
+             self.assertEqual(py.call_real(*cmd), py.call_link(*cmd))
+ 
++    @unittest.skipIf('RPM_BUILD_ROOT' not in os.environ,
++                     "Test doesn't expect Fedora's paths")
+     def test_user_similar(self):
+         # Issue #8759: make sure the posix scheme for the users
+         # is similar to the global posix_prefix one
