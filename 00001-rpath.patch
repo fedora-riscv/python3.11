@@ -9,7 +9,7 @@ Subject: [PATCH] 00001: Fixup distutils/unixccompiler.py to remove standard
  1 file changed, 9 insertions(+)
 
 diff --git a/Lib/distutils/unixccompiler.py b/Lib/distutils/unixccompiler.py
-index f0792de74a..4d837936c6 100644
+index d00c48981e..0283a28c19 100644
 --- a/Lib/distutils/unixccompiler.py
 +++ b/Lib/distutils/unixccompiler.py
 @@ -82,6 +82,15 @@ class UnixCCompiler(CCompiler):

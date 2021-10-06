@@ -20,33 +20,20 @@
         run: rpm -qa
     - smoke:
         dir: python/smoke
-        run: VERSION=3.10 ./venv.sh
+        run: VERSION=3.11 ./venv.sh
     - smoke_virtualenv:
         dir: python/smoke
-        run: VERSION=3.10 METHOD=virtualenv ./venv.sh
-    - debugsmoke:
-        dir: python/smoke
-        run: PYTHON=python3-debug TOX=false VERSION=3.10 ./venv.sh
+        run: VERSION=3.11 METHOD=virtualenv ./venv.sh
     - selftest:
         dir: python/selftest
-        run: VERSION=3.10 X="" ./parallel.sh
-    - debugtest:
-        dir: python/selftest
-        run: VERSION=3.10 PYTHON=python3-debug X="" ./parallel.sh
-    - debugflags:
-        dir: python/flags
-        run: python3-debug ./assertflags.py -O0
+        run: VERSION=3.11 X="" ./parallel.sh
     - marshalparser:
         dir: python/marshalparser
-        run: VERSION=3.10 SAMPLE=10 test_marshalparser_compatibility.sh
+        run: VERSION=3.11 SAMPLE=10 test_marshalparser_compatibility.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gdb  # for test_gdb
-    - python3.10  # the test subject
-    - python3-debug  # for leak testing
-    - python3-devel  # for extension building in venv and selftest
-    - python3-tkinter  # for selftest
-    - python3-test  # for selftest
+    - python3.11  # the test subject
     - tox  # for venv tests
     - virtualenv  # for virtualenv tests
     - glibc-all-langpacks # for locale tests

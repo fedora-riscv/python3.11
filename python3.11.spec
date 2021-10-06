@@ -2,10 +2,10 @@
 # Top-level metadata
 # ==================
 
-%global pybasever 3.10
+%global pybasever 3.11
 
 # pybasever without the dot:
-%global pyshortver 310
+%global pyshortver 311
 
 Name: python%{pybasever}
 Summary: Version %{pybasever} of the Python interpreter
@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-#global prerel ...
+%global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -60,7 +60,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -246,7 +246,7 @@ BuildRequires: python3-rpm-generators
 
 Source0: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz
 Source1: %{url}ftp/python/%{general_version}/Python-%{upstream_version}.tar.xz.asc
-# The release manager for Python 3.10 is pablogsal
+# The release manager for Python 3.11 is pablogsal
 Source2: https://keybase.io/pablogsal/pgp_keys.asc
 
 # A simple script to check timestamps of bytecode files
@@ -446,11 +446,6 @@ Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 # The zoneinfo module needs tzdata
 Requires: tzdata
 
-# Since patch 251 changed from distutils to sysconfig, pip needed to be adapted
-# The previous versions could cause serious bugs during `sudo pip install --upgrade ...`
-# Better safe than sorry
-Conflicts: %{pkgname}-pip < 21.2.3-3
-
 %description -n %{pkgname}-libs
 This package contains runtime libraries for use by Python:
 - the majority of the Python standard library
@@ -464,10 +459,8 @@ Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 # The RPM related dependencies bring nothing to a non-RPM Python developer
 # But we want them when packages BuildRequire python3-devel
-# 3.10-9 macros started to set $RPM_BUILD_ROOT when expanding macros like %%python3_sitearch,
-# which is necessary since patch 251 changed from distutils to sysconfig
-Requires: (python-rpm-macros >= 3.10-9 if rpm-build)
-Requires: (python3-rpm-macros >= 3.10-9 if rpm-build)
+Requires: (python-rpm-macros if rpm-build)
+Requires: (python3-rpm-macros if rpm-build)
 Requires: (pyproject-rpm-macros if rpm-build)
 
 # Python developers are very likely to need pip
@@ -1073,8 +1066,15 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
+  # test_sundry and test_name_error_suggestions_do_not_trigger_for_too_many_locals fail with Python 3.11.0a1.
+  # Fixes should be included in 2nd alpha.
+  # https://bugs.python.org/issue45400
+  # https://bugs.python.org/issue45402
+
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
+    -i test_sundry \
+    -i test_name_error_suggestions_do_not_trigger_for_too_many_locals \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
@@ -1165,8 +1165,6 @@ CheckPython optimized
 %dir %{pylibdir}/ensurepip/_bundled
 %{pylibdir}/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
 %{pylibdir}/ensurepip/_bundled/setuptools-%{setuptools_version}-py3-none-any.whl
-%{pylibdir}/ensurepip/_bundled/__init__.py
-%{pylibdir}/ensurepip/_bundled/__pycache__/*%{bytecode_suffixes}
 %endif
 
 %dir %{pylibdir}/concurrent/
@@ -1226,6 +1224,7 @@ CheckPython optimized
 %{dynload_dir}/_ssl.%{SOABI_optimized}.so
 %{dynload_dir}/_statistics.%{SOABI_optimized}.so
 %{dynload_dir}/_struct.%{SOABI_optimized}.so
+%{dynload_dir}/_typing.%{SOABI_optimized}.so
 %{dynload_dir}/array.%{SOABI_optimized}.so
 %{dynload_dir}/audioop.%{SOABI_optimized}.so
 %{dynload_dir}/binascii.%{SOABI_optimized}.so
@@ -1328,6 +1327,11 @@ CheckPython optimized
 %{pylibdir}/urllib
 %{pylibdir}/xml
 %{pylibdir}/zoneinfo
+
+%dir %{pylibdir}/__phello__
+%{pylibdir}/__phello__/__init__.py
+%{pylibdir}/__phello__/spam.py
+%{pylibdir}/__phello__/__pycache__/*%{bytecode_suffixes}
 
 %if "%{_lib}" == "lib64"
 %attr(0755,root,root) %dir %{_prefix}/lib/python%{pybasever}
@@ -1514,6 +1518,7 @@ CheckPython optimized
 %{dynload_dir}/_ssl.%{SOABI_debug}.so
 %{dynload_dir}/_statistics.%{SOABI_debug}.so
 %{dynload_dir}/_struct.%{SOABI_debug}.so
+%{dynload_dir}/_typing.%{SOABI_debug}.so
 %{dynload_dir}/array.%{SOABI_debug}.so
 %{dynload_dir}/audioop.%{SOABI_debug}.so
 %{dynload_dir}/binascii.%{SOABI_debug}.so
@@ -1596,80 +1601,5 @@ CheckPython optimized
 # ======================================================
 
 %changelog
-* Tue Oct 05 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0-2
-- Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
-  when RPM build or venv/virtualenv is not detected,
-  instead of patching distutils
-
-* Mon Oct 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0-1
-- Update to 3.10.0 final
-
-* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 3.10.0~rc2-2
-- Rebuilt with OpenSSL 3.0.0
-
-* Wed Sep 08 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc2-1
-- Update to 3.10.0rc2
-
-* Tue Aug 03 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~rc1-1
-- Update to 3.10.0rc1
-
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~b4-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Jul 16 2021 Petr Viktorin <pviktori@redhat.com> - 3.10.0~b4-2
-- Provide python3-turtle from python3-tkinter
-- Require pyproject-rpm-macros from python3-devel
-
-* Sun Jul 11 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~b4-1
-- Update to 3.10.0b4
-
-* Thu Jun 17 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~b3-1
-- Update to 3.10.0b3
-
-* Tue Jun 01 2021 Python Maint <python-maint@redhat.com> - 3.10.0~b2-3
-- Rebuilt for Python 3.10
-
-* Tue Jun 01 2021 Python Maint <python-maint@redhat.com> - 3.10.0~b2-2
-- Bootstrap for Python 3.10
-
-* Tue Jun 01 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~b2-1
-- Update to 3.10.0b2
-
-* Fri May 14 2021 Charalampos Stratakis <cstratak@redhat.com> - 3.10.0~b1-2
-- Use the system installed mpdecimal instead of the bundled copy (#1943359)
-
-* Tue May 04 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~b1-1
-- Update to 3.10.0b1
-
-* Tue Apr 06 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a7-1
-- Update to 3.10.0a7
-
-* Mon Mar 22 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a6-2
-- When flat, don't require/provide python(abi) = 3.10
-
-* Tue Mar 02 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a6-1
-- Update to 3.10.0a6
-
-* Wed Feb  3 15:01:21 CET 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a5-1
-- Update to 3.10.0a5
-
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0~a4-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Fri Jan 15 2021 Charalampos Stratakis <cstratak@redhat.com> - 3.10.0~a4-2
-- Compile the debug build with -O0 instead of -Og (rhbz#1818857)
-
-* Mon Jan 04 2021 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a4-1
-- Update to 3.10.0a4
-
-* Tue Dec 08 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.10.0~a3-1
-- Update to 3.10.0a3
-
-* Wed Nov 04 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a2-1
-- Update to 3.10.0a2
-
-* Mon Oct 12 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a1-2
-- Finish initial bootstrap, build Python 3.10 with Python 3.10
-
-* Fri Oct 09 2020 Miro Hrončok <mhroncok@redhat.com> - 3.10.0~a1-1
-- Initial Python 3.10 package forked from Python 3.9
+* Wed Oct 06 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a1-1
+- Initial Python 3.11 package forked from Python 3.10

@@ -2,6 +2,9 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Lumir Balhar <lbalhar@redhat.com>
 Date: Mon, 15 Feb 2021 12:19:27 +0100
 Subject: [PATCH] 00251: Change user install location
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
 when RPM build or venv/virtualenv is not detected,
