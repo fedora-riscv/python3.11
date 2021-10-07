@@ -1073,10 +1073,8 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
-  # test_frozentable fails with Python 3.10.0a6 (https://bugs.python.org/issue43372)
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
-    -i test_frozentable \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
