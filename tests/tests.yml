@@ -44,7 +44,7 @@
     - python3-devel  # for extension building in venv and selftest
     - python3-tkinter  # for selftest
     - python3-test  # for selftest
-    - python3-tox  # for venv tests
+    - tox  # for venv tests
     - glibc-all-langpacks # for locale tests
     - marshalparser  # for testing compatibility (magic numbers) with marshalparser
     - rpm  # for debugging
