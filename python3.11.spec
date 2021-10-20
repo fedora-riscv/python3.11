@@ -226,8 +226,8 @@ BuildRequires: /usr/bin/dtrace
 BuildRequires: /usr/sbin/ifconfig
 
 %if %{with rpmwheels}
-BuildRequires: python-setuptools-wheel
-BuildRequires: python-pip-wheel
+BuildRequires: %{python_wheel_pkg_prefix}-setuptools-wheel
+BuildRequires: %{python_wheel_pkg_prefix}-pip-wheel
 %endif
 
 %if %{without bootstrap}
@@ -425,8 +425,8 @@ This package contains /usr/bin/python - the "python" command that runs Python 3.
 Summary:        Python runtime libraries
 
 %if %{with rpmwheels}
-Requires: python-setuptools-wheel
-Requires: python-pip-wheel
+Requires: %{python_wheel_pkg_prefix}-setuptools-wheel
+Requires: %{python_wheel_pkg_prefix}-pip-wheel
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
@@ -583,8 +583,8 @@ Provides: python%{pyshortver} = %{version}-%{release}
 Obsoletes: python%{pyshortver} < %{version}-%{release}
 
 %if %{with rpmwheels}
-Requires: python-setuptools-wheel
-Requires: python-pip-wheel
+Requires: %{python_wheel_pkg_prefix}-setuptools-wheel
+Requires: %{python_wheel_pkg_prefix}-pip-wheel
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
@@ -717,7 +717,7 @@ BuildPython() {
   --with-ssl-default-suites=openssl \
   --without-static-libpython \
 %if %{with rpmwheels}
-  --with-wheel-pkg-dir=%{_datadir}/python-wheels \
+  --with-wheel-pkg-dir=%{python_wheel_dir} \
 %endif
 %if %{with valgrind}
   --with-valgrind \
