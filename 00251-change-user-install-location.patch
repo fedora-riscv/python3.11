@@ -25,14 +25,15 @@ Downstream only for now, waiting for https://bugs.python.org/issue43976
 Co-authored-by: Petr Viktorin <encukou@gmail.com>
 Co-authored-by: Miro Hrončok <miro@hroncok.cz>
 Co-authored-by: Michal Cyprian <m.cyprian@gmail.com>
+Co-authored-by: Lumír Balhar <frenzy.madness@gmail.com>
 ---
  Lib/site.py                |  9 ++++++++-
- Lib/sysconfig.py           | 19 +++++++++++++++++++
+ Lib/sysconfig.py           | 25 +++++++++++++++++++++++++
  Lib/test/test_sysconfig.py |  4 +++-
- 3 files changed, 30 insertions(+), 2 deletions(-)
+ 3 files changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/site.py b/Lib/site.py
-index 939893eb5e..d1316c3355 100644
+index e129f3b485..ab771c70dd 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -380,8 +380,15 @@ def getsitepackages(prefixes=None):
@@ -53,16 +54,22 @@ index 939893eb5e..d1316c3355 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 95b48f6429..226b55a556 100644
+index daf9f00006..40e4edf0ae 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -58,6 +58,25 @@
+@@ -58,6 +58,31 @@
          },
      }
  
 +# backup the original posix_prefix as rpm_prefix
 +# RPM packages use it and we need to be able to read it even when changed
 +_INSTALL_SCHEMES['rpm_prefix'] = _INSTALL_SCHEMES['posix_prefix']
++# Virtualenv >= 20.10.0 favors the "venv" scheme over the defaults when creating virtual environments.
++# See: https://github.com/pypa/virtualenv/commit/8da79db86d8a5c74d03667a40e64ff832076445e
++# See: https://bugs.python.org/issue45413
++# "venv" should be the same as the unpatched posix_prefix for us,
++# so new virtual environments aren't created with paths like venv/local/bin/python.
++_INSTALL_SCHEMES['venv'] = _INSTALL_SCHEMES['posix_prefix']
 +
 +if (not (hasattr(sys, 'real_prefix') or
 +    sys.prefix != sys.base_prefix) and
@@ -83,7 +90,7 @@ index 95b48f6429..226b55a556 100644
  # NOTE: site.py has copy of this function.
  # Sync it when modify this function.
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index 9408657c91..db4cbc55ec 100644
+index 9408657c91..fd49b2bcce 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
 @@ -263,7 +263,7 @@ def test_get_config_h_filename(self):
@@ -91,7 +98,7 @@ index 9408657c91..db4cbc55ec 100644
  
      def test_get_scheme_names(self):
 -        wanted = ['nt', 'posix_home', 'posix_prefix']
-+        wanted = ['nt', 'posix_home', 'posix_prefix', 'rpm_prefix']
++        wanted = ['nt', 'posix_home', 'posix_prefix', 'rpm_prefix', 'venv']
          if HAS_USER_BASE:
              wanted.extend(['nt_user', 'osx_framework_user', 'posix_user'])
          self.assertEqual(get_scheme_names(), tuple(sorted(wanted)))

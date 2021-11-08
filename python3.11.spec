@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a1
+%global prerel a2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -68,8 +68,8 @@ License: Python
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 21.2.3
-%global setuptools_version 57.4.0
+%global pip_version 21.2.4
+%global setuptools_version 58.1.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
@@ -267,7 +267,7 @@ Source11: idle3.appdata.xml
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
 
-# 00251 # 0952e38e5bf725ebbab48b13a35566e30635ddf8
+# 00251 # 531494a5ded29dad59f617304dab4eb8b7f80b0b
 # Change user install location
 #
 # Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
@@ -1066,15 +1066,13 @@ CheckPython() {
   # test_distutils
   #   distutils.tests.test_bdist_rpm tests fail when bootstraping the Python
   #   package: rpmbuild requires /usr/bin/pythonX.Y to be installed
-  # test_sundry and test_name_error_suggestions_do_not_trigger_for_too_many_locals fail with Python 3.11.0a1.
-  # Fixes should be included in 2nd alpha.
-  # https://bugs.python.org/issue45400
-  # https://bugs.python.org/issue45402
+  # test_freeze_simple_script is skipped, because it fails when bundled wheels
+  #  are removed in Fedora.
+  #  upstream report: https://bugs.python.org/issue45783
 
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
-    -i test_sundry \
-    -i test_name_error_suggestions_do_not_trigger_for_too_many_locals \
+    -i test_freeze_simple_script \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
@@ -1438,7 +1436,6 @@ CheckPython optimized
 
 %{pylibdir}/ctypes/test
 %{pylibdir}/distutils/tests
-%{pylibdir}/sqlite3/test
 %{pylibdir}/test
 %{dynload_dir}/_ctypes_test.%{SOABI_optimized}.so
 %{dynload_dir}/_testbuffer.%{SOABI_optimized}.so
@@ -1601,6 +1598,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Nov 15 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a2-1
+- Update to 3.11.0a2
+- Patch 251 was updated to include specific install scheme for virtualenv
+
 * Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 3.11.0~a1-2
 - Rebuild(libnsl2)
 

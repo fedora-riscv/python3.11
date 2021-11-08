@@ -19,7 +19,7 @@ Ideally, we should talk to upstream and explain why we don't want this
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/py_compile.py b/Lib/py_compile.py
-index 0f9b59025c..59dc3fe50b 100644
+index 388614e51b..db52725016 100644
 --- a/Lib/py_compile.py
 +++ b/Lib/py_compile.py
 @@ -70,7 +70,8 @@ class PycInvalidationMode(enum.Enum):
