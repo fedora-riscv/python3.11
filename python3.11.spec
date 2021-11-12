@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1601,5 +1601,8 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 3.11.0~a1-2
+- Rebuild(libnsl2)
+
 * Wed Oct 06 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a1-1
 - Initial Python 3.11 package forked from Python 3.10
