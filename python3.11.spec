@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a2
+%global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -60,7 +60,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_without bootstrap
+%bcond_with bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -1598,6 +1598,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Dec 10 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a3-1
+- Update to 3.11.0a3
+
 * Mon Nov 15 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a2-1
 - Update to 3.11.0a2
 - Patch 251 was updated to include specific install scheme for virtualenv
