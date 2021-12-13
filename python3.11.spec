@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -466,6 +466,9 @@ Requires: (pyproject-rpm-macros if rpm-build)
 # Python developers are very likely to need pip
 Recommends: %{pkgname}-pip
 
+# tox users are likely to need the devel subpackage
+Supplements: tox
+
 %if %{without bootstrap}
 Requires: (python3-rpm-generators if rpm-build)
 %endif
@@ -592,6 +595,9 @@ Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 
 # The zoneinfo module needs tzdata
 Requires: tzdata
+
+# The flatpackage is usable with tox
+Supplements: tox
 
 # The description for the flat package (SRPM and built)
 %description
@@ -1598,6 +1604,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Dec 13 2021 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a3-2
+- Supplement tox
+
 * Fri Dec 10 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a3-1
 - Update to 3.11.0a3
 
