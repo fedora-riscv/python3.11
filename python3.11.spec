@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -1604,6 +1604,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Jan 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a3-3
+- Rebuilt for https://fedoraproject.org/wiki/Changes/LIBFFI34
+
 * Mon Dec 13 2021 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a3-2
 - Supplement tox
 
