@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a3
+%global prerel a4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1310,6 +1310,11 @@ CheckPython optimized
 %{pylibdir}/importlib/metadata/*.py
 %{pylibdir}/importlib/metadata/__pycache__/*%{bytecode_suffixes}
 
+%dir %{pylibdir}/importlib/resources/
+%dir %{pylibdir}/importlib/resources/__pycache__/
+%{pylibdir}/importlib/resources/*.py
+%{pylibdir}/importlib/resources/__pycache__/*%{bytecode_suffixes}
+
 %dir %{pylibdir}/json/
 %dir %{pylibdir}/json/__pycache__/
 %{pylibdir}/json/*.py
@@ -1604,6 +1609,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jan 17 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a4-1
+- Update to 3.11.0a4
+
 * Sat Jan 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a3-3
 - Rebuilt for https://fedoraproject.org/wiki/Changes/LIBFFI34
 
