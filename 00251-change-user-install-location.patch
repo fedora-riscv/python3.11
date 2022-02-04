@@ -54,7 +54,7 @@ index b11cd48e69..63ddd5b21b 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index da918b7ba1..89e5c079ca 100644
+index d4a8a68028..491f82de45 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -58,6 +58,31 @@
@@ -90,7 +90,7 @@ index da918b7ba1..89e5c079ca 100644
  # NOTE: site.py has copy of this function.
  # Sync it when modify this function.
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index 506266d081..761cac2779 100644
+index 2c4120979d..3a2901b0bf 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
 @@ -267,7 +267,7 @@ def test_get_config_h_filename(self):
@@ -102,7 +102,7 @@ index 506266d081..761cac2779 100644
          if HAS_USER_BASE:
              wanted.extend(['nt_user', 'osx_framework_user', 'posix_user'])
          self.assertEqual(get_scheme_names(), tuple(sorted(wanted)))
-@@ -278,6 +278,8 @@ def test_symlink(self): # Issue 7880
+@@ -279,6 +279,8 @@ def test_symlink(self): # Issue 7880
              cmd = "-c", "import sysconfig; print(sysconfig.get_platform())"
              self.assertEqual(py.call_real(*cmd), py.call_link(*cmd))
  
