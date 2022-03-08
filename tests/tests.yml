@@ -20,10 +20,10 @@
         run: rpm -qa
     - smoke:
         dir: python/smoke
-        run: VERSION=3.11 ./venv.sh
+        run: VERSION=3.11 CYTHON=false ./venv.sh
     - smoke_virtualenv:
         dir: python/smoke
-        run: VERSION=3.11 METHOD=virtualenv ./venv.sh
+        run: VERSION=3.11 CYTHON=false METHOD=virtualenv ./venv.sh
     - selftest:
         dir: python/selftest
         run: VERSION=3.11 X="" ./parallel.sh
