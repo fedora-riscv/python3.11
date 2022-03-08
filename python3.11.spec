@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a6
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -60,7 +60,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_without bootstrap
+%bcond_with bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -1609,6 +1609,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Mar 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a6-2
+- Finish bootstrapping 3.11.0a6
+
 * Mon Mar 07 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a6-1
 - Update to 3.11.0a6
 
