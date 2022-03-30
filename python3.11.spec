@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel a7
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -40,13 +40,10 @@ License: Python
 %endif
 
 # Flat package, i.e. no separate subpackages
-# Default (in Fedora): if this is a main Python, it is not a flatpackage
+# Default (in Fedora): don't use the flatpackage structure for Python 3.11 and
+#   higher, remove the bcond from the spec in the future
 # Not supported: Combination of flatpackage enabled and main_python enabled
-%if %{with main_python}
 %bcond_with flatpackage
-%else
-%bcond_without flatpackage
-%endif
 
 # When bootstrapping python3, we need to build setuptools.
 # but setuptools BR python3-devel and that brings in python3-rpm-generators;
@@ -319,6 +316,13 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # Descriptions, and metadata for subpackages
 # ==========================================
 
+%if %{without main_python}
+# We'll not provide this, on purpose
+# No package in Fedora shall ever depend on a alternative Python via this
+%global __requires_exclude ^python\\(abi\\) = 3\\..+
+%global __provides_exclude ^python\\(abi\\) = 3\\..+
+%endif # without main_python
+
 # this if branch is ~300 lines long and contains subpackages' definitions
 %if %{without flatpackage}
 %if %{with main_python}
@@ -363,9 +367,11 @@ Recommends: %{_bindir}/python
 Provides: python%{pyshortver} = %{version}-%{release}
 Obsoletes: python%{pyshortver} < %{version}-%{release}
 
+%if %{with main_python}
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
+%endif # with main_python
 
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
@@ -474,7 +480,10 @@ Requires: (python3-rpm-generators if rpm-build)
 %endif
 
 Provides: %{pkgname}-2to3 = %{version}-%{release}
+
+%if %{with main_python}
 Provides: 2to3 = %{version}-%{release}
+%endif
 
 Conflicts: %{pkgname} < %{version}-%{release}
 
@@ -492,8 +501,10 @@ Summary: A basic graphical development environment for Python
 Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-tkinter = %{version}-%{release}
 
+%if %{with main_python}
 Provides: idle3 = %{version}-%{release}
 Provides: idle = %{version}-%{release}
+%endif
 
 Provides: %{pkgname}-tools = %{version}-%{release}
 Provides: %{pkgname}-tools%{?_isa} = %{version}-%{release}
@@ -570,11 +581,6 @@ The debug runtime additionally supports debug builds of C-API extensions
 %endif # with debug_build
 
 %else  # with flatpackage
-
-# We'll not provide this, on purpose
-# No package in Fedora shall ever depend on flatpackage via this
-%global __requires_exclude ^python\\(abi\\) = 3\\..+
-%global __provides_exclude ^python\\(abi\\) = 3\\..+
 
 # Python interpreter packages used to be named (or provide) name pythonXY (e.g.
 # python39). However, to align it with the executable names and to prepare for
@@ -1617,6 +1623,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Apr 20 2022 Tomas Orsava <torsava@redhat.com> - 3.11.0~a7-3
+- Build Python 3.11 with subpackages
+- `python(abi)` is still not Provided for alternative Python versions
+- Resolves: rhbz#2063227
+
 * Thu Apr 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a7-2
 - Finish bootstrapping 3.11.0a7
 
