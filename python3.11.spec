@@ -152,6 +152,20 @@ License: Python
 %{warn:Doing a main_python build with wrong %%__default_python3_pkgversion (0%{?__default_python3_pkgversion}, but this is %pyshortver)}
 %endif
 
+%if %{with main_python}
+# To keep the upgrade path clean, we Obsolete python3.X from the python3
+# package and python3.X-foo from individual subpackages.
+# Note that using Obsoletes without package version is not standard practice.
+# Here we assert that *any* version of the system's default interpreter is
+# preferable to an "extra" interpreter. For example, python3-3.6.1 will
+# replace python3.6-3.6.2.
+%define unversioned_obsoletes_of_python3_X_if_main() %{expand:\
+Obsoletes: python%{pybasever}%{?1:-%{1}}\
+}
+%else
+%define unversioned_obsoletes_of_python3_X_if_main() %{nil}
+%endif
+
 # =======================
 # Build-time requirements
 # =======================
@@ -323,12 +337,8 @@ Summary: Python %{pybasever} interpreter
 # For consistency, we provide python3.X from python3 as well.
 Provides: python%{pybasever} = %{version}-%{release}
 Provides: python%{pybasever}%{?_isa} = %{version}-%{release}
-# To keep the upgrade path clean, we Obsolete python3.X.
-# Note that using Obsoletes without package version is not standard practice.
-# Here we assert that *any* version of the system's default interpreter is
-# preferable to an "extra" interpreter. For example, python3-3.6.1 will
-# replace python3.6-3.6.2.
-Obsoletes: python%{pybasever}
+
+%unversioned_obsoletes_of_python3_X_if_main
 
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # https://fedoraproject.org/wiki/Changes/Python_means_Python3
@@ -421,6 +431,8 @@ Provides: bundled(python3dist(pip)) = %{pip_version}
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %endif
 
+%unversioned_obsoletes_of_python3_X_if_main libs
+
 # There are files in the standard library that have python shebang.
 # We've filtered the automatic requirement out so libs are installable without
 # the main package. This however makes it pulled in by default.
@@ -451,6 +463,8 @@ Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 Requires: (python-rpm-macros if rpm-build)
 Requires: (python3-rpm-macros if rpm-build)
 Requires: (pyproject-rpm-macros if rpm-build)
+
+%unversioned_obsoletes_of_python3_X_if_main devel
 
 # Python developers are very likely to need pip
 Recommends: %{pkgname}-pip
@@ -484,6 +498,8 @@ Summary: A basic graphical development environment for Python
 Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-tkinter = %{version}-%{release}
 
+%unversioned_obsoletes_of_python3_X_if_main idle
+
 %if %{with main_python}
 Provides: idle3 = %{version}-%{release}
 Provides: idle = %{version}-%{release}
@@ -510,6 +526,8 @@ configuration, browsers, and other dialogs.
 Summary: A GUI toolkit for Python
 Requires: %{pkgname} = %{version}-%{release}
 
+%unversioned_obsoletes_of_python3_X_if_main tkinter
+
 # The importable module "turtle" is here, so provide python3-turtle.
 # (We don't provide python3-turtledemo, that's not too useful when imported.)
 %py_provides %{pkgname}-turtle
@@ -523,6 +541,8 @@ the Python programming language.
 Summary: The self-test suite for the main python3 package
 Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
+
+%unversioned_obsoletes_of_python3_X_if_main test
 
 %description -n %{pkgname}-test
 The self-test suite for the Python interpreter.
@@ -545,6 +565,8 @@ Requires: %{pkgname}-devel%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-test%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-tkinter%{?_isa} = %{version}-%{release}
 Requires: %{pkgname}-idle%{?_isa} = %{version}-%{release}
+
+%unversioned_obsoletes_of_python3_X_if_main debug
 
 %description -n %{pkgname}-debug
 python3-debug provides a version of the Python runtime with numerous debugging
