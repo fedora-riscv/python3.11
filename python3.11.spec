@@ -31,19 +31,12 @@ License: Python
 # Main Python, i.e. whether this is the main Python version in the distribution
 # that owns /usr/bin/python3 and other unique paths
 # This also means the built subpackages are called python3 rather than python3X
-# WARNING: This also influences the flatpackage bcond below.
 # By default, this is determined by the %%__default_python3_pkgversion value
 %if "%{?__default_python3_pkgversion}" == "%{pybasever}"
 %bcond_without main_python
 %else
 %bcond_with main_python
 %endif
-
-# Flat package, i.e. no separate subpackages
-# Default (in Fedora): don't use the flatpackage structure for Python 3.11 and
-#   higher, remove the bcond from the spec in the future
-# Not supported: Combination of flatpackage enabled and main_python enabled
-%bcond_with flatpackage
 
 # When bootstrapping python3, we need to build setuptools.
 # but setuptools BR python3-devel and that brings in python3-rpm-generators;
@@ -76,11 +69,7 @@ License: Python
 
 # Extra build for debugging the interpreter or C-API extensions
 # (the -debug subpackages)
-%if %{with flatpackage}
-%bcond_with debug_build
-%else
 %bcond_without debug_build
-%endif
 
 # Support for the GDB debugger
 %bcond_without gdb_hooks
@@ -316,15 +305,7 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # Descriptions, and metadata for subpackages
 # ==========================================
 
-%if %{without main_python}
-# We'll not provide this, on purpose
-# No package in Fedora shall ever depend on a alternative Python via this
-%global __requires_exclude ^python\\(abi\\) = 3\\..+
-%global __provides_exclude ^python\\(abi\\) = 3\\..+
-%endif # without main_python
 
-# this if branch is ~300 lines long and contains subpackages' definitions
-%if %{without flatpackage}
 %if %{with main_python}
 # Description for the python3X SRPM only:
 %description
@@ -337,7 +318,7 @@ third-party libraries.
 Summary: Python %{pybasever} interpreter
 
 # In order to support multiple Python interpreters for development purposes,
-# packages with the naming scheme flatpackage (e.g. python3.5) exist for
+# packages with fully versioned naming scheme (e.g. python3.9*) exist for
 # non-default versions of Python 3.
 # For consistency, we provide python3.X from python3 as well.
 Provides: python%{pybasever} = %{version}-%{release}
@@ -361,9 +342,6 @@ Recommends: %{_bindir}/python
 # python39). However, to align it with the executable names and to prepare for
 # Python 3.10, they were renamed to pythonX.Y (e.g. python3.9, python3.10). We
 # provide and obsolete the previous names.
-# - Here are the tags for the nonflat package, regardless if main_python (e.g.
-#   python3) or not (e.g. python39). For the flat package, the provide is
-#   repeated many lines later.
 Provides: python%{pyshortver} = %{version}-%{release}
 Obsoletes: python%{pyshortver} < %{version}-%{release}
 
@@ -371,7 +349,12 @@ Obsoletes: python%{pyshortver} < %{version}-%{release}
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
-%endif # with main_python
+%else
+# We'll not provide this, on purpose
+# No package in Fedora shall ever depend on a alternative Python via this
+%global __requires_exclude ^python\\(abi\\) = 3\\..+
+%global __provides_exclude ^python\\(abi\\) = 3\\..+
+%endif
 
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
@@ -580,41 +563,6 @@ The debug runtime additionally supports debug builds of C-API extensions
 (with the "d" ABI flag) for debugging issues in those extensions.
 %endif # with debug_build
 
-%else  # with flatpackage
-
-# Python interpreter packages used to be named (or provide) name pythonXY (e.g.
-# python39). However, to align it with the executable names and to prepare for
-# Python 3.10, they were renamed to pythonX.Y (e.g. python3.9, python3.10). We
-# provide and obsolete the previous names.
-# - Here are the tags for the flat package. For the nonflat package, the
-#   provide is repeated many lines above.
-Provides: python%{pyshortver} = %{version}-%{release}
-Obsoletes: python%{pyshortver} < %{version}-%{release}
-
-%if %{with rpmwheels}
-Requires: %{python_wheel_pkg_prefix}-setuptools-wheel
-Requires: %{python_wheel_pkg_prefix}-pip-wheel
-%else
-Provides: bundled(python3dist(pip)) = %{pip_version}
-Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
-%endif
-
-# The zoneinfo module needs tzdata
-Requires: tzdata
-
-# The flatpackage is usable with tox
-Supplements: tox
-
-# The description for the flat package (SRPM and built)
-%description
-Python %{pybasever} package for developers.
-
-This package exists to allow developers to test their code against a newer
-version of Python. This is not a full Python stack and if you wish to run
-your applications with Python %{pybasever}, update your Fedora to a newer
-version once Python %{pybasever} is stable.
-
-%endif # with flatpackage
 
 # ======================================================
 # The prep phase of the build:
@@ -1123,17 +1071,13 @@ CheckPython optimized
 
 
 %if %{with main_python}
-%if %{without flatpackage}
 %files -n python-unversioned-command
-%endif
 %{_bindir}/python
 %{_mandir}/*/python.1*
 %endif
 
-%if %{without flatpackage}
 %files -n %{pkgname}-libs
 %doc README.rst
-%endif
 
 %dir %{pylibdir}
 %dir %{dynload_dir}
@@ -1141,9 +1085,7 @@ CheckPython optimized
 %license %{pylibdir}/LICENSE.txt
 
 %{pylibdir}/lib2to3
-%if %{without flatpackage}
 %exclude %{pylibdir}/lib2to3/tests
-%endif
 
 %dir %{pylibdir}/unittest/
 %dir %{pylibdir}/unittest/__pycache__/
@@ -1341,11 +1283,8 @@ CheckPython optimized
 %dir %{pylibdir}/tomllib/
 %{pylibdir}/tomllib/*.py
 %{pylibdir}/tomllib/__pycache__/*%{bytecode_suffixes}
-
-%if %{without flatpackage}
 %exclude %{pylibdir}/turtle.py
 %exclude %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
-%endif
 
 %{pylibdir}/urllib
 %{pylibdir}/xml
@@ -1376,15 +1315,10 @@ CheckPython optimized
 %endif
 
 
-%if %{without flatpackage}
 %files -n %{pkgname}-devel
-%endif
-
 %{pylibdir}/config-%{LDVERSION_optimized}-%{platform_triplet}/*
-%if %{without flatpackage}
 %exclude %{pylibdir}/config-%{LDVERSION_optimized}-%{platform_triplet}/Makefile
 %exclude %{_includedir}/python%{LDVERSION_optimized}/%{_pyconfig_h}
-%endif
 %{_includedir}/python%{LDVERSION_optimized}/*.h
 %{_includedir}/python%{LDVERSION_optimized}/internal/
 %{_includedir}/python%{LDVERSION_optimized}/cpython/
@@ -1419,10 +1353,7 @@ CheckPython optimized
 %{_libdir}/pkgconfig/python-%{pybasever}-embed.pc
 
 
-%if %{without flatpackage}
 %files -n %{pkgname}-idle
-%endif
-
 %if %{with main_python}
 %{_bindir}/idle*
 %else
@@ -1437,14 +1368,9 @@ CheckPython optimized
 %{_datadir}/icons/hicolor/*/apps/idle3.*
 %endif
 
-%if %{without flatpackage}
 %files -n %{pkgname}-tkinter
-%endif
-
 %{pylibdir}/tkinter
-%if %{without flatpackage}
 %exclude %{pylibdir}/tkinter/test
-%endif
 %{dynload_dir}/_tkinter.%{SOABI_optimized}.so
 %{pylibdir}/turtle.py
 %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
@@ -1455,10 +1381,7 @@ CheckPython optimized
 %{pylibdir}/turtledemo/__pycache__/*%{bytecode_suffixes}
 
 
-%if %{without flatpackage}
 %files -n %{pkgname}-test
-%endif
-
 %{pylibdir}/ctypes/test
 %{pylibdir}/distutils/tests
 %{pylibdir}/test
@@ -1480,10 +1403,7 @@ CheckPython optimized
 # all of the other subpackages
 
 %if %{with debug_build}
-%if %{without flatpackage}
 %files -n %{pkgname}-debug
-%endif
-
 %if %{with main_python}
 %{_bindir}/python3-debug
 %{_bindir}/python-debug
