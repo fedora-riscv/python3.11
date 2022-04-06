@@ -28,9 +28,9 @@ Co-authored-by: Michal Cyprian <m.cyprian@gmail.com>
 Co-authored-by: Lumír Balhar <frenzy.madness@gmail.com>
 ---
  Lib/site.py                |  9 ++++++++-
- Lib/sysconfig.py           | 25 +++++++++++++++++++++++++
+ Lib/sysconfig.py           | 19 +++++++++++++++++++
  Lib/test/test_sysconfig.py |  4 +++-
- 3 files changed, 36 insertions(+), 2 deletions(-)
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/site.py b/Lib/site.py
 index b11cd48e69..63ddd5b21b 100644
@@ -54,22 +54,16 @@ index b11cd48e69..63ddd5b21b 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index d4a8a68028..491f82de45 100644
+index 2a01342eda..447bfff83f 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -58,6 +58,31 @@
-         },
-     }
+@@ -103,6 +103,25 @@
+ else:
+     _INSTALL_SCHEMES['venv'] = _INSTALL_SCHEMES['posix_venv']
  
 +# backup the original posix_prefix as rpm_prefix
 +# RPM packages use it and we need to be able to read it even when changed
 +_INSTALL_SCHEMES['rpm_prefix'] = _INSTALL_SCHEMES['posix_prefix']
-+# Virtualenv >= 20.10.0 favors the "venv" scheme over the defaults when creating virtual environments.
-+# See: https://github.com/pypa/virtualenv/commit/8da79db86d8a5c74d03667a40e64ff832076445e
-+# See: https://bugs.python.org/issue45413
-+# "venv" should be the same as the unpatched posix_prefix for us,
-+# so new virtual environments aren't created with paths like venv/local/bin/python.
-+_INSTALL_SCHEMES['venv'] = _INSTALL_SCHEMES['posix_prefix']
 +
 +if (not (hasattr(sys, 'real_prefix') or
 +    sys.prefix != sys.base_prefix) and
@@ -90,19 +84,19 @@ index d4a8a68028..491f82de45 100644
  # NOTE: site.py has copy of this function.
  # Sync it when modify this function.
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index 2c4120979d..3a2901b0bf 100644
+index c7ec78fa4d..e47139df1f 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
-@@ -267,7 +267,7 @@ def test_get_config_h_filename(self):
+@@ -333,7 +333,7 @@ def test_get_config_h_filename(self):
          self.assertTrue(os.path.isfile(config_h), config_h)
  
      def test_get_scheme_names(self):
--        wanted = ['nt', 'posix_home', 'posix_prefix']
-+        wanted = ['nt', 'posix_home', 'posix_prefix', 'rpm_prefix', 'venv']
+-        wanted = ['nt', 'posix_home', 'posix_prefix', 'posix_venv', 'nt_venv', 'venv']
++        wanted = ['nt', 'posix_home', 'posix_prefix', 'posix_venv', 'nt_venv', 'venv', 'rpm_prefix']
          if HAS_USER_BASE:
              wanted.extend(['nt_user', 'osx_framework_user', 'posix_user'])
          self.assertEqual(get_scheme_names(), tuple(sorted(wanted)))
-@@ -279,6 +279,8 @@ def test_symlink(self): # Issue 7880
+@@ -345,6 +345,8 @@ def test_symlink(self): # Issue 7880
              cmd = "-c", "import sysconfig; print(sysconfig.get_platform())"
              self.assertEqual(py.call_real(*cmd), py.call_link(*cmd))
  

@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a6
+%global prerel a7
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -60,7 +60,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -68,7 +68,7 @@ License: Python
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 21.2.4
+%global pip_version 22.0.4
 %global setuptools_version 58.1.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
@@ -267,7 +267,7 @@ Source11: idle3.appdata.xml
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
 
-# 00251 # 531494a5ded29dad59f617304dab4eb8b7f80b0b
+# 00251 # 178b2099a8eb7c487f1a32c3f055be6c154c0116
 # Change user install location
 #
 # Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
@@ -1323,10 +1323,18 @@ CheckPython optimized
 %{pylibdir}/logging
 %{pylibdir}/multiprocessing
 
+%dir %{pylibdir}/re/
+%{pylibdir}/re/*.py
+%{pylibdir}/re/__pycache__/*%{bytecode_suffixes}
+
 %dir %{pylibdir}/sqlite3/
 %dir %{pylibdir}/sqlite3/__pycache__/
 %{pylibdir}/sqlite3/*.py
 %{pylibdir}/sqlite3/__pycache__/*%{bytecode_suffixes}
+
+%dir %{pylibdir}/tomllib/
+%{pylibdir}/tomllib/*.py
+%{pylibdir}/tomllib/__pycache__/*%{bytecode_suffixes}
 
 %if %{without flatpackage}
 %exclude %{pylibdir}/turtle.py
@@ -1609,6 +1617,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Apr 06 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a7-1
+- Update to 3.11.0a7
+
 * Tue Mar 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~a6-2
 - Finish bootstrapping 3.11.0a6
 
