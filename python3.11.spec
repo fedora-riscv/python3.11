@@ -38,6 +38,15 @@ License: Python
 %bcond_with main_python
 %endif
 
+# If this is *not* Main Python, should it contain `Provides: python(abi) ...`?
+# In Fedora no package shall depend on an alternative Python via this tag, so we do not provide it.
+# In ELN/RHEL/CentOS we want to allow building against alternative stacks, so the Provide is enabled.
+%if 0%{?fedora}
+%bcond_with python_abi_provides_for_alt_pythons
+%else
+%bcond_without python_abi_provides_for_alt_pythons
+%endif
+
 # When bootstrapping python3, we need to build setuptools.
 # but setuptools BR python3-devel and that brings in python3-rpm-generators;
 # python3-rpm-generators needs python3-setuptools, so we cannot have it yet.
@@ -355,13 +364,12 @@ Recommends: %{_bindir}/python
 Provides: python%{pyshortver} = %{version}-%{release}
 Obsoletes: python%{pyshortver} < %{version}-%{release}
 
-%if %{with main_python}
+%if %{with main_python} || %{with python_abi_provides_for_alt_pythons}
 # Packages with Python modules in standard locations automatically
 # depend on python(abi). Provide that here.
 Provides: python(abi) = %{pybasever}
 %else
-# We'll not provide this, on purpose
-# No package in Fedora shall ever depend on a alternative Python via this
+# We exclude the `python(abi)` Provides
 %global __requires_exclude ^python\\(abi\\) = 3\\..+
 %global __provides_exclude ^python\\(abi\\) = 3\\..+
 %endif
