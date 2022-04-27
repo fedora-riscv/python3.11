@@ -19,9 +19,6 @@ addFilter(r'self-obsoletion python3\.\d+ obsoletes python3\.\d+')
 # intentionally hardcoded
 addFilter(r'hardcoded-library-path in %{_prefix}/lib/(debug/%{_libdir}|python%{pybasever})')
 
-# intentional for our pythonXY package
-addFilter(r'python3\.\d+\.[^:]+: (E|W): devel-file-in-non-devel-package')
-
 # we have non binary stuff, python files
 addFilter(r'only-non-binary-in-usr-lib')
 
