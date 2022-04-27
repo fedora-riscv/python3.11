@@ -1237,6 +1237,10 @@ CheckPython optimized
 %dir %{pylibdir}/site-packages/
 %dir %{pylibdir}/site-packages/__pycache__/
 %{pylibdir}/site-packages/README.txt
+
+%exclude %{pylibdir}/_sysconfigdata_d_linux_%{platform_triplet}.py
+%exclude %{pylibdir}/__pycache__/_sysconfigdata_d_linux_%{platform_triplet}%{bytecode_suffixes}
+
 %{pylibdir}/*.py
 %dir %{pylibdir}/__pycache__/
 %{pylibdir}/__pycache__/*%{bytecode_suffixes}
@@ -1550,6 +1554,9 @@ CheckPython optimized
 %{dynload_dir}/_testinternalcapi.%{SOABI_debug}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 
+%{pylibdir}/_sysconfigdata_d_linux_%{platform_triplet}.py
+%{pylibdir}/__pycache__/_sysconfigdata_d_linux_%{platform_triplet}%{bytecode_suffixes}
+
 %endif # with debug_build
 
 # We put the debug-gdb.py file inside /usr/lib/debug to avoid noise from ldconfig
@@ -1577,6 +1584,7 @@ CheckPython optimized
 - Build Python 3.11 with subpackages
 - `python(abi)` is still not Provided for alternative Python versions
 - Drop old no-longer-needed Obsoletes of python311 and python3-tools
+- Move _sysconfigdata_d_linux*.py to the debug subpackage
 - Resolves: rhbz#2063227
 
 * Thu Apr 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a7-2
