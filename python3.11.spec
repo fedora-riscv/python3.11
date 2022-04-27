@@ -360,9 +360,8 @@ Recommends: %{_bindir}/python
 # Python interpreter packages used to be named (or provide) name pythonXY (e.g.
 # python39). However, to align it with the executable names and to prepare for
 # Python 3.10, they were renamed to pythonX.Y (e.g. python3.9, python3.10). We
-# provide and obsolete the previous names.
+# provide the previous names.
 Provides: python%{pyshortver} = %{version}-%{release}
-Obsoletes: python%{pyshortver} < %{version}-%{release}
 
 %if %{with main_python} || %{with python_abi_provides_for_alt_pythons}
 # Packages with Python modules in standard locations automatically
@@ -517,7 +516,6 @@ Provides: idle = %{version}-%{release}
 
 Provides: %{pkgname}-tools = %{version}-%{release}
 Provides: %{pkgname}-tools%{?_isa} = %{version}-%{release}
-Obsoletes: %{pkgname}-tools < %{version}-%{release}
 
 %description -n %{pkgname}-idle
 IDLE is Python’s Integrated Development and Learning Environment.
@@ -1578,6 +1576,7 @@ CheckPython optimized
 * Wed Apr 20 2022 Tomas Orsava <torsava@redhat.com> - 3.11.0~a7-3
 - Build Python 3.11 with subpackages
 - `python(abi)` is still not Provided for alternative Python versions
+- Drop old no-longer-needed Obsoletes of python311 and python3-tools
 - Resolves: rhbz#2063227
 
 * Thu Apr 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~a7-2
