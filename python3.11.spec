@@ -474,8 +474,10 @@ Requires: (pyproject-rpm-macros if rpm-build)
 
 %unversioned_obsoletes_of_python3_X_if_main devel
 
+%if %{with main_python}
 # Python developers are very likely to need pip
 Recommends: %{pkgname}-pip
+%endif
 
 # tox users are likely to need the devel subpackage
 Supplements: tox
