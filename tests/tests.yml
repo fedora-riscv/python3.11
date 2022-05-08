@@ -32,6 +32,7 @@
         run: VERSION=3.11 SAMPLE=10 test_marshalparser_compatibility.sh
     required_packages:
     - gcc  # for extension building in venv and selftest
+    - gcc-c++ # for test_cppext
     - gdb  # for test_gdb
     - python3.11  # the test subject
     - tox  # for venv tests

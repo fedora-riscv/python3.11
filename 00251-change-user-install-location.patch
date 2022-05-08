@@ -54,7 +54,7 @@ index b11cd48e69..63ddd5b21b 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 2a01342eda..447bfff83f 100644
+index e21b7303fe..37b04452bc 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -103,6 +103,25 @@
@@ -84,7 +84,7 @@ index 2a01342eda..447bfff83f 100644
  # NOTE: site.py has copy of this function.
  # Sync it when modify this function.
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index c7ec78fa4d..e47139df1f 100644
+index f2b93706b2..cc58f47cdb 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
 @@ -333,7 +333,7 @@ def test_get_config_h_filename(self):

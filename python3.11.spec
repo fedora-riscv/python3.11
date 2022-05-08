@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel a7
+%global prerel b1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -59,7 +59,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -1580,6 +1580,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sun May 08 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b1-1
+- Update to 3.11.0b1
+
 * Wed Apr 20 2022 Tomas Orsava <torsava@redhat.com> - 3.11.0~a7-3
 - Build Python 3.11 with subpackages
 - `python(abi)` is still not Provided for alternative Python versions
