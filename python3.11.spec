@@ -1238,8 +1238,10 @@ CheckPython optimized
 %dir %{pylibdir}/site-packages/__pycache__/
 %{pylibdir}/site-packages/README.txt
 
+%if %{with debug_build}
 %exclude %{pylibdir}/_sysconfigdata_d_linux_%{platform_triplet}.py
 %exclude %{pylibdir}/__pycache__/_sysconfigdata_d_linux_%{platform_triplet}%{bytecode_suffixes}
+%endif
 
 %{pylibdir}/*.py
 %dir %{pylibdir}/__pycache__/
