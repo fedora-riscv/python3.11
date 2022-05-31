@@ -1239,8 +1239,8 @@ CheckPython optimized
 %{pylibdir}/site-packages/README.txt
 
 %if %{with debug_build}
-%exclude %{pylibdir}/_sysconfigdata_d_linux_%{platform_triplet}.py
-%exclude %{pylibdir}/__pycache__/_sysconfigdata_d_linux_%{platform_triplet}%{bytecode_suffixes}
+%exclude %{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}.py
+%exclude %{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
 %endif
 
 %{pylibdir}/*.py
@@ -1556,8 +1556,8 @@ CheckPython optimized
 %{dynload_dir}/_testinternalcapi.%{SOABI_debug}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
 
-%{pylibdir}/_sysconfigdata_d_linux_%{platform_triplet}.py
-%{pylibdir}/__pycache__/_sysconfigdata_d_linux_%{platform_triplet}%{bytecode_suffixes}
+%{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}.py
+%{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
 
 %endif # with debug_build
 
