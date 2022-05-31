@@ -310,6 +310,10 @@ Patch251: 00251-change-user-install-location.patch
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 
+# 00381 # d7e0c24c40417744f227744f9d6875670b7c187e
+# gh-92597: Ensure that AST nodes without explicit end positions can be compiled
+Patch381: 00381-gh-92597-ensure-that-ast-nodes-without-explicit-end-positions-can-be-compiled.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
