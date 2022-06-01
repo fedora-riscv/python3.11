@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b2
+%global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -309,10 +309,6 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
-
-# 00381 # d7e0c24c40417744f227744f9d6875670b7c187e
-# gh-92597: Ensure that AST nodes without explicit end positions can be compiled
-Patch381: 00381-gh-92597-ensure-that-ast-nodes-without-explicit-end-positions-can-be-compiled.patch
 
 # (New patches go here ^^^)
 #
@@ -1586,6 +1582,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jun 01 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-1
+- Update to 3.11.0b3
+
 * Tue May 31 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b2-1
 - Update to 3.11.0b2
 
