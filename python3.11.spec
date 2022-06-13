@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python
 
 
@@ -59,11 +59,11 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_without bootstrap
+%bcond_with bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
-%bcond_with rpmwheels
+%bcond_without rpmwheels
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
@@ -71,10 +71,10 @@ License: Python
 %global setuptools_version 58.1.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
-%bcond_with optimizations
+%bcond_without optimizations
 
 # Run the test suite in %%check
-%bcond_with tests
+%bcond_without tests
 
 # Extra build for debugging the interpreter or C-API extensions
 # (the -debug subpackages)
@@ -1582,6 +1582,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jun 13 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b3-3
+- Finish bootstrapping for Python 3.11 mass rebuild
+
 * Mon Jun 13 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b3-2
 - Initial bootstrap for Python 3.11 mass rebuild
 
