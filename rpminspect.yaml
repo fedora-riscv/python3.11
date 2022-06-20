@@ -9,6 +9,13 @@ badfuncs:
     ignore:
         - /usr/lib*/python*/lib-dynload/_socket.*
 
+# exclude the debug build from annocheck entirely
+annocheck:
+    ignore:
+        - /usr/bin/python*d
+        - /usr/lib*/libpython*d.so.1.0
+        - /usr/lib*/python*/lib-dynload/*.cpython-*d-*-*-*.so
+
 # don't report changed content of compiled files
 # that is expected with every toolchain update and not reproducible yet
 changedfiles:
