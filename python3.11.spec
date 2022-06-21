@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Python
 
 
@@ -199,6 +199,7 @@ BuildRequires: glibc-devel
 BuildRequires: gmp-devel
 BuildRequires: gnupg2
 BuildRequires: libappstream-glib
+BuildRequires: libb2-devel
 BuildRequires: libffi-devel
 BuildRequires: libnsl2-devel
 BuildRequires: libtirpc-devel
@@ -1595,6 +1596,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 21 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-5
+- Build Python with the optimized Blake2 library libb2
+
 * Tue Jun 21 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-4
 - Make C++ version of _Py_CAST work with 0/NULL
 
