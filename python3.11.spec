@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python
 
 
@@ -309,6 +309,19 @@ Patch251: 00251-change-user-install-location.patch
 # Downstream only: only used when building RPM packages
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
+
+# 00383 # b4e1d3233b9fbcd9a60370d0f29e65012bb9532d
+# gh-93442: Make C++ version of _Py_CAST work with 0/NULL
+#
+# Add C++ overloads for _Py_CAST_impl() to handle 0/NULL.  This will allow
+# C++ extensions that pass 0 or NULL to macros using _Py_CAST() to
+# continue to compile.  Without this, you get an error like:
+#
+#     invalid ‘static_cast’ from type ‘int’ to type ‘_object*’
+#
+# The modern way to use a NULL value in C++ is to use nullptr.  However,
+# we want to not break extensions that do things the old way.
+Patch383: 00383-gh-93442-make-c-version-of-_py_cast-work-with-0-null.patch
 
 # (New patches go here ^^^)
 #
@@ -1582,6 +1595,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 21 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-4
+- Make C++ version of _Py_CAST work with 0/NULL
+
 * Mon Jun 13 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b3-3
 - Finish bootstrapping for Python 3.11 mass rebuild
 
