@@ -15,39 +15,40 @@
     repositories:
     - repo: "https://src.fedoraproject.org/tests/python.git"
       dest: "python"
+    pybasever: "3.11"
     tests:
     - rpm_qa:
         run: rpm -qa
     - smoke:
         dir: python/smoke
-        run: VERSION=3.11 ./venv.sh
+        run: "VERSION={{ pybasever }} ./venv.sh"
     - smoke_virtualenv:
         dir: python/smoke
-        run: VERSION=3.11 METHOD=virtualenv ./venv.sh
+        run: "VERSION={{ pybasever }} METHOD=virtualenv ./venv.sh"
     - debugsmoke:
         dir: python/smoke
-        run: PYTHON=python3.11d TOX=false VERSION=3.11 ./venv.sh
+        run: "PYTHON=python{{ pybasever }}d TOX=false VERSION={{ pybasever }} ./venv.sh"
     - selftest:
         dir: python/selftest
-        run: VERSION=3.11 X="" ./parallel.sh
+        run: "VERSION={{ pybasever }} X='' ./parallel.sh"
     - debugtest:
         dir: python/selftest
-        run: VERSION=3.11 PYTHON=python3.11d X="" ./parallel.sh
+        run: "VERSION={{ pybasever }} PYTHON=python{{ pybasever }}d X='' ./parallel.sh"
     - debugflags:
         dir: python/flags
-        run: python3.11d ./assertflags.py -O0
+        run: "python{{ pybasever }}d ./assertflags.py -O0"
     - marshalparser:
         dir: python/marshalparser
-        run: VERSION=3.11 SAMPLE=10 test_marshalparser_compatibility.sh
+        run: "VERSION={{ pybasever }} SAMPLE=10 test_marshalparser_compatibility.sh"
     required_packages:
     - gcc  # for extension building in venv and selftest
     - gcc-c++ # for test_cppext
     - gdb  # for test_gdb
-    - python3.11  # the test subject
-    - python3.11-debug  # for leak testing
-    - python3.11-devel  # for extension building in venv and selftest
-    - python3.11-tkinter  # for selftest
-    - python3.11-test  # for selftest
+    - "python{{ pybasever }}"  # the test subject
+    - "python{{ pybasever }}-debug"  # for leak testing
+    - "python{{ pybasever }}-devel"  # for extension building in venv and selftest
+    - "python{{ pybasever }}-tkinter"  # for selftest
+    - "python{{ pybasever }}-test"  # for selftest
     - tox  # for venv tests
     - virtualenv  # for virtualenv tests
     - glibc-all-langpacks # for locale tests
