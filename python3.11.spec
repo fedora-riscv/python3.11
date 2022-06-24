@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Python
 
 
@@ -311,6 +311,17 @@ Patch251: 00251-change-user-install-location.patch
 # Ideally, we should talk to upstream and explain why we don't want this
 Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 
+# 00371 # c1754d9c2750f89cb702e1b63a99201f5f7cff00
+# Revert "bpo-1596321: Fix threading._shutdown() for the main thread (GH-28549) (GH-28589)"
+#
+# This reverts commit 38c67738c64304928c68d5c2bd78bbb01d979b94. It
+# introduced regression causing FreeIPA's tests to fail.
+#
+# For more info see:
+# https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
+# https://github.com/GrahamDumpleton/mod_wsgi/issues/730
+Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
+
 # 00383 # b4e1d3233b9fbcd9a60370d0f29e65012bb9532d
 # gh-93442: Make C++ version of _Py_CAST work with 0/NULL
 #
@@ -323,6 +334,10 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # The modern way to use a NULL value in C++ is to use nullptr.  However,
 # we want to not break extensions that do things the old way.
 Patch383: 00383-gh-93442-make-c-version-of-_py_cast-work-with-0-null.patch
+
+# 00384 # 7c809258e34925560cc13a377b1c6d9c03e83207
+# gh-94028: Clear and reset sqlite3 statements properly in cursor iternext (GH-94042)
+Patch384: 00384-gh-94028-clear-and-reset-sqlite3-statements-properly-in-cursor-iternext-gh-94042.patch
 
 # (New patches go here ^^^)
 #
@@ -1596,6 +1611,10 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jun 24 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b3-6
+- Clear and reset sqlite3 statements properly in cursor iternext (fixes rhbz#2099049)
+- Revert a problematic fix of threading._shutdown() again (fixes rhbz#2100282)
+
 * Tue Jun 21 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-5
 - Build Python with the optimized Blake2 library libb2
 
