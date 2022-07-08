@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Python
 
 
@@ -59,7 +59,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_without bootstrap
+%bcond_with bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -1628,6 +1628,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-8
+- Finish bootstrap of the re module speed regression fix
+
 * Fri Jul 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-7
 - Fix speed regression in the re module which prevented chromium from building
 
