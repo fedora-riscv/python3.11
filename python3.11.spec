@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b3
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Python
 
 
@@ -59,7 +59,7 @@ License: Python
 #   IMPORTANT: When bootstrapping, it's very likely the wheels for pip and
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 # Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
 # Uses upstream bundled prebuilt wheels otherwise
@@ -338,6 +338,23 @@ Patch383: 00383-gh-93442-make-c-version-of-_py_cast-work-with-0-null.patch
 # 00384 # 7c809258e34925560cc13a377b1c6d9c03e83207
 # gh-94028: Clear and reset sqlite3 statements properly in cursor iternext (GH-94042)
 Patch384: 00384-gh-94028-clear-and-reset-sqlite3-statements-properly-in-cursor-iternext-gh-94042.patch
+
+# 00385 # 8696ca2373ef3d7595dfb62e2b63180621f40d5d
+# gh-91404: Revert "bpo-23689: re module, fix memory leak..."
+#
+# This fixes a speed regression in the re module
+# which prevented chromium from building in Fedora.
+#
+# Revert "bpo-23689: re module, fix memory leak when a match is terminated by a signal or memory allocation failure"
+#
+# This reverts commit 6e3eee5c11b539e9aab39cff783acf57838c355a.
+#
+# Manual fixups to increase the MAGIC number and to handle conflicts with
+# a couple of changes that landed after that.
+#
+#
+# gh-94675: Add a regression test for rjsmin re slowdown
+Patch385: 00385-gh-91404-revert-bpo-23689-re-module-fix-memory-leak.patch
 
 # (New patches go here ^^^)
 #
@@ -1611,6 +1628,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-7
+- Fix speed regression in the re module which prevented chromium from building
+
 * Fri Jun 24 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b3-6
 - Clear and reset sqlite3 statements properly in cursor iternext (fixes rhbz#2099049)
 - Revert a problematic fix of threading._shutdown() again (fixes rhbz#2100282)

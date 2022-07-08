@@ -1,0 +1,746 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Fri, 17 Jun 2022 01:43:56 -0700
+Subject: [PATCH] 00385: gh-91404: Revert "bpo-23689: re module, fix memory
+ leak..."
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes a speed regression in the re module
+which prevented chromium from building in Fedora.
+
+Revert "bpo-23689: re module, fix memory leak when a match is terminated by a signal or memory allocation failure"
+
+This reverts commit 6e3eee5c11b539e9aab39cff783acf57838c355a.
+
+Manual fixups to increase the MAGIC number and to handle conflicts with
+a couple of changes that landed after that.
+
+(cherry picked from commit 4beee0c7b0c2cc78a893dde88fd8e34099dcf877)
+Co-authored-by: Gregory P. Smith <greg@krypto.org>
+
+gh-94675: Add a regression test for rjsmin re slowdown
+
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+---
+ Lib/re/_compiler.py                           | 59 ++++++-----------
+ Lib/re/_constants.py                          |  2 +-
+ Lib/test/test_re.py                           | 59 +++++++++--------
+ ...2-06-15-21-35-11.gh-issue-91404.39TZzW.rst |  3 +
+ ...2-07-08-12-22-00.gh-issue-94675.IiTs5f.rst |  1 +
+ Modules/_sre/clinic/sre.c.h                   | 27 ++------
+ Modules/_sre/sre.c                            | 65 +++++++------------
+ Modules/_sre/sre.h                            |  4 --
+ Modules/_sre/sre_constants.h                  |  2 +-
+ Modules/_sre/sre_lib.h                        | 30 +++++----
+ 10 files changed, 105 insertions(+), 147 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2022-06-15-21-35-11.gh-issue-91404.39TZzW.rst
+ create mode 100644 Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+
+diff --git a/Lib/re/_compiler.py b/Lib/re/_compiler.py
+index 4b5322338c..d8e0d2fdef 100644
+--- a/Lib/re/_compiler.py
++++ b/Lib/re/_compiler.py
+@@ -28,21 +28,14 @@
+     POSSESSIVE_REPEAT: (POSSESSIVE_REPEAT, SUCCESS, POSSESSIVE_REPEAT_ONE),
+ }
+ 
+-class _CompileData:
+-    __slots__ = ('code', 'repeat_count')
+-    def __init__(self):
+-        self.code = []
+-        self.repeat_count = 0
+-
+ def _combine_flags(flags, add_flags, del_flags,
+                    TYPE_FLAGS=_parser.TYPE_FLAGS):
+     if add_flags & TYPE_FLAGS:
+         flags &= ~TYPE_FLAGS
+     return (flags | add_flags) & ~del_flags
+ 
+-def _compile(data, pattern, flags):
++def _compile(code, pattern, flags):
+     # internal: compile a (sub)pattern
+-    code = data.code
+     emit = code.append
+     _len = len
+     LITERAL_CODES = _LITERAL_CODES
+@@ -115,7 +108,7 @@ def _compile(data, pattern, flags):
+                 skip = _len(code); emit(0)
+                 emit(av[0])
+                 emit(av[1])
+-                _compile(data, av[2], flags)
++                _compile(code, av[2], flags)
+                 emit(SUCCESS)
+                 code[skip] = _len(code) - skip
+             else:
+@@ -123,11 +116,7 @@ def _compile(data, pattern, flags):
+                 skip = _len(code); emit(0)
+                 emit(av[0])
+                 emit(av[1])
+-                # now op is in (MIN_REPEAT, MAX_REPEAT, POSSESSIVE_REPEAT)
+-                if op != POSSESSIVE_REPEAT:
+-                    emit(data.repeat_count)
+-                    data.repeat_count += 1
+-                _compile(data, av[2], flags)
++                _compile(code, av[2], flags)
+                 code[skip] = _len(code) - skip
+                 emit(REPEATING_CODES[op][1])
+         elif op is SUBPATTERN:
+@@ -136,7 +125,7 @@ def _compile(data, pattern, flags):
+                 emit(MARK)
+                 emit((group-1)*2)
+             # _compile_info(code, p, _combine_flags(flags, add_flags, del_flags))
+-            _compile(data, p, _combine_flags(flags, add_flags, del_flags))
++            _compile(code, p, _combine_flags(flags, add_flags, del_flags))
+             if group:
+                 emit(MARK)
+                 emit((group-1)*2+1)
+@@ -148,7 +137,7 @@ def _compile(data, pattern, flags):
+             # pop their stack if they reach it
+             emit(ATOMIC_GROUP)
+             skip = _len(code); emit(0)
+-            _compile(data, av, flags)
++            _compile(code, av, flags)
+             emit(SUCCESS)
+             code[skip] = _len(code) - skip
+         elif op in SUCCESS_CODES:
+@@ -163,7 +152,7 @@ def _compile(data, pattern, flags):
+                 if lo != hi:
+                     raise error("look-behind requires fixed-width pattern")
+                 emit(lo) # look behind
+-            _compile(data, av[1], flags)
++            _compile(code, av[1], flags)
+             emit(SUCCESS)
+             code[skip] = _len(code) - skip
+         elif op is AT:
+@@ -182,7 +171,7 @@ def _compile(data, pattern, flags):
+             for av in av[1]:
+                 skip = _len(code); emit(0)
+                 # _compile_info(code, av, flags)
+-                _compile(data, av, flags)
++                _compile(code, av, flags)
+                 emit(JUMP)
+                 tailappend(_len(code)); emit(0)
+                 code[skip] = _len(code) - skip
+@@ -210,12 +199,12 @@ def _compile(data, pattern, flags):
+             emit(op)
+             emit(av[0]-1)
+             skipyes = _len(code); emit(0)
+-            _compile(data, av[1], flags)
++            _compile(code, av[1], flags)
+             if av[2]:
+                 emit(JUMP)
+                 skipno = _len(code); emit(0)
+                 code[skipyes] = _len(code) - skipyes + 1
+-                _compile(data, av[2], flags)
++                _compile(code, av[2], flags)
+                 code[skipno] = _len(code) - skipno
+             else:
+                 code[skipyes] = _len(code) - skipyes + 1
+@@ -582,17 +571,17 @@ def isstring(obj):
+ def _code(p, flags):
+ 
+     flags = p.state.flags | flags
+-    data = _CompileData()
++    code = []
+ 
+     # compile info block
+-    _compile_info(data.code, p, flags)
++    _compile_info(code, p, flags)
+ 
+     # compile the pattern
+-    _compile(data, p.data, flags)
++    _compile(code, p.data, flags)
+ 
+-    data.code.append(SUCCESS)
++    code.append(SUCCESS)
+ 
+-    return data
++    return code
+ 
+ def _hex_code(code):
+     return '[%s]' % ', '.join('%#0*x' % (_sre.CODESIZE*2+2, x) for x in code)
+@@ -693,7 +682,7 @@ def print_2(*args):
+                     else:
+                         print_(FAILURE)
+                 i += 1
+-            elif op in (REPEAT_ONE, MIN_REPEAT_ONE,
++            elif op in (REPEAT, REPEAT_ONE, MIN_REPEAT_ONE,
+                         POSSESSIVE_REPEAT, POSSESSIVE_REPEAT_ONE):
+                 skip, min, max = code[i: i+3]
+                 if max == MAXREPEAT:
+@@ -701,13 +690,6 @@ def print_2(*args):
+                 print_(op, skip, min, max, to=i+skip)
+                 dis_(i+3, i+skip)
+                 i += skip
+-            elif op is REPEAT:
+-                skip, min, max, repeat_index = code[i: i+4]
+-                if max == MAXREPEAT:
+-                    max = 'MAXREPEAT'
+-                print_(op, skip, min, max, repeat_index, to=i+skip)
+-                dis_(i+4, i+skip)
+-                i += skip
+             elif op is GROUPREF_EXISTS:
+                 arg, skip = code[i: i+2]
+                 print_(op, arg, skip, to=i+skip)
+@@ -762,11 +744,11 @@ def compile(p, flags=0):
+     else:
+         pattern = None
+ 
+-    data = _code(p, flags)
++    code = _code(p, flags)
+ 
+     if flags & SRE_FLAG_DEBUG:
+         print()
+-        dis(data.code)
++        dis(code)
+ 
+     # map in either direction
+     groupindex = p.state.groupdict
+@@ -775,6 +757,7 @@ def compile(p, flags=0):
+         indexgroup[i] = k
+ 
+     return _sre.compile(
+-        pattern, flags | p.state.flags, data.code,
+-        p.state.groups-1, groupindex, tuple(indexgroup),
+-        data.repeat_count)
++        pattern, flags | p.state.flags, code,
++        p.state.groups-1,
++        groupindex, tuple(indexgroup)
++        )
+diff --git a/Lib/re/_constants.py b/Lib/re/_constants.py
+index 1cc85c631f..10ee14bfab 100644
+--- a/Lib/re/_constants.py
++++ b/Lib/re/_constants.py
+@@ -13,7 +13,7 @@
+ 
+ # update when constants are added or removed
+ 
+-MAGIC = 20220423
++MAGIC = 20220615
+ 
+ from _sre import MAXREPEAT, MAXGROUPS
+ 
+diff --git a/Lib/test/test_re.py b/Lib/test/test_re.py
+index 6d61412f16..5d946370ee 100644
+--- a/Lib/test/test_re.py
++++ b/Lib/test/test_re.py
+@@ -1,6 +1,7 @@
+ from test.support import (gc_collect, bigmemtest, _2G,
+                           cpython_only, captured_stdout,
+-                          check_disallow_instantiation, is_emscripten, is_wasi)
++                          check_disallow_instantiation, is_emscripten, is_wasi,
++                          SHORT_TIMEOUT)
+ import locale
+ import re
+ import string
+@@ -11,6 +12,14 @@
+ from re import Scanner
+ from weakref import proxy
+ 
++# some platforms lack working multiprocessing
++try:
++    import _multiprocessing
++except ImportError:
++    multiprocessing = None
++else:
++    import multiprocessing
++
+ # Misc tests from Tim Peters' re.doc
+ 
+ # WARNING: Don't change details in these tests if you don't know
+@@ -1796,12 +1805,9 @@ def test_dealloc(self):
+         long_overflow = 2**128
+         self.assertRaises(TypeError, re.finditer, "a", {})
+         with self.assertRaises(OverflowError):
+-            _sre.compile("abc", 0, [long_overflow], 0, {}, (), 0)
++            _sre.compile("abc", 0, [long_overflow], 0, {}, ())
+         with self.assertRaises(TypeError):
+-            _sre.compile({}, 0, [], 0, [], [], 0)
+-        with self.assertRaises(RuntimeError):
+-            # invalid repeat_count -1
+-            _sre.compile("abc", 0, [1], 0, {}, (), -1)
++            _sre.compile({}, 0, [], 0, [], [])
+ 
+     def test_search_dot_unicode(self):
+         self.assertTrue(re.search("123.*-", '123abc-'))
+@@ -2441,6 +2447,26 @@ def test_template_function_and_flag_is_deprecated(self):
+         self.assertTrue(template_re1.match('ahoy'))
+         self.assertFalse(template_re1.match('nope'))
+ 
++    @unittest.skipIf(multiprocessing is None, 'test requires multiprocessing')
++    def test_regression_gh94675(self):
++        pattern = re.compile(r'(?<=[({}])(((//[^\n]*)?[\n])([\000-\040])*)*'
++                             r'((/[^/\[\n]*(([^\n]|(\[\n]*(]*)*\]))'
++                             r'[^/\[]*)*/))((((//[^\n]*)?[\n])'
++                             r'([\000-\040]|(/\*[^*]*\*+'
++                             r'([^/*]\*+)*/))*)+(?=[^\000-\040);\]}]))')
++        input_js = '''a(function() {
++            ///////////////////////////////////////////////////////////////////
++        });'''
++        p = multiprocessing.Process(target=pattern.sub, args=('', input_js))
++        p.start()
++        p.join(SHORT_TIMEOUT)
++        try:
++            self.assertFalse(p.is_alive(), 'pattern.sub() timed out')
++        finally:
++            if p.is_alive():
++                p.terminate()
++                p.join()
++
+ 
+ def get_debug_out(pat):
+     with captured_stdout() as out:
+@@ -2540,27 +2566,6 @@ def test_possesive_repeat(self):
+ 14. SUCCESS
+ ''')
+ 
+-    def test_repeat_index(self):
+-        self.assertEqual(get_debug_out(r'(?:ab)*?(?:cd)*'), '''\
+-MIN_REPEAT 0 MAXREPEAT
+-  LITERAL 97
+-  LITERAL 98
+-MAX_REPEAT 0 MAXREPEAT
+-  LITERAL 99
+-  LITERAL 100
+-
+- 0. INFO 4 0b0 0 MAXREPEAT (to 5)
+- 5: REPEAT 8 0 MAXREPEAT 0 (to 14)
+-10.   LITERAL 0x61 ('a')
+-12.   LITERAL 0x62 ('b')
+-14: MIN_UNTIL
+-15. REPEAT 8 0 MAXREPEAT 1 (to 24)
+-20.   LITERAL 0x63 ('c')
+-22.   LITERAL 0x64 ('d')
+-24: MAX_UNTIL
+-25. SUCCESS
+-''')
+-
+ 
+ class PatternReprTests(unittest.TestCase):
+     def check(self, pattern, expected):
+diff --git a/Misc/NEWS.d/next/Library/2022-06-15-21-35-11.gh-issue-91404.39TZzW.rst b/Misc/NEWS.d/next/Library/2022-06-15-21-35-11.gh-issue-91404.39TZzW.rst
+new file mode 100644
+index 0000000000..e20b15c7b7
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2022-06-15-21-35-11.gh-issue-91404.39TZzW.rst
+@@ -0,0 +1,3 @@
++Revert the :mod:`re` memory leak when a match is terminated by a signal or
++memory allocation failure as the implemented fix caused a major performance
++regression.
+diff --git a/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst b/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+new file mode 100644
+index 0000000000..d0005d9f60
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+@@ -0,0 +1 @@
++Add a regression test for :mod:`re` exponentional slowdown when using rjsmin.
+diff --git a/Modules/_sre/clinic/sre.c.h b/Modules/_sre/clinic/sre.c.h
+index e243c756e1..048a494f1b 100644
+--- a/Modules/_sre/clinic/sre.c.h
++++ b/Modules/_sre/clinic/sre.c.h
+@@ -764,7 +764,7 @@ PyDoc_STRVAR(_sre_SRE_Pattern___deepcopy____doc__,
+ 
+ PyDoc_STRVAR(_sre_compile__doc__,
+ "compile($module, /, pattern, flags, code, groups, groupindex,\n"
+-"        indexgroup, repeat_count)\n"
++"        indexgroup)\n"
+ "--\n"
+ "\n");
+ 
+@@ -774,24 +774,23 @@ PyDoc_STRVAR(_sre_compile__doc__,
+ static PyObject *
+ _sre_compile_impl(PyObject *module, PyObject *pattern, int flags,
+                   PyObject *code, Py_ssize_t groups, PyObject *groupindex,
+-                  PyObject *indexgroup, Py_ssize_t repeat_count);
++                  PyObject *indexgroup);
+ 
+ static PyObject *
+ _sre_compile(PyObject *module, PyObject *const *args, Py_ssize_t nargs, PyObject *kwnames)
+ {
+     PyObject *return_value = NULL;
+-    static const char * const _keywords[] = {"pattern", "flags", "code", "groups", "groupindex", "indexgroup", "repeat_count", NULL};
++    static const char * const _keywords[] = {"pattern", "flags", "code", "groups", "groupindex", "indexgroup", NULL};
+     static _PyArg_Parser _parser = {NULL, _keywords, "compile", 0};
+-    PyObject *argsbuf[7];
++    PyObject *argsbuf[6];
+     PyObject *pattern;
+     int flags;
+     PyObject *code;
+     Py_ssize_t groups;
+     PyObject *groupindex;
+     PyObject *indexgroup;
+-    Py_ssize_t repeat_count;
+ 
+-    args = _PyArg_UnpackKeywords(args, nargs, NULL, kwnames, &_parser, 7, 7, 0, argsbuf);
++    args = _PyArg_UnpackKeywords(args, nargs, NULL, kwnames, &_parser, 6, 6, 0, argsbuf);
+     if (!args) {
+         goto exit;
+     }
+@@ -827,19 +826,7 @@ _sre_compile(PyObject *module, PyObject *const *args, Py_ssize_t nargs, PyObject
+         goto exit;
+     }
+     indexgroup = args[5];
+-    {
+-        Py_ssize_t ival = -1;
+-        PyObject *iobj = _PyNumber_Index(args[6]);
+-        if (iobj != NULL) {
+-            ival = PyLong_AsSsize_t(iobj);
+-            Py_DECREF(iobj);
+-        }
+-        if (ival == -1 && PyErr_Occurred()) {
+-            goto exit;
+-        }
+-        repeat_count = ival;
+-    }
+-    return_value = _sre_compile_impl(module, pattern, flags, code, groups, groupindex, indexgroup, repeat_count);
++    return_value = _sre_compile_impl(module, pattern, flags, code, groups, groupindex, indexgroup);
+ 
+ exit:
+     return return_value;
+@@ -1129,4 +1116,4 @@ _sre_SRE_Scanner_search(ScannerObject *self, PyTypeObject *cls, PyObject *const
+     }
+     return _sre_SRE_Scanner_search_impl(self, cls);
+ }
+-/*[clinic end generated code: output=97e7ce058366760b input=a9049054013a1b77]*/
++/*[clinic end generated code: output=fd2f45c941620e6e input=a9049054013a1b77]*/
+diff --git a/Modules/_sre/sre.c b/Modules/_sre/sre.c
+index 491734f243..0a7019a085 100644
+--- a/Modules/_sre/sre.c
++++ b/Modules/_sre/sre.c
+@@ -427,12 +427,6 @@ state_init(SRE_STATE* state, PatternObject* pattern, PyObject* string,
+     state->lastmark = -1;
+     state->lastindex = -1;
+ 
+-    state->repeats_array = PyMem_New(SRE_REPEAT, pattern->repeat_count);
+-    if (!state->repeats_array) {
+-        PyErr_NoMemory();
+-        goto err;
+-    }
+-
+     state->buffer.buf = NULL;
+     ptr = getstring(string, &length, &isbytes, &charsize, &state->buffer);
+     if (!ptr)
+@@ -482,9 +476,6 @@ state_init(SRE_STATE* state, PatternObject* pattern, PyObject* string,
+        safely casted to `void*`, see bpo-39943 for details. */
+     PyMem_Free((void*) state->mark);
+     state->mark = NULL;
+-    PyMem_Free(state->repeats_array);
+-    state->repeats_array = NULL;
+-
+     if (state->buffer.buf)
+         PyBuffer_Release(&state->buffer);
+     return NULL;
+@@ -500,8 +491,6 @@ state_fini(SRE_STATE* state)
+     /* See above PyMem_Del for why we explicitly cast here. */
+     PyMem_Free((void*) state->mark);
+     state->mark = NULL;
+-    PyMem_Free(state->repeats_array);
+-    state->repeats_array = NULL;
+ }
+ 
+ /* calculate offset from start of string */
+@@ -1418,15 +1407,14 @@ _sre.compile
+     groups: Py_ssize_t
+     groupindex: object(subclass_of='&PyDict_Type')
+     indexgroup: object(subclass_of='&PyTuple_Type')
+-    repeat_count: Py_ssize_t
+ 
+ [clinic start generated code]*/
+ 
+ static PyObject *
+ _sre_compile_impl(PyObject *module, PyObject *pattern, int flags,
+                   PyObject *code, Py_ssize_t groups, PyObject *groupindex,
+-                  PyObject *indexgroup, Py_ssize_t repeat_count)
+-/*[clinic end generated code: output=922af562d51b1657 input=77e39c322501ec2a]*/
++                  PyObject *indexgroup)
++/*[clinic end generated code: output=ef9c2b3693776404 input=0a68476dbbe5db30]*/
+ {
+     /* "compile" pattern descriptor to pattern object */
+ 
+@@ -1484,8 +1472,8 @@ _sre_compile_impl(PyObject *module, PyObject *pattern, int flags,
+     self->pattern = pattern;
+ 
+     self->flags = flags;
++
+     self->groups = groups;
+-    self->repeat_count = repeat_count;
+ 
+     if (PyDict_GET_SIZE(groupindex) > 0) {
+         Py_INCREF(groupindex);
+@@ -1657,7 +1645,7 @@ _validate_charset(SRE_CODE *code, SRE_CODE *end)
+ }
+ 
+ static int
+-_validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
++_validate_inner(SRE_CODE *code, SRE_CODE *end, Py_ssize_t groups)
+ {
+     /* Some variables are manipulated by the macros above */
+     SRE_CODE op;
+@@ -1678,8 +1666,8 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                sre_match() code is robust even if they don't, and the worst
+                you can get is nonsensical match results. */
+             GET_ARG;
+-            if (arg > 2 * (size_t)self->groups + 1) {
+-                VTRACE(("arg=%d, groups=%d\n", (int)arg, (int)self->groups));
++            if (arg > 2 * (size_t)groups + 1) {
++                VTRACE(("arg=%d, groups=%d\n", (int)arg, (int)groups));
+                 FAIL;
+             }
+             break;
+@@ -1808,7 +1796,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                     if (skip == 0)
+                         break;
+                     /* Stop 2 before the end; we check the JUMP below */
+-                    if (!_validate_inner(code, code+skip-3, self))
++                    if (!_validate_inner(code, code+skip-3, groups))
+                         FAIL;
+                     code += skip-3;
+                     /* Check that it ends with a JUMP, and that each JUMP
+@@ -1837,7 +1825,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                     FAIL;
+                 if (max > SRE_MAXREPEAT)
+                     FAIL;
+-                if (!_validate_inner(code, code+skip-4, self))
++                if (!_validate_inner(code, code+skip-4, groups))
+                     FAIL;
+                 code += skip-4;
+                 GET_OP;
+@@ -1849,7 +1837,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+         case SRE_OP_REPEAT:
+         case SRE_OP_POSSESSIVE_REPEAT:
+             {
+-                SRE_CODE op1 = op, min, max, repeat_index;
++                SRE_CODE op1 = op, min, max;
+                 GET_SKIP;
+                 GET_ARG; min = arg;
+                 GET_ARG; max = arg;
+@@ -1857,17 +1845,9 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                     FAIL;
+                 if (max > SRE_MAXREPEAT)
+                     FAIL;
+-                if (op1 == SRE_OP_REPEAT) {
+-                    GET_ARG; repeat_index = arg;
+-                    if (repeat_index >= (size_t)self->repeat_count)
+-                        FAIL;
+-                    skip -= 4;
+-                } else {
+-                    skip -= 3;
+-                }
+-                if (!_validate_inner(code, code+skip, self))
++                if (!_validate_inner(code, code+skip-3, groups))
+                     FAIL;
+-                code += skip;
++                code += skip-3;
+                 GET_OP;
+                 if (op1 == SRE_OP_POSSESSIVE_REPEAT) {
+                     if (op != SRE_OP_SUCCESS)
+@@ -1883,7 +1863,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+         case SRE_OP_ATOMIC_GROUP:
+             {
+                 GET_SKIP;
+-                if (!_validate_inner(code, code+skip-2, self))
++                if (!_validate_inner(code, code+skip-2, groups))
+                     FAIL;
+                 code += skip-2;
+                 GET_OP;
+@@ -1897,7 +1877,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+         case SRE_OP_GROUPREF_UNI_IGNORE:
+         case SRE_OP_GROUPREF_LOC_IGNORE:
+             GET_ARG;
+-            if (arg >= (size_t)self->groups)
++            if (arg >= (size_t)groups)
+                 FAIL;
+             break;
+ 
+@@ -1906,7 +1886,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                'group' is either an integer group number or a group name,
+                'then' and 'else' are sub-regexes, and 'else' is optional. */
+             GET_ARG;
+-            if (arg >= (size_t)self->groups)
++            if (arg >= (size_t)groups)
+                 FAIL;
+             GET_SKIP_ADJ(1);
+             code--; /* The skip is relative to the first arg! */
+@@ -1939,17 +1919,17 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+                 code[skip-3] == SRE_OP_JUMP)
+             {
+                 VTRACE(("both then and else parts present\n"));
+-                if (!_validate_inner(code+1, code+skip-3, self))
++                if (!_validate_inner(code+1, code+skip-3, groups))
+                     FAIL;
+                 code += skip-2; /* Position after JUMP, at <skipno> */
+                 GET_SKIP;
+-                if (!_validate_inner(code, code+skip-1, self))
++                if (!_validate_inner(code, code+skip-1, groups))
+                     FAIL;
+                 code += skip-1;
+             }
+             else {
+                 VTRACE(("only a then part present\n"));
+-                if (!_validate_inner(code+1, code+skip-1, self))
++                if (!_validate_inner(code+1, code+skip-1, groups))
+                     FAIL;
+                 code += skip-1;
+             }
+@@ -1963,7 +1943,7 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+             if (arg & 0x80000000)
+                 FAIL; /* Width too large */
+             /* Stop 1 before the end; we check the SUCCESS below */
+-            if (!_validate_inner(code+1, code+skip-2, self))
++            if (!_validate_inner(code+1, code+skip-2, groups))
+                 FAIL;
+             code += skip-2;
+             GET_OP;
+@@ -1982,19 +1962,18 @@ _validate_inner(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
+ }
+ 
+ static int
+-_validate_outer(SRE_CODE *code, SRE_CODE *end, PatternObject *self)
++_validate_outer(SRE_CODE *code, SRE_CODE *end, Py_ssize_t groups)
+ {
+-    if (self->groups < 0 || (size_t)self->groups > SRE_MAXGROUPS ||
+-        self->repeat_count < 0 ||
++    if (groups < 0 || (size_t)groups > SRE_MAXGROUPS ||
+         code >= end || end[-1] != SRE_OP_SUCCESS)
+         FAIL;
+-    return _validate_inner(code, end-1, self);
++    return _validate_inner(code, end-1, groups);
+ }
+ 
+ static int
+ _validate(PatternObject *self)
+ {
+-    if (!_validate_outer(self->code, self->code+self->codesize, self))
++    if (!_validate_outer(self->code, self->code+self->codesize, self->groups))
+     {
+         PyErr_SetString(PyExc_RuntimeError, "invalid SRE code");
+         return 0;
+diff --git a/Modules/_sre/sre.h b/Modules/_sre/sre.h
+index aff064d343..52ae3e11b5 100644
+--- a/Modules/_sre/sre.h
++++ b/Modules/_sre/sre.h
+@@ -29,8 +29,6 @@ typedef struct {
+     Py_ssize_t groups; /* must be first! */
+     PyObject* groupindex; /* dict */
+     PyObject* indexgroup; /* tuple */
+-    /* the number of REPEATs */
+-    Py_ssize_t repeat_count;
+     /* compatibility */
+     PyObject* pattern; /* pattern source (or None) */
+     int flags; /* flags used when compiling pattern source */
+@@ -85,8 +83,6 @@ typedef struct {
+     size_t data_stack_base;
+     /* current repeat context */
+     SRE_REPEAT *repeat;
+-    /* repeat contexts array */
+-    SRE_REPEAT *repeats_array;
+ } SRE_STATE;
+ 
+ typedef struct {
+diff --git a/Modules/_sre/sre_constants.h b/Modules/_sre/sre_constants.h
+index 590d5be7cb..c633514736 100644
+--- a/Modules/_sre/sre_constants.h
++++ b/Modules/_sre/sre_constants.h
+@@ -11,7 +11,7 @@
+  * See the sre.c file for information on usage and redistribution.
+  */
+ 
+-#define SRE_MAGIC 20220423
++#define SRE_MAGIC 20220615
+ #define SRE_OP_FAILURE 0
+ #define SRE_OP_SUCCESS 1
+ #define SRE_OP_ANY 2
+diff --git a/Modules/_sre/sre_lib.h b/Modules/_sre/sre_lib.h
+index 1e5b50170a..fb4c18b63d 100644
+--- a/Modules/_sre/sre_lib.h
++++ b/Modules/_sre/sre_lib.h
+@@ -1079,12 +1079,17 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+                by the UNTIL operator (MAX_UNTIL, MIN_UNTIL) */
+             /* <REPEAT> <skip> <1=min> <2=max>
+                <3=repeat_index> item <UNTIL> tail */
+-            TRACE(("|%p|%p|REPEAT %d %d %d\n", pattern, ptr,
+-                   pattern[1], pattern[2], pattern[3]));
+-
+-            /* install repeat context */
+-            ctx->u.rep = &state->repeats_array[pattern[3]];
++            TRACE(("|%p|%p|REPEAT %d %d\n", pattern, ptr,
++                   pattern[1], pattern[2]));
+ 
++            /* install new repeat context */
++            /* TODO(https://github.com/python/cpython/issues/67877): Fix this
++             * potential memory leak. */
++            ctx->u.rep = (SRE_REPEAT*) PyObject_Malloc(sizeof(*ctx->u.rep));
++            if (!ctx->u.rep) {
++                PyErr_NoMemory();
++                RETURN_FAILURE;
++            }
+             ctx->u.rep->count = -1;
+             ctx->u.rep->pattern = pattern;
+             ctx->u.rep->prev = state->repeat;
+@@ -1094,6 +1099,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+             state->ptr = ptr;
+             DO_JUMP(JUMP_REPEAT, jump_repeat, pattern+pattern[0]);
+             state->repeat = ctx->u.rep->prev;
++            PyObject_Free(ctx->u.rep);
+ 
+             if (ret) {
+                 RETURN_ON_ERROR(ret);
+@@ -1103,8 +1109,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+ 
+         TARGET(SRE_OP_MAX_UNTIL):
+             /* maximizing repeat */
+-            /* <REPEAT> <skip> <1=min> <2=max>
+-               <3=repeat_index> item <MAX_UNTIL> tail */
++            /* <REPEAT> <skip> <1=min> <2=max> item <MAX_UNTIL> tail */
+ 
+             /* FIXME: we probably need to deal with zero-width
+                matches in here... */
+@@ -1124,7 +1129,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+                 /* not enough matches */
+                 ctx->u.rep->count = ctx->count;
+                 DO_JUMP(JUMP_MAX_UNTIL_1, jump_max_until_1,
+-                        ctx->u.rep->pattern+4);
++                        ctx->u.rep->pattern+3);
+                 if (ret) {
+                     RETURN_ON_ERROR(ret);
+                     RETURN_SUCCESS;
+@@ -1146,7 +1151,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+                 DATA_PUSH(&ctx->u.rep->last_ptr);
+                 ctx->u.rep->last_ptr = state->ptr;
+                 DO_JUMP(JUMP_MAX_UNTIL_2, jump_max_until_2,
+-                        ctx->u.rep->pattern+4);
++                        ctx->u.rep->pattern+3);
+                 DATA_POP(&ctx->u.rep->last_ptr);
+                 if (ret) {
+                     MARK_POP_DISCARD(ctx->lastmark);
+@@ -1171,8 +1176,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+ 
+         TARGET(SRE_OP_MIN_UNTIL):
+             /* minimizing repeat */
+-            /* <REPEAT> <skip> <1=min> <2=max>
+-               <3=repeat_index> item <MIN_UNTIL> tail */
++            /* <REPEAT> <skip> <1=min> <2=max> item <MIN_UNTIL> tail */
+ 
+             ctx->u.rep = state->repeat;
+             if (!ctx->u.rep)
+@@ -1189,7 +1193,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+                 /* not enough matches */
+                 ctx->u.rep->count = ctx->count;
+                 DO_JUMP(JUMP_MIN_UNTIL_1, jump_min_until_1,
+-                        ctx->u.rep->pattern+4);
++                        ctx->u.rep->pattern+3);
+                 if (ret) {
+                     RETURN_ON_ERROR(ret);
+                     RETURN_SUCCESS;
+@@ -1232,7 +1236,7 @@ SRE(match)(SRE_STATE* state, const SRE_CODE* pattern, int toplevel)
+             DATA_PUSH(&ctx->u.rep->last_ptr);
+             ctx->u.rep->last_ptr = state->ptr;
+             DO_JUMP(JUMP_MIN_UNTIL_3,jump_min_until_3,
+-                    ctx->u.rep->pattern+4);
++                    ctx->u.rep->pattern+3);
+             DATA_POP(&ctx->u.rep->last_ptr);
+             if (ret) {
+                 RETURN_ON_ERROR(ret);
