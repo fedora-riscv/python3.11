@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b3
+%global prerel b4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 8%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -322,39 +322,14 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # https://github.com/GrahamDumpleton/mod_wsgi/issues/730
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
 
-# 00383 # b4e1d3233b9fbcd9a60370d0f29e65012bb9532d
-# gh-93442: Make C++ version of _Py_CAST work with 0/NULL
+# 00385 # d7319d51c72f0a6c1af5f32a728de1e3f8fea514
+# gh-94675: Add a regression test for rjsmin re slowdown
 #
-# Add C++ overloads for _Py_CAST_impl() to handle 0/NULL.  This will allow
-# C++ extensions that pass 0 or NULL to macros using _Py_CAST() to
-# continue to compile.  Without this, you get an error like:
-#
-#     invalid ‘static_cast’ from type ‘int’ to type ‘_object*’
-#
-# The modern way to use a NULL value in C++ is to use nullptr.  However,
-# we want to not break extensions that do things the old way.
-Patch383: 00383-gh-93442-make-c-version-of-_py_cast-work-with-0-null.patch
-
-# 00384 # 7c809258e34925560cc13a377b1c6d9c03e83207
-# gh-94028: Clear and reset sqlite3 statements properly in cursor iternext (GH-94042)
-Patch384: 00384-gh-94028-clear-and-reset-sqlite3-statements-properly-in-cursor-iternext-gh-94042.patch
-
-# 00385 # 8696ca2373ef3d7595dfb62e2b63180621f40d5d
-# gh-91404: Revert "bpo-23689: re module, fix memory leak..."
-#
-# This fixes a speed regression in the re module
+# This tests a speed regression in the re module
 # which prevented chromium from building in Fedora.
 #
-# Revert "bpo-23689: re module, fix memory leak when a match is terminated by a signal or memory allocation failure"
-#
-# This reverts commit 6e3eee5c11b539e9aab39cff783acf57838c355a.
-#
-# Manual fixups to increase the MAGIC number and to handle conflicts with
-# a couple of changes that landed after that.
-#
-#
-# gh-94675: Add a regression test for rjsmin re slowdown
-Patch385: 00385-gh-91404-revert-bpo-23689-re-module-fix-memory-leak.patch
+# https://github.com/python/cpython/pull/94685
+Patch385: 00385-gh-94675-add-a-regression-test-for-rjsmin-re-slowdown.patch
 
 # (New patches go here ^^^)
 #
@@ -1628,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jul 11 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b4-1
+- Update to 3.11.0b4
+
 * Fri Jul 08 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b3-8
 - Finish bootstrap of the re module speed regression fix
 

@@ -1,0 +1,77 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 8 Jul 2022 12:19:43 +0200
+Subject: [PATCH] 00385: gh-94675: Add a regression test for rjsmin re slowdown
+
+This tests a speed regression in the re module
+which prevented chromium from building in Fedora.
+
+https://github.com/python/cpython/pull/94685
+---
+ Lib/test/test_re.py                           | 31 ++++++++++++++++++-
+ ...2-07-08-12-22-00.gh-issue-94675.IiTs5f.rst |  1 +
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+
+diff --git a/Lib/test/test_re.py b/Lib/test/test_re.py
+index ab980793fa..5d946370ee 100644
+--- a/Lib/test/test_re.py
++++ b/Lib/test/test_re.py
+@@ -1,6 +1,7 @@
+ from test.support import (gc_collect, bigmemtest, _2G,
+                           cpython_only, captured_stdout,
+-                          check_disallow_instantiation, is_emscripten, is_wasi)
++                          check_disallow_instantiation, is_emscripten, is_wasi,
++                          SHORT_TIMEOUT)
+ import locale
+ import re
+ import string
+@@ -11,6 +12,14 @@
+ from re import Scanner
+ from weakref import proxy
+ 
++# some platforms lack working multiprocessing
++try:
++    import _multiprocessing
++except ImportError:
++    multiprocessing = None
++else:
++    import multiprocessing
++
+ # Misc tests from Tim Peters' re.doc
+ 
+ # WARNING: Don't change details in these tests if you don't know
+@@ -2438,6 +2447,26 @@ def test_template_function_and_flag_is_deprecated(self):
+         self.assertTrue(template_re1.match('ahoy'))
+         self.assertFalse(template_re1.match('nope'))
+ 
++    @unittest.skipIf(multiprocessing is None, 'test requires multiprocessing')
++    def test_regression_gh94675(self):
++        pattern = re.compile(r'(?<=[({}])(((//[^\n]*)?[\n])([\000-\040])*)*'
++                             r'((/[^/\[\n]*(([^\n]|(\[\n]*(]*)*\]))'
++                             r'[^/\[]*)*/))((((//[^\n]*)?[\n])'
++                             r'([\000-\040]|(/\*[^*]*\*+'
++                             r'([^/*]\*+)*/))*)+(?=[^\000-\040);\]}]))')
++        input_js = '''a(function() {
++            ///////////////////////////////////////////////////////////////////
++        });'''
++        p = multiprocessing.Process(target=pattern.sub, args=('', input_js))
++        p.start()
++        p.join(SHORT_TIMEOUT)
++        try:
++            self.assertFalse(p.is_alive(), 'pattern.sub() timed out')
++        finally:
++            if p.is_alive():
++                p.terminate()
++                p.join()
++
+ 
+ def get_debug_out(pat):
+     with captured_stdout() as out:
+diff --git a/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst b/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+new file mode 100644
+index 0000000000..d0005d9f60
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2022-07-08-12-22-00.gh-issue-94675.IiTs5f.rst
+@@ -0,0 +1 @@
++Add a regression test for :mod:`re` exponentional slowdown when using rjsmin.

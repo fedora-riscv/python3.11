@@ -33,7 +33,7 @@ Co-authored-by: Lumír Balhar <frenzy.madness@gmail.com>
  3 files changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/site.py b/Lib/site.py
-index b11cd48e69..63ddd5b21b 100644
+index 69670d9d7f..104cb93899 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -377,8 +377,15 @@ def getsitepackages(prefixes=None):
@@ -54,7 +54,7 @@ index b11cd48e69..63ddd5b21b 100644
          if os.path.isdir(sitedir):
              addsitedir(sitedir, known_paths)
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index e21b7303fe..37b04452bc 100644
+index ebe3711827..dca8aa89b6 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -103,6 +103,25 @@
@@ -84,10 +84,10 @@ index e21b7303fe..37b04452bc 100644
  # NOTE: site.py has copy of this function.
  # Sync it when modify this function.
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index f2b93706b2..cc58f47cdb 100644
+index 578ac1db50..e78ff15ad3 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
-@@ -333,7 +333,7 @@ def test_get_config_h_filename(self):
+@@ -336,7 +336,7 @@ def test_get_config_h_filename(self):
          self.assertTrue(os.path.isfile(config_h), config_h)
  
      def test_get_scheme_names(self):
@@ -96,7 +96,7 @@ index f2b93706b2..cc58f47cdb 100644
          if HAS_USER_BASE:
              wanted.extend(['nt_user', 'osx_framework_user', 'posix_user'])
          self.assertEqual(get_scheme_names(), tuple(sorted(wanted)))
-@@ -345,6 +345,8 @@ def test_symlink(self): # Issue 7880
+@@ -348,6 +348,8 @@ def test_symlink(self): # Issue 7880
              cmd = "-c", "import sysconfig; print(sysconfig.get_platform())"
              self.assertEqual(py.call_real(*cmd), py.call_link(*cmd))
  
