@@ -6,8 +6,10 @@ xml:
 
 # exclude _socket from ipv4 only functions check, it has both ipv4 and ipv6 only
 badfuncs:
-    ignore:
-        - /usr/lib*/python*/lib-dynload/_socket.*
+    allowed:
+        /usr/lib*/python*/lib-dynload/_socket.*:
+            - inet_aton
+            - inet_ntoa
 
 # exclude the debug build from annocheck entirely
 annocheck:
