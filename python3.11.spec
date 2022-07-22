@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel b4
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -1603,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.0~b4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Mon Jul 11 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~b4-1
 - Update to 3.11.0b4
 
