@@ -13,6 +13,9 @@ Filters = [
     # chroot function
     'missing-call-to-chdir-with-chroot',
 
+    # gethostbyname function calls gethostbyname
+    '(E|W): binary-or-shlib-calls-gethostbyname /usr/lib(64)?/python3\.\d+/lib-dynload/_socket\.',
+
     # intentionally unversioned and selfobsoleted
     'unversioned-explicit-obsoletes python',
     'unversioned Obsoletes: Obsoletes: python3\.\d+$',
@@ -27,10 +30,23 @@ Filters = [
     # some devel files that are deliberately needed
     'devel-file-in-non-devel-package /usr/include/python3\.\d+m?/pyconfig-(32|64)\.h',
     'devel-file-in-non-devel-package /usr/lib(64)?/python3\.\d+/distutils/tests/xxmodule\.c',
+    # ...or are used as test data
+    'devel-file-in-non-devel-package /usr/lib(64)?/python3\.\d+/test',
 
     # some bytecode is shipped without sources on purpose, as a space optimization
     # if this regex needs to be relaxed in the future, make sure it **does not** match pyc files in __pycache__
     'python-bytecode-without-source /usr/lib(64)?/python3\.\d+/(encodings|pydoc_data)/[^/]+.pyc',
+
+    # DUPLICATE FILES
+    # test data are often duplicated
+    '(E|W): files-duplicate /usr/lib(64)?/python3\.\d+/(test|__phello__)/',
+    # duplicated inits or mains are also common
+    '(E|W): files-duplicate .+__init__\.py.+__init__\.py',
+    '(E|W): files-duplicate .+__main__\.py.+__main__\.py',
+    # files in the debugsource package
+    '(E|W): files-duplicate  /usr/src/debug',
+    # general waste report
+    '(E|W): files-duplicated-waste',
 
     # SORRY, NOT SORRY:
     # manual pages
@@ -65,6 +81,8 @@ Filters = [
     'python3(\.\d+)?-debug\.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-package',
 
     # this goes to other subpackage, hence not actually dangling
+    'dangling-relative-symlink /usr/bin/python python3',
+    'dangling-relative-symlink /usr/share/man/man1/python\.1\.gz python3\.1\.gz',
     'dangling-relative-symlink /usr/lib(64)?/pkgconfig/python-3\.\d+dm?(-embed)?\.pc python-3\.\d+(-embed)?\.pc',
 
     # the python-unversioned-command package contains dangling symlinks by design
