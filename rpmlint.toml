@@ -1,0 +1,88 @@
+Filters = [
+
+    # KNOWN BUGS:
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1489816
+    'crypto-policy-non-compliance-openssl',
+
+
+    # TESTS:
+    '(zero-length|pem-certificate|uncompressed-zip) /usr/lib(64)?/python3\.\d+/test',
+
+
+    # OTHER DELIBERATES:
+    # chroot function
+    'missing-call-to-chdir-with-chroot',
+
+    # intentionally unversioned and selfobsoleted
+    'unversioned-explicit-obsoletes python',
+    'unversioned Obsoletes: Obsoletes: python3\.\d+$',
+    'self-obsoletion python3\.\d+(-\S+)? obsoletes python3\.\d+(-\S+)?',
+
+    # intentionally hardcoded
+    'hardcoded-library-path in %{_prefix}/lib/(debug/%{_libdir}|python%{pybasever})',
+
+    # we have non binary stuff, python files
+    'only-non-binary-in-usr-lib',
+
+    # some devel files that are deliberately needed
+    'devel-file-in-non-devel-package /usr/include/python3\.\d+m?/pyconfig-(32|64)\.h',
+    'devel-file-in-non-devel-package /usr/lib(64)?/python3\.\d+/distutils/tests/xxmodule\.c',
+
+    # some bytecode is shipped without sources on purpose, as a space optimization
+    # if this regex needs to be relaxed in the future, make sure it **does not** match pyc files in __pycache__
+    'python-bytecode-without-source /usr/lib(64)?/python3\.\d+/(encodings|pydoc_data)/[^/]+.pyc',
+
+    # SORRY, NOT SORRY:
+    # manual pages
+    'no-manual-page-for-binary (idle|pydoc|pyvenv|2to3|python3?-debug|pathfix|msgfmt|pygettext)',
+    'no-manual-page-for-binary python3?.*-config$',
+    'no-manual-page-for-binary python3\.\d+dm?$',
+
+    # missing documentation from subpackages
+    '^python3(\.\d+)?-(debug|tkinter|test|idle)\.[^:]+: (E|W): no-documentation',
+
+    # platform python is obsoleted, but not provided
+    'obsolete-not-provided platform-python',
+
+    # we have extra tokens at the end of %endif/%else directives, we consider them useful
+    'extra tokens at the end of %(endif|else) directive',
+
+
+    # RPMLINT IMPERFECTIONS
+    # https://github.com/rpm-software-management/rpmlint/issues/780
+    '/usr/lib/debug',
+
+    # we provide python(abi) manually to be sure. createrepo will merge this with the automatic
+    'python3(\.\d+)?\.[^:-]+: (E|W): useless-provides python\(abi\)',
+
+    # debugsource and debuginfo have no docs
+    '^python3(\.\d+)?-debug(source|info)\.[^:]+: (E|W): no-documentation',
+
+    # this is OK for F28+
+    'library-without-ldconfig-post',
+
+    # debug package contains devel and non-devel files
+    'python3(\.\d+)?-debug\.[^:]+: (E|W): (non-)?devel-file-in-(non-)?devel-package',
+
+    # this goes to other subpackage, hence not actually dangling
+    'dangling-relative-symlink /usr/lib(64)?/pkgconfig/python-3\.\d+dm?(-embed)?\.pc python-3\.\d+(-embed)?\.pc',
+
+    # the python-unversioned-command package contains dangling symlinks by design
+    '^python-unversioned-command\.[^:]+: (E|W): dangling-relative-symlink (/usr/bin/python \./python3|/usr/share/man/man1/python\.1\S* ./python3\.1\S*)$',
+
+    # we need this macro to evaluate, even if the line starts with #
+    'macro-in-comment %\{_pyconfig(32|64)_h\}',
+
+    # Python modules don't need to be linked against libc
+    # Since 3.8 they are no longer linked against libpython3.8.so.1.0
+    '(E|W): library-not-linked-against-libc /usr/lib(64)?/python3\.\d+/lib-dynload/',
+    '(E|W): shared-lib(rary)?-without-dependency-information /usr/lib(64)?/python3\.\d+/lib-dynload/',
+
+    # specfile-errors are listed twice, once with reason and once without
+    # we filter out the empty ones
+    '\bpython3(\.\d+)?\.(src|spec): (E|W): specfile-error\s+$',
+
+    # SPELLING ERRORS
+    'spelling-error .* en_US (bytecode|pyc|filename|tkinter|namespaces|pytest) ',
+
+]
