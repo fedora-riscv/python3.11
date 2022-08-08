@@ -14,7 +14,7 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel b5
+%global prerel rc1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
@@ -67,7 +67,7 @@ License: Python
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 22.2
+%global pip_version 22.2.2
 %global setuptools_version 63.2.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
@@ -321,15 +321,6 @@ Patch328: 00328-pyc-timestamp-invalidation-mode.patch
 # https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
 # https://github.com/GrahamDumpleton/mod_wsgi/issues/730
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
-
-# 00385 # d7319d51c72f0a6c1af5f32a728de1e3f8fea514
-# gh-94675: Add a regression test for rjsmin re slowdown
-#
-# This tests a speed regression in the re module
-# which prevented chromium from building in Fedora.
-#
-# https://github.com/python/cpython/pull/94685
-Patch385: 00385-gh-94675-add-a-regression-test-for-rjsmin-re-slowdown.patch
 
 # (New patches go here ^^^)
 #
@@ -1603,6 +1594,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Aug 08 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~rc1-1
+- Update to 3.11.0rc1
+
 * Tue Jul 26 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~b5-1
 - Update to 3.11.0b5
 
