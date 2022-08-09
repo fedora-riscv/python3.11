@@ -17,7 +17,7 @@ URL: https://www.python.org/
 %global prerel rc1
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python
 
 
@@ -277,24 +277,25 @@ Source11: idle3.appdata.xml
 # Was Patch0 in ivazquez' python3000 specfile
 Patch1: 00001-rpath.patch
 
-# 00251 # 178b2099a8eb7c487f1a32c3f055be6c154c0116
+# 00251 # af0f1ba72e01cb93371ff21fb7ca889daa43fa7a
 # Change user install location
 #
-# Change the values of sysconfig's "posix_prefix" install scheme to /usr/local
-# when RPM build or venv/virtualenv is not detected,
-# to make pip, sysconfig and distutils install into an isolated location.
+# Set values of base and platbase in sysconfig from /usr
+# to /usr/local when RPM build is not detected
+# to make pip and similar tools install into separate location.
 #
-# The original values are saved as an additional "rpm_prefix" install scheme.
-#
-# The site module adds the /usr/local paths to sys.path when site packages are
-# enabled and RPM build is not detected.
+# Set values of prefix and exec_prefix in distutils install command
+# to /usr/local if executable is /usr/bin/python* and RPM build
+# is not detected to make distutils and pypa/distutils install into separate location.
 #
 # Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+# Downstream only.
 #
-# Rewrote in Fedora 36+ to patch sysconfig instead of distutils,
-# see https://discuss.python.org/t/pep-632-deprecate-distutils-module/5134/104
+# We've tried to rework in Fedora 36/Python 3.10 to follow https://bugs.python.org/issue43976
+# but we have identified serious problems with that approach,
+# see https://bugzilla.redhat.com/2026979 or https://bugzilla.redhat.com/2097183
 #
-# Downstream only for now, waiting for https://bugs.python.org/issue43976
+# pypa/distutils integration: https://github.com/pypa/distutils/pull/70
 Patch251: 00251-change-user-install-location.patch
 
 # 00328 # 318e500c98f5e59eb1f23e0fcd32db69b9bd17e1
@@ -1594,6 +1595,11 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Aug 09 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~rc1-2
+- Don't use custom installation schemes
+- Fixes rhbz#2026979
+- Fixes rhbz#2097183
+
 * Mon Aug 08 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.0~rc1-1
 - Update to 3.11.0rc1
 
