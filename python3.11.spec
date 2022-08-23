@@ -18,7 +18,7 @@ URL: https://www.python.org/
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
 Release: 1%{?dist}
-License: Python
+License: Python-2.0.1
 
 
 # ==================================
