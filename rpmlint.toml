@@ -44,7 +44,7 @@ Filters = [
     '(E|W): files-duplicate .+__init__\.py.+__init__\.py',
     '(E|W): files-duplicate .+__main__\.py.+__main__\.py',
     # files in the debugsource package
-    '(E|W): files-duplicate  /usr/src/debug',
+    '(E|W): files-duplicate /usr/src/debug',
     # general waste report
     '(E|W): files-duplicated-waste',
 
