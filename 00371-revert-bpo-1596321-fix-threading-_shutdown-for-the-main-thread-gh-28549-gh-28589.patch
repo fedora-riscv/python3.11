@@ -60,7 +60,7 @@ index 9c6561c099..84714c03fe 100644
  class ThreadJoinOnShutdown(BaseTestCase):
  
 diff --git a/Lib/threading.py b/Lib/threading.py
-index 8e7cdf6f62..a701401f28 100644
+index 4f72938551..18c10e6489 100644
 --- a/Lib/threading.py
 +++ b/Lib/threading.py
 @@ -1546,29 +1546,20 @@ def _shutdown():

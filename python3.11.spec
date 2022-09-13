@@ -14,10 +14,10 @@ URL: https://www.python.org/
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
 %global general_version %{pybasever}.0
-%global prerel rc1
+%global prerel rc2
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python
 
 
@@ -1595,6 +1595,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Sep 13 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~rc2-1
+- Update to 3.11.0rc2
+
 * Tue Aug 09 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.0~rc1-2
 - Don't use custom installation schemes
 - Fixes rhbz#2026979
