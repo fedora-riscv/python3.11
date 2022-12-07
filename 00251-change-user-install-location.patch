@@ -160,7 +160,7 @@ index ebe3711827..55af57b335 100644
          # On Windows we want to substitute 'lib' for schemes rather
          # than the native value (without modifying vars, in case it
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index 578ac1db50..dc58e7db18 100644
+index d96371d242..72b028435f 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
 @@ -111,8 +111,19 @@ def test_get_path(self):
