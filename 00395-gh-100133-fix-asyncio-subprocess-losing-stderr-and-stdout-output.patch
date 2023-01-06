@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Wed, 21 Dec 2022 02:24:19 -0800
+Subject: [PATCH] 00395: GH-100133: fix `asyncio` subprocess losing `stderr`
+ and `stdout` output
+
+(cherry picked from commit a7715ccfba5b86ab09f86ec56ac3755c93b46b48)
+
+Co-authored-by: Kumar Aditya <59607654+kumaraditya303@users.noreply.github.com>
+---
+ Lib/asyncio/base_subprocess.py                  |  3 ---
+ Lib/test/test_asyncio/test_subprocess.py        | 17 +++++++++++++++++
+ ...22-12-10-08-36-07.gh-issue-100133.g-zQlp.rst |  1 +
+ 3 files changed, 18 insertions(+), 3 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2022-12-10-08-36-07.gh-issue-100133.g-zQlp.rst
+
+diff --git a/Lib/asyncio/base_subprocess.py b/Lib/asyncio/base_subprocess.py
+index e15bb4141f..4c9b0dd565 100644
+--- a/Lib/asyncio/base_subprocess.py
++++ b/Lib/asyncio/base_subprocess.py
+@@ -215,9 +215,6 @@ def _process_exited(self, returncode):
+             # object. On Python 3.6, it is required to avoid a ResourceWarning.
+             self._proc.returncode = returncode
+         self._call(self._protocol.process_exited)
+-        for p in self._pipes.values():
+-            if p is not None:
+-                p.pipe.close()
+ 
+         self._try_finish()
+ 
+diff --git a/Lib/test/test_asyncio/test_subprocess.py b/Lib/test/test_asyncio/test_subprocess.py
+index f71ad72f99..bea2314a52 100644
+--- a/Lib/test/test_asyncio/test_subprocess.py
++++ b/Lib/test/test_asyncio/test_subprocess.py
+@@ -684,6 +684,23 @@ async def execute():
+ 
+         self.assertIsNone(self.loop.run_until_complete(execute()))
+ 
++    def test_subprocess_communicate_stdout(self):
++        # See https://github.com/python/cpython/issues/100133
++        async def get_command_stdout(cmd, *args):
++            proc = await asyncio.create_subprocess_exec(
++                cmd, *args, stdout=asyncio.subprocess.PIPE,
++            )
++            stdout, _ = await proc.communicate()
++            return stdout.decode().strip()
++
++        async def main():
++            outputs = [f'foo{i}' for i in range(10)]
++            res = await asyncio.gather(*[get_command_stdout(sys.executable, '-c',
++                                        f'print({out!r})') for out in outputs])
++            self.assertEqual(res, outputs)
++
++        self.loop.run_until_complete(main())
++
+ 
+ if sys.platform != 'win32':
+     # Unix
+diff --git a/Misc/NEWS.d/next/Library/2022-12-10-08-36-07.gh-issue-100133.g-zQlp.rst b/Misc/NEWS.d/next/Library/2022-12-10-08-36-07.gh-issue-100133.g-zQlp.rst
+new file mode 100644
+index 0000000000..881e6ed80f
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2022-12-10-08-36-07.gh-issue-100133.g-zQlp.rst
+@@ -0,0 +1 @@
++Fix regression in :mod:`asyncio` where a subprocess would sometimes lose data received from pipe.

@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Python-2.0.1
 
 
@@ -314,6 +314,10 @@ Patch251: 00251-change-user-install-location.patch
 # https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
 # https://github.com/GrahamDumpleton/mod_wsgi/issues/730
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
+
+# 00395 # 18ff37a92c507144edf32274b356dd1dd734cf07
+# GH-100133: fix `asyncio` subprocess losing `stderr` and `stdout` output
+Patch395: 00395-gh-100133-fix-asyncio-subprocess-losing-stderr-and-stdout-output.patch
 
 # (New patches go here ^^^)
 #
@@ -1597,6 +1601,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jan 06 2023 Miro Hrončok <mhroncok@redhat.com> - 3.11.1-3
+- Fix `asyncio` subprocess losing `stderr` and `stdout` output
+
 * Mon Dec 19 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.1-2
 - No longer patch the default bytecode cache invalidation policy
 
