@@ -2,6 +2,14 @@
 # Top-level metadata
 # ==================
 
+# for Python 3.11 bootstrap on riscv64
+%global _with_bootstrap 1
+%global _without_rpmwheels 1
+%global _without_tests 1
+%global _without_optimizations 1
+%global _with_main_python 1
+
+
 %global pybasever 3.11
 
 # pybasever without the dot:
@@ -13,11 +21,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.1
+%global general_version %{pybasever}.0
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1~bootstrap%{?dist}
 License: Python-2.0.1
 
 
@@ -67,7 +75,7 @@ License: Python-2.0.1
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 22.3.1
+%global pip_version 22.3
 %global setuptools_version 65.5.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
@@ -1595,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Sat Jan 07 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 3.11.1-1~bootstrap
+- For riscv64 bootstrap.
+
 * Wed Dec 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.1-1
 - Update to 3.11.1
 
