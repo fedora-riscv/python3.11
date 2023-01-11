@@ -319,6 +319,12 @@ Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-g
 # GH-100133: fix `asyncio` subprocess losing `stderr` and `stdout` output
 Patch395: 00395-gh-100133-fix-asyncio-subprocess-losing-stderr-and-stdout-output.patch
 
+# 00396 # 4c775fbed65016fec5dfd66316559024d2af9135
+# gh-100160: Remove any deprecation warnings in asyncio.get_event_loop()
+#
+# Some deprecation warnings will reappear (in a slightly different form) in 3.12.
+Patch396: 00396-gh-100160-remove-any-deprecation-warnings-in-asyncio-get_event_loop.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -1603,6 +1609,7 @@ CheckPython optimized
 %changelog
 * Fri Jan 06 2023 Miro Hrončok <mhroncok@redhat.com> - 3.11.1-3
 - Fix `asyncio` subprocess losing `stderr` and `stdout` output
+- Remove any deprecation warnings in asyncio.get_event_loop()
 
 * Mon Dec 19 2022 Miro Hrončok <mhroncok@redhat.com> - 3.11.1-2
 - No longer patch the default bytecode cache invalidation policy
