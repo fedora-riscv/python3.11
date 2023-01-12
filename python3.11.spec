@@ -484,7 +484,11 @@ Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 # But we want them when packages BuildRequire python3-devel
 Requires: (python-rpm-macros if rpm-build)
 Requires: (python3-rpm-macros if rpm-build)
-Requires: (pyproject-rpm-macros if rpm-build)
+# We omit this dependency on RHEL to avoid pulling the macros to AppStream:
+# RHEL users can use the minimal implementation of %%pyproject_buildrequires
+# from pyproject-srpm-macros instead.
+# On Fedora, we keep this to avoid one additional round of %%generate_buildrequires.
+%{!?rhel:Requires: (pyproject-rpm-macros if rpm-build)}
 
 %unversioned_obsoletes_of_python3_X_if_main devel
 
