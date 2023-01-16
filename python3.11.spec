@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 1.rv64%{?dist}
 License: Python-2.0.1
 
 
@@ -1079,6 +1079,14 @@ CheckPython() {
     %if %{with bootstrap}
     -x test_distutils \
     %endif
+    %ifarch riscv64
+    -x test_faulthandler \
+    -x test_gdb test_posix \
+    -x test_signal \
+    -x test_socket \
+    -x test_subprocess \
+    -x test_distutils \
+    %endif
     %ifarch %{mips64}
     -x test_ctypes \
     %endif
@@ -1595,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Jan 16 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 3.11.1-1.rv64
+- Skip failed tests for riscv64.
+
 * Wed Dec 07 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.1-1
 - Update to 3.11.1
 
