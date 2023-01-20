@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Python-2.0.1
 
 
@@ -1607,6 +1607,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
 * Fri Jan 06 2023 Miro Hrončok <mhroncok@redhat.com> - 3.11.1-3
 - Fix `asyncio` subprocess losing `stderr` and `stdout` output
 - Remove any deprecation warnings in asyncio.get_event_loop()
