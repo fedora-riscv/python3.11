@@ -13,11 +13,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.1
+%global general_version %{pybasever}.2
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -314,16 +314,6 @@ Patch251: 00251-change-user-install-location.patch
 # https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
 # https://github.com/GrahamDumpleton/mod_wsgi/issues/730
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
-
-# 00395 # 18ff37a92c507144edf32274b356dd1dd734cf07
-# GH-100133: fix `asyncio` subprocess losing `stderr` and `stdout` output
-Patch395: 00395-gh-100133-fix-asyncio-subprocess-losing-stderr-and-stdout-output.patch
-
-# 00396 # 4c775fbed65016fec5dfd66316559024d2af9135
-# gh-100160: Remove any deprecation warnings in asyncio.get_event_loop()
-#
-# Some deprecation warnings will reappear (in a slightly different form) in 3.12.
-Patch396: 00396-gh-100160-remove-any-deprecation-warnings-in-asyncio-get_event_loop.patch
 
 # (New patches go here ^^^)
 #
@@ -1453,6 +1443,7 @@ CheckPython optimized
 %{dynload_dir}/_ctypes_test.%{SOABI_optimized}.so
 %{dynload_dir}/_testbuffer.%{SOABI_optimized}.so
 %{dynload_dir}/_testcapi.%{SOABI_optimized}.so
+%{dynload_dir}/_testclinic.%{SOABI_optimized}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_optimized}.so
 %{dynload_dir}/_testinternalcapi.%{SOABI_optimized}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_optimized}.so
@@ -1581,6 +1572,7 @@ CheckPython optimized
 %{dynload_dir}/_ctypes_test.%{SOABI_debug}.so
 %{dynload_dir}/_testbuffer.%{SOABI_debug}.so
 %{dynload_dir}/_testcapi.%{SOABI_debug}.so
+%{dynload_dir}/_testclinic.%{SOABI_debug}.so
 %{dynload_dir}/_testimportmultiple.%{SOABI_debug}.so
 %{dynload_dir}/_testinternalcapi.%{SOABI_debug}.so
 %{dynload_dir}/_testmultiphase.%{SOABI_debug}.so
@@ -1611,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Feb 08 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.2-1
+- Update to 3.11.2
+
 * Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
