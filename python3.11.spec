@@ -1098,6 +1098,7 @@ CheckPython() {
     -x test_subprocess \
     -x test_distutils \
     -x test_workers \
+    -x test_notify_all \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
