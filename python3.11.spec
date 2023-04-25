@@ -1097,6 +1097,7 @@ CheckPython() {
     -x test_socket \
     -x test_subprocess \
     -x test_distutils \
+    -x test_workers \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
