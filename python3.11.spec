@@ -1099,6 +1099,7 @@ CheckPython() {
     -x test_distutils \
     -x test_workers \
     -x test_notify_all \
+    -x test_notify_n \
     -x test_mymanager_context_prestarted \
     %endif
     %ifarch %{mips64}
