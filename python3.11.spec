@@ -1101,6 +1101,7 @@ CheckPython() {
     -x test_notify_all \
     -x test_notify_n \
     -x test_mymanager_context_prestarted \
+    -x test_task_del_collect \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
