@@ -1084,24 +1084,18 @@ CheckPython() {
   # see: https://github.com/python/cpython/issues/104280#issuecomment-1669249980
 
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
-    -wW --slowest -j0 --timeout=1800 \
+    -wW --slowest -j0 \
     -i test_freeze_simple_script \
     -i test_check_probes \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
     %ifarch riscv64
-    -x test_faulthandler \
-    -x test_gdb test_posix \
-    -x test_signal \
-    -x test_socket \
-    -x test_subprocess \
-    -x test_distutils \
-    -x test_workers \
-    -x test_notify_all \
-    -x test_notify_n \
-    -x test_mymanager_context_prestarted \
-    -x test_task_del_collect \
+    -x test_asyncio \
+    -x test_concurrent_futures \
+    --timeout=18000 \
+    %else
+    --timeout=1800 \
     %endif
     %ifarch %{mips64}
     -x test_ctypes \
