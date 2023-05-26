@@ -316,7 +316,7 @@ Patch251: 00251-change-user-install-location.patch
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
 
 # 00399 # 62614243969f1c717a02a1c65e55ef173ad9a6dd
-# gh-102153: Start stripping C0 control and space chars in `urlsplit` (GH-102508) (#104575)
+# CVE-2023-24329
 #
 # * gh-102153: Start stripping C0 control and space chars in `urlsplit` (GH-102508)
 #
@@ -325,7 +325,7 @@ Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-g
 # This adds more sanitizing to respect the "Remove any leading C0 control or space from input" [rule](https://url.spec.whatwg.org/GH-url-parsing:~:text=Remove%%20any%%20leading%%20and%%20trailing%%20C0%%20control%%20or%%20space%%20from%%20input.) in response to [CVE-2023-24329](https://nvd.nist.gov/vuln/detail/CVE-2023-24329).
 #
 # ---------
-Patch399: 00399-gh-102153-start-stripping-c0-control-and-space-chars-in-urlsplit-gh-102508-104575.patch
+Patch399: 00399-cve-2023-24329.patch
 
 # (New patches go here ^^^)
 #
