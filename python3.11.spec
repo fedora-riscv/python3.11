@@ -13,11 +13,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.3
+%global general_version %{pybasever}.4
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -67,7 +67,7 @@ License: Python-2.0.1
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 22.3.1
+%global pip_version 23.1.2
 %global setuptools_version 65.5.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
@@ -314,18 +314,6 @@ Patch251: 00251-change-user-install-location.patch
 # https://bodhi.fedoraproject.org/updates/FEDORA-2021-e152ce5f31
 # https://github.com/GrahamDumpleton/mod_wsgi/issues/730
 Patch371: 00371-revert-bpo-1596321-fix-threading-_shutdown-for-the-main-thread-gh-28549-gh-28589.patch
-
-# 00399 # 62614243969f1c717a02a1c65e55ef173ad9a6dd
-# CVE-2023-24329
-#
-# * gh-102153: Start stripping C0 control and space chars in `urlsplit` (GH-102508)
-#
-# `urllib.parse.urlsplit` has already been respecting the WHATWG spec a bit GH-25595.
-#
-# This adds more sanitizing to respect the "Remove any leading C0 control or space from input" [rule](https://url.spec.whatwg.org/GH-url-parsing:~:text=Remove%%20any%%20leading%%20and%%20trailing%%20C0%%20control%%20or%%20space%%20from%%20input.) in response to [CVE-2023-24329](https://nvd.nist.gov/vuln/detail/CVE-2023-24329).
-#
-# ---------
-Patch399: 00399-cve-2023-24329.patch
 
 # (New patches go here ^^^)
 #
@@ -1615,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Wed Jun 07 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.4-1
+- Update to 3.11.4
+
 * Wed May 24 2023 Lumír Balhar <lbalhar@redhat.com> - 3.11.3-2
 - Fix for CVE-2023-24329
 
