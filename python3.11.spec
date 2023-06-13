@@ -17,7 +17,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python-2.0.1
 
 
@@ -1603,6 +1603,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.11.4-2
+- Rebuilt for Python 3.12
+
 * Wed Jun 07 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.4-1
 - Update to 3.11.4
 
