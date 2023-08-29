@@ -13,11 +13,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.4
+%global general_version %{pybasever}.5
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -67,7 +67,7 @@ License: Python-2.0.1
 # If the rpmwheels condition is disabled, we use the bundled wheel packages
 # from Python with the versions below.
 # This needs to be manually updated when we update Python.
-%global pip_version 23.1.2
+%global pip_version 23.2.1
 %global setuptools_version 65.5.0
 
 # Expensive optimizations (mainly, profile-guided optimizations)
@@ -1079,10 +1079,14 @@ CheckPython() {
   # test_freeze_simple_script is skipped, because it fails when bundled wheels
   #  are removed in Fedora.
   #  upstream report: https://bugs.python.org/issue45783
+  # test_check_probes is failing since it was introduced in 3.12.0rc1,
+  # the test is skipped until it is fixed in upstream.
+  # see: https://github.com/python/cpython/issues/104280#issuecomment-1669249980
 
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest -j0 --timeout=1800 \
     -i test_freeze_simple_script \
+    -i test_check_probes \
     %if %{with bootstrap}
     -x test_distutils \
     %endif
@@ -1604,6 +1608,9 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Mon Aug 28 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.5-1
+- Update to 3.11.5
+
 * Wed Aug 02 2023 Charalampos Stratakis <cstratak@redhat.com> - 3.11.4-4
 - Remove extra distro-applied CFLAGS passed to user built C extensions
 - https://fedoraproject.org/wiki/Changes/Python_Extension_Flags_Reduction
