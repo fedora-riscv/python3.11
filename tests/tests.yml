@@ -30,10 +30,10 @@
         run: "PYTHON=python{{ pybasever }}d TOX=false VERSION={{ pybasever }} ./venv.sh"
     - selftest:
         dir: python/selftest
-        run: "VERSION={{ pybasever }} X='' ./parallel.sh"
+        run: "VERSION={{ pybasever }} X='-i test_check_probes' ./parallel.sh"
     - debugtest:
         dir: python/selftest
-        run: "VERSION={{ pybasever }} PYTHON=python{{ pybasever }}d X='' ./parallel.sh"
+        run: "VERSION={{ pybasever }} PYTHON=python{{ pybasever }}d X='-i test_check_probes' ./parallel.sh"
     - debugflags:
         dir: python/flags
         run: "python{{ pybasever }}d ./assertflags.py -O0"
